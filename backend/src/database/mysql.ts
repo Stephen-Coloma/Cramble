@@ -1,6 +1,7 @@
 import config from "../config/config"
 import mysql from 'mysql'
 
+
 //database params
 const params = {
     host: config.database.host,
@@ -49,8 +50,10 @@ export default class Database{
 
     /**This method accepts a connection of type PoolConnection and a query string.  I made this a promise so that I can make use of then and catch and finally
      * I pass in the query string to the connection.query method, and a callback will be used to determine if the query is successful or not.
+     * 
+     * return type is any: not sure how to make the result set a return type
     */
-    static async ProcessQuery(connection: mysql.PoolConnection, queryString: string) {
+    static async ProcessQuery(connection: mysql.PoolConnection, queryString: string): Promise<any> {
         // release the connection
         //connection is a PoolConnection from the pool
         return new Promise((resolve, reject) =>{

@@ -1,8 +1,9 @@
 import {Request, Response, Router} from 'express'
+import signUpController from '../controller/signup'
+import isUsernameExists from '../middleware/isUsernameExists ';
+
 const router = Router();
 
-router.get('/signup', (req: Request, res: Response)=>{
-    res.send('SIGN UP PAGE!')
-})
+router.post('/signup', isUsernameExists,signUpController)
 
 export default router;
