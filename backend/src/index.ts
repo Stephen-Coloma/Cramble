@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import env from 'dotenv'
 import loginRouter from './routes/login'
 import signupRoute from './routes/signup'
+import homepageRouter from './routes/homepage'
 
 // config
 env.config();
@@ -11,15 +12,10 @@ const HOST = process.env.HOST as string;
 const PORT = parseInt(process.env.PORT as string);
 
 // routers
-//prefix: /api/auth
+//prefix: /api/
 app.use('/api/', loginRouter)  
 app.use('/api/', signupRoute)
-
-
-// homepage
-app.get('/', (req: Request, res: Response) => {
-    res.send('HOMEPAGE')
-})
+app.use('/api/', homepageRouter)
 
 app.listen(PORT, HOST, () => {
     console.log(`Example app listening on port ${PORT}`)
