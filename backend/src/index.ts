@@ -3,6 +3,7 @@ import config from './config/config'
 import loginRouter from './routes/login'
 import signupRoute from './routes/signup'
 import homepageRouter from './routes/homepage'
+import Database from './database/mysql'
 
 // config
 const hostname = config.server.hostname;
@@ -16,5 +17,5 @@ app.use('/api/', signupRoute)
 app.use('/api/', homepageRouter)
 
 app.listen(port, hostname, () => {
-    console.log(`Example app listening on port ${port}`)    
-})
+    console.log(`Example app listening on port ${port}`);
+ })
