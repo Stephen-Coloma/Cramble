@@ -22,7 +22,7 @@ export default class Database{
         queueLimit: 0 //default 0, no limit
     })
 
-    /**This method, when called, returns a promise of type PoolConnection
+    /**This method, when called, returns a promise of type PoolConnection. I made this a promise so that I can make use of then and catch and finally
      * PoolConnection is a subclass of mysql.Connection
      * Since it is a promise, we can either resolce or reject it depending on the success of the code inside the callback
      * Inside the callback, there is another callback which gets a connection in the pool created above. 
@@ -38,13 +38,33 @@ export default class Database{
         return new Promise<mysql.PoolConnection>((resolve, reject) =>{
             this.pool.getConnection((err, connection)=>{
                 if(err){
-                    reject(err)
+                    reject(err);
+                    return;
                 }
                 console.log('Database connected successfully');
-                resolve(connection)
+                resolve(connection);
             });
         }) 
     }
 
-    
+    /**This method accepts a connection of type PoolConnection and a query string.  I made this a promise so that I can make use of then and catch and finally
+     * I pass in the query string to the connection.query method, and a callback will be used to determine if the query is successful or not.
+    */
+    static async ProcessQuery(connection: mysql.PoolConnection, queryString: string) {
+        // release the connection
+        //connection is a PoolConnection from the pool
+        return new Promise((resolve, reject) =>{
+            connection.query(queryString, (err, result) => {
+                if(err){
+                    reject(err);
+                    return;
+                }
+
+                connection.release()
+                resolve(result);
+            });
+        });
+    } 
+
+
 }
