@@ -1,7 +1,59 @@
 import { Request, Response, NextFunction } from "express";
+import { UserSignUp } from "../dtos/UserSignUp.dto";
+import { databaseInstance as Database } from "../database/mysql";
+import bcrypt from 'bcryptjs';
 
-const signUpController = (req: Request, res: Response, next: NextFunction) =>{
-    
+const signUpController = (req: Request<{}, {}, UserSignUp>, res: Response) => {
+    const user: UserSignUp = {
+        first_name: req.body.first_name,
+        last_name: req.body.last_name,
+        username: req.body.username,
+        password: req.body.password,
+        email: req.body.email,
+    }
+
+    // check if all are filled out
+    if(user.first_name && user.last_name && user.username && user.password && user.email){
+        user.password = hashPassword(user.password);
+
+        saveToDatabase(user, res);
+    }else{
+        res.status(400).json({error: "All fields are required"})
+    }
+}
+
+// a function that saves user signup data to the database
+async function saveToDatabase(user:UserSignUp, res: Response) {
+    const queryString = `
+            INSERT INTO users (first_name, last_name, username, password, email)
+            VALUES ('${user.first_name}', '${user.last_name}', '${user.username}', '${user.password}', '${user.email}')
+        `;
+
+    try{
+        const connection = await Database.connect();
+        const results = await Database.processQuery(connection, queryString);
+        if(results.affectedRows > 0){
+            res.status(201).json({message: "User created successfully"})
+        }
+        
+    }catch(error: unknown){
+        if(error instanceof Error){            
+            res.json({
+                message: error.message,
+            })
+        }
+        throw error;
+    }
+}
+
+// a function that hashes a password string before saving to the database
+function hashPassword(password: string): string{
+    try {
+        const hash =  bcrypt.hashSync(password, 5);
+        return hash;
+    } catch (err) {
+        throw err;  // Rethrow error if hashing fails
+    }
 }
 
 export default signUpController;

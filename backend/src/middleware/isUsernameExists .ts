@@ -3,7 +3,7 @@ import {databaseInstance as Database}  from "../database/mysql";
 
 /** isUsernameExists middleware checks whether an inputed username is already existing in the database or not.
  * 
- * responds "invalid" when username already exist
+ * responds "{message: username username is taken already}" when username already exist
  * proceed to signUpController when valid
  */
 const isUsernameExists = async (req: Request, res: Response, next: NextFunction) =>{
@@ -15,7 +15,7 @@ const isUsernameExists = async (req: Request, res: Response, next: NextFunction)
         const connection = await Database.connect();
         const results = await Database.processQuery(connection, queryString);
         const count = results[0].count
-        count > 0 ? res.json('invalid') : next()
+        count > 0 ? res.json({message: "username is already taken"}) : next()
     }catch(error: unknown){
         if(error instanceof Error){
             res.json({
