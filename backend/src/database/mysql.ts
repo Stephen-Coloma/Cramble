@@ -1,3 +1,4 @@
+import { parseArgs } from "util";
 import config from "../config/config"
 import mysql from 'mysql'
 
@@ -10,18 +11,30 @@ const params = {
     password: config.database.password,
 }
 
-export default class Database{
-    //make constructor private to prevent instantiation
-    private constructor(){};
+class Database{
+    private pool: mysql.Pool;
 
-    static pool = mysql.createPool({
-        host: params.host,
-        database: params.database,
-        user: params.user,
-        password: params.password,
-        connectionLimit: 10, //default, maximum of connection to create at once
-        queueLimit: 0 //default 0, no limit
-    })
+    private constructor(){
+        this.pool = mysql.createPool({
+            host: params.host,
+            database: params.database,
+            user: params.user,
+            password: params.password,
+            connectionLimit: 10, //default, maximum of connection to create at once
+            queueLimit: 0 //default 0, no limit
+        })
+        
+    };
+
+    //singleton instance
+    private static instance: Database;
+
+    public static getInstance(): Database{
+        if(!this.instance){
+            Database.instance = new Database;
+        }
+        return Database.instance;
+    }
 
     /**This method, when called, returns a promise of type PoolConnection. I made this a promise so that I can make use of then and catch and finally
      * PoolConnection is a subclass of mysql.Connection
@@ -35,7 +48,7 @@ export default class Database{
      * 
      * this.pool.getConnection --> needs a callback which params is MysqlError and PoolConnection
      */
-    static async Connect(): Promise<mysql.PoolConnection>{
+    async connect(): Promise<mysql.PoolConnection>{
         return new Promise<mysql.PoolConnection>((resolve, reject) =>{
             this.pool.getConnection((err, connection)=>{
                 if(err){
@@ -53,8 +66,7 @@ export default class Database{
      * 
      * return type is any: not sure how to make the result set a return type
     */
-    static async ProcessQuery(connection: mysql.PoolConnection, queryString: string): Promise<any> {
-        // release the connection
+    async processQuery(connection: mysql.PoolConnection, queryString: string): Promise<any> {
         //connection is a PoolConnection from the pool
         return new Promise((resolve, reject) =>{
             connection.query(queryString, (err, result) => {
@@ -68,6 +80,6 @@ export default class Database{
             });
         });
     } 
+}//end of class
 
-
-}
+export const databaseInstance = Database.getInstance();
