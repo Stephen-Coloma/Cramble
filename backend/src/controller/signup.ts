@@ -1,6 +1,7 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response,  } from "express";
 import { UserSignUp } from "../dtos/UserSignUp.dto";
 import { databaseInstance as Database } from "../database/mysql";
+import { sendErrorToClient } from "../utilities/utility";
 import bcrypt from 'bcryptjs';
 
 const signUpController = (req: Request<{}, {}, UserSignUp>, res: Response) => {
@@ -18,7 +19,7 @@ const signUpController = (req: Request<{}, {}, UserSignUp>, res: Response) => {
 
         saveToDatabase(user, res);
     }else{
-        res.status(400).json({error: "All fields are required"})
+        res.status(400).json({error: "All fields are required"}).end();
     }
 }
 
@@ -33,27 +34,19 @@ async function saveToDatabase(user:UserSignUp, res: Response) {
         const connection = await Database.connect();
         const results = await Database.processQuery(connection, queryString);
         if(results.affectedRows > 0){
-            res.status(201).json({message: "User created successfully"})
+            res.status(201).json({message: "User created successfully"}).end()
         }
-        
+
     }catch(error: unknown){
-        if(error instanceof Error){            
-            res.json({
-                message: error.message,
-            })
-        }
-        throw error;
+       sendErrorToClient(error, res);
     }
 }
 
 // a function that hashes a password string before saving to the database
-function hashPassword(password: string): string{
-    try {
-        const hash =  bcrypt.hashSync(password, 5);
-        return hash;
-    } catch (err) {
-        throw err;  // Rethrow error if hashing fails
-    }
+function hashPassword(password: string): string {
+    const hash =  bcrypt.hashSync(password, 5);
+    return hash;
 }
 
 export default signUpController;
+

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
-import {databaseInstance as Database}  from "../database/mysql";
+import { databaseInstance as Database }  from "../database/mysql";
+import { sendErrorToClient } from "../utilities/utility";
 
 /** isUsernameExists middleware checks whether an inputed username is already existing in the database or not.
  * 
@@ -14,15 +15,10 @@ const isUsernameExists = async (req: Request, res: Response, next: NextFunction)
     try{
         const connection = await Database.connect();
         const results = await Database.processQuery(connection, queryString);
-        const count = results[0].count
-        count > 0 ? res.json({message: "username is already taken"}) : next()
+        const count = results[0].count;
+        count > 0 ? res.status(406).json({message: "username is already taken"}).end() : next();
     }catch(error: unknown){
-        if(error instanceof Error){
-            res.json({
-                message: error.message,
-                error
-            })
-        }
+        sendErrorToClient(error, res);
     }
 }
 
