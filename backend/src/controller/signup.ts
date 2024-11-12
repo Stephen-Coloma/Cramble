@@ -27,12 +27,20 @@ const signUpController = (req: Request<{}, {}, UserSignUp>, res: Response) => {
 async function saveToDatabase(user:UserSignUp, res: Response) {
     const queryString = `
             INSERT INTO users (first_name, last_name, username, password, email)
-            VALUES ('${user.first_name}', '${user.last_name}', '${user.username}', '${user.password}', '${user.email}')
+            VALUES (?, ?, ?, ?, ?)
         `;
+
+    const values = [
+        user.first_name,
+        user.last_name,
+        user.username,
+        user.password,
+        user.email,
+    ];
 
     try{
         const connection = await Database.connect();
-        const results = await Database.processQuery(connection, queryString);
+        const results = await Database.processQuery(connection, queryString, values);
         if(results.affectedRows > 0){
             res.status(201).json({message: "User created successfully"}).end()
         }
@@ -49,4 +57,3 @@ function hashPassword(password: string): string {
 }
 
 export default signUpController;
-

@@ -8,7 +8,7 @@ export function sendErrorToClient(error: unknown, res: Response){
         res.status(500).json({
             name: errorToSend.name,
             message: errorToSend.message,
-            error //debugging on client api
+            //error //debugging on client api
             // stack: errorToSend.stack
         }).end()
     }else{      

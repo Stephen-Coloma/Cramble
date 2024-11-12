@@ -1,6 +1,6 @@
 import { parseArgs } from "util";
 import config from "../config/config"
-import mysql from 'mysql'
+import mysql, { QueryOptions } from 'mysql'
 
 
 //database params
@@ -63,13 +63,14 @@ class Database{
 
     /**This method accepts a connection of type PoolConnection and a query string.  I made this a promise so that I can make use of then and catch and finally
      * I pass in the query string to the connection.query method, and a callback will be used to determine if the query is successful or not.
+     * further, when values[] is provided,it is a parameterized query. empty array will handle simple query
      * 
      * return type is any: not sure how to make the result set a return type
     */
-    async processQuery(connection: mysql.PoolConnection, queryString: string): Promise<any> {
+    async processQuery(connection: mysql.PoolConnection, queryString: string, values: any[] = []): Promise<any> {
         //connection is a PoolConnection from the pool
         return new Promise((resolve, reject) =>{
-            connection.query(queryString, (err, result) => {
+            connection.query(queryString, values, (err, result) => {
                 if(err){
                     reject(err);
                     return;
