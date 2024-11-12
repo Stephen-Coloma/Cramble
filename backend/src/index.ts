@@ -2,7 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import config from './config/config'
 import loginRouter from './routes/login'
-import signupRoute from './routes/signup'
+import signupRouter from './routes/signup'
 import homepageRouter from './routes/homepage'
 
 // config
@@ -13,9 +13,9 @@ app.use(bodyParser.json())
 
 // routers
 //prefix: /api/
-app.use('/api/', loginRouter)  
-app.use('/api/', signupRoute)
 app.use('/api/', homepageRouter)
+app.use('/api/', signupRouter)
+app.use('/api/', loginRouter)  
 
 app.listen(port, hostname, () => {
     console.log(`Server listening on port ${port}`);

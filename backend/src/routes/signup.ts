@@ -14,6 +14,6 @@ const router = Router();
     "email": ""
     }   
  */
-router.post('/signup', isUsernameExists,signUpController)
+router.post('/signup', isUsernameExists, signUpController)
 
 export default router;

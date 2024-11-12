@@ -1,8 +1,15 @@
-import { Request, Response, Router } from "express";
+import { Router } from "express";
+import loginController from "../controller/login"
+
 const router = Router();
 
-router.get('/login', (req: Request, res: Response) => {
-    res.send('LOGIN PAGE!')
-})
+/**
+ * Request Body must have data:
+ * {
+    "username": "",
+    "password": "",
+    }   
+ */
+router.post('/login', loginController)
 
 export default router;
