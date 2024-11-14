@@ -9,3 +9,6 @@
 
 # environment files
 /.env
+
+# copy of the database
+/*.sql
