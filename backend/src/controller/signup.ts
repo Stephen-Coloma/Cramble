@@ -1,7 +1,7 @@
 import { Request, Response,  } from "express";
 import { UserSignUp } from "../dtos/UserSignUp.dto";
 import { databaseInstance as Database } from "../database/mysql";
-import { sendErrorToClient } from "../utilities/utility";
+import sendErrorToClient from "../utilities/errorhandler";
 import bcrypt from 'bcryptjs';
 
 const signUpController = (req: Request<{}, {}, UserSignUp>, res: Response) => {
@@ -19,7 +19,8 @@ const signUpController = (req: Request<{}, {}, UserSignUp>, res: Response) => {
 
         saveToDatabase(user, res);
     }else{
-        res.status(400).json({error: "All fields are required"}).end();
+        // res.status(400).json({error: "All fields are required"}).end();
+        sendErrorToClient("All fields are required", res, 400);
     }
 }
 

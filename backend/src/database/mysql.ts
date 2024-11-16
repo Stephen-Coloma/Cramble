@@ -1,7 +1,5 @@
-import { parseArgs } from "util";
 import config from "../config/config"
-import mysql, { QueryOptions } from 'mysql'
-
+import mysql from 'mysql'
 
 //database params
 const params = {
