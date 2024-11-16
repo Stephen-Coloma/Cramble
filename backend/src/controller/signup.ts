@@ -13,15 +13,9 @@ const signUpController = (req: Request<{}, {}, UserSignUp>, res: Response) => {
         email: req.body.email,
     }
 
-    // check if all are filled out
-    if(user.first_name && user.last_name && user.username && user.password && user.email){
-        user.password = hashPassword(user.password);
-
-        saveToDatabase(user, res);
-    }else{
-        // res.status(400).json({error: "All fields are required"}).end();
-        sendErrorToClient("All fields are required", res, 400);
-    }
+    // all fields are filled based on isSignUpDataValid middleware
+    user.password = hashPassword(user.password);
+    saveToDatabase(user, res);
 }
 
 // a function that saves user signup data to the database

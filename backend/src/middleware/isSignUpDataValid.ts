@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { UserSignUp } from "../dtos/UserSignUp.dto";
-import Joi, { invalid } from "joi";
+import Joi from "joi";
 import sendErrorToClient from "../utilities/errorhandler";
 
 /**
@@ -49,7 +49,6 @@ function validateSignUp(data: UserSignUp): boolean | object{
         const invalidFields = error.details.map(detail => detail.path[0]);
         return {invalidField: invalidFields};
     } else {
-        // Return the validated data
         return true;
     }
 }
@@ -65,10 +64,10 @@ const isSignUpDataValid = (req: Request<{}, {}, UserSignUp>, res: Response, next
     
     //validate        
     const results = validateSignUp(user);
-    if(typeof results === 'object'){
-        sendErrorToClient(results, res, 400);
-    }else{
+    if(typeof results === 'boolean'){
         next()
+    }else{
+        sendErrorToClient(results, res, 400);
     }    
 }
 
