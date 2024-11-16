@@ -14,7 +14,8 @@ export default function sendErrorToClient(error: unknown, res: Response, statusC
     }
     // console.log(error); // debugging on server console
     
-    if((error as Error).message !== ""){
+    //must not undefined and message must not have empty message
+    if((error as Error).message && (error as Error).message !== ""){       
         const errorToSend = new Error(getErrorMessage(error)); // makes passed in errors as type Error. since we can throw string and numbers 
         res.status(statusCode).json({
             name: errorToSend.name,
