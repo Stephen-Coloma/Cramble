@@ -1,5 +1,6 @@
 import { Router } from "express";
 import loginController from "../controller/login"
+import isLoginDataValid from "../middleware/validation/isLoginDataValid";
 
 const router = Router();
 
@@ -10,6 +11,6 @@ const router = Router();
     "password": "",
     }   
  */
-router.post('/login', loginController)
+router.post('/login', isLoginDataValid, loginController)
 
 export default router;

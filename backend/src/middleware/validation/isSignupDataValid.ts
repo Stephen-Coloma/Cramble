@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { UserSignUp } from "../dtos/UserSignUp.dto";
+import { UserSignUp } from "../../dtos/UserSignUp.dto";
 import Joi from "joi";
 
 /**
@@ -40,16 +40,17 @@ const signupSchema = Joi.object({
         .required()
 });
 
-function validateSignUp(data: UserSignUp): boolean | object{
-    const {error, value } = signupSchema.validate(data, {abortEarly: false });
+function validateSignup(data: UserSignUp): boolean | object{
+    const { error } = signupSchema.validate(data, { abortEarly: false });
 
-    if(!value){
-        // Collect all fields with error
-        const invalidFields = error!.details.map(detail => detail.path[0]);
-        return {invalidField: invalidFields};
-    }else{
-         return true;
+    // If there is an error, collect invalid fields and return them
+    if (error) {
+        const invalidFields = error.details.map((detail) => detail.path[0]);        
+        return { invalidFields };
     }
+
+    // Validation passed
+    return true;
 }
 
 const isSignUpDataValid = (req: Request<{}, {}, UserSignUp>, res: Response, next: NextFunction) =>{
@@ -62,7 +63,7 @@ const isSignUpDataValid = (req: Request<{}, {}, UserSignUp>, res: Response, next
     }
     
     //validate        
-    const results = validateSignUp(user);
+    const results = validateSignup(user);
     if(typeof results === 'boolean'){
         next()
     }else{

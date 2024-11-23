@@ -1,6 +1,7 @@
 import {Router} from 'express'
 import signUpController from '../controller/signup'
 import isUsernameExists from '../middleware/isUsernameExists ';
+import isSignupDataValid from '../middleware/validation/isSignupDataValid';
 
 const router = Router();
 
@@ -14,6 +15,6 @@ const router = Router();
     "email": ""
     }   
  */
-router.post('/signup', isUsernameExists, signUpController)
+router.post('/signup', isSignupDataValid, isUsernameExists, signUpController)
 
 export default router;

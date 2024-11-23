@@ -1,8 +1,9 @@
 import { Request, Response,  } from "express";
-import { UserSignUp } from "../dtos/UserSignUp.dto";
 import { databaseInstance as Database } from "../database/mysql";
+import { UserSignUp } from "../dtos/UserSignUp.dto";
 import sendErrorToClient from "../utilities/errorhandler";
 import bcrypt from 'bcryptjs';
+
 
 const signUpController = (req: Request<{}, {}, UserSignUp>, res: Response) => {
     const user: UserSignUp = {
