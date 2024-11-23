@@ -37,7 +37,6 @@ async function saveToDatabase(user:UserSignUp, res: Response) {
         const connection = await Database.connect();
         const results = await Database.processQuery(connection, queryString, values);
         if(results.affectedRows > 0){
-            //you can redirect the page to the login page
             res.status(201).json({message: "User created successfully"}).end()
         }
 

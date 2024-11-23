@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { UserSignUp } from "../dtos/UserSignUp.dto";
 import Joi from "joi";
-import sendErrorToClient from "../utilities/errorhandler";
 
 /**
  * {
@@ -44,12 +43,12 @@ const signupSchema = Joi.object({
 function validateSignUp(data: UserSignUp): boolean | object{
     const {error, value } = signupSchema.validate(data, {abortEarly: false });
 
-    if (error) {
+    if(!value){
         // Collect all fields with error
-        const invalidFields = error.details.map(detail => detail.path[0]);
+        const invalidFields = error!.details.map(detail => detail.path[0]);
         return {invalidField: invalidFields};
-    } else {
-        return true;
+    }else{
+         return true;
     }
 }
 
@@ -67,7 +66,8 @@ const isSignUpDataValid = (req: Request<{}, {}, UserSignUp>, res: Response, next
     if(typeof results === 'boolean'){
         next()
     }else{
-        sendErrorToClient(results, res, 400);
+        res.status(400).json(results).end();
+        // sendErrorToClient(results, res, 400);
     }    
 }
 

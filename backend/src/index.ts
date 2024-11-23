@@ -3,9 +3,9 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import config from './config/config';
-import loginRouter from './routes/login';
-import signupRouter from './routes/signup';
-import homepageRouter from './routes/homepage';
+import loginRouter from './routers/login';
+import signupRouter from './routers/signup';
+import homepageRouter from './routers/homepage';
 import env from 'dotenv';
 
 // config

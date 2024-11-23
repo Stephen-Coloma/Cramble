@@ -21,8 +21,7 @@ const loginController = async(req: Request<{}, {}, UserLogin>, res: Response) =>
         
         //results array is empty, usually results are in array
         if(results.length === 0){
-            sendErrorToClient("Username not found", res, 401);
-            // res.status(401).json({message: "Username not found"}).end()
+            res.status(401).json({message: "Username not found"}).end()
         }else{
             let hashedPassword = results[0].password;
 
@@ -30,8 +29,7 @@ const loginController = async(req: Request<{}, {}, UserLogin>, res: Response) =>
                 //possible to sync cookies or sessions before redirecting to homapage
                 res.status(202).json({message: "Login successful"}).end()
             }else{
-                // res.status(401).json({message: "Incorrect password"}).end()
-                sendErrorToClient("Incorrect password", res, 401)
+                res.status(401).json({message: "Incorrect password"}).end()
             }
         }
                 
