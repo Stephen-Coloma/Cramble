@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
-import { UserLogin } from "../dtos/UserLogin.dto";
-import { databaseInstance as Database } from "../database/mysql";
-import sendErrorToClient  from "../utilities/errorhandler";
+import { UserLogin } from "../../dtos/UserLogin.dto";
+import { databaseInstance as Database } from "../../database/mysql";
+import sendErrorToClient  from "../../utilities/errorhandler";
 import bcrypt from 'bcryptjs';
 
 const loginController = async(req: Request<{}, {}, UserLogin>, res: Response) => {

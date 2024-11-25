@@ -3,8 +3,7 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import config from './config/config';
-import loginRouter from './routers/login';
-import signupRouter from './routers/signup';
+import authRoutes from './routers/auth'
 import env from 'dotenv';
 
 // config
@@ -18,9 +17,9 @@ app.use(cookieParser(process.env.COOKIE_PARSER_SECRET_KEY || undefined))
 app.use(helmet());
 
 // routers
-//prefix: /api/
-app.use('/api/', signupRouter)
-app.use('/api/', loginRouter)  
+//prefix: /api
+app.use('/auth', authRoutes.loginRouter)
+app.use('/auth', authRoutes.signupRouter)
 
 //custom 404
 app.use((req, res, next) => {

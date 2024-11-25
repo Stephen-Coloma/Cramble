@@ -1,7 +1,7 @@
 import { Request, Response,  } from "express";
-import { databaseInstance as Database } from "../database/mysql";
-import { UserSignUp } from "../dtos/UserSignUp.dto";
-import sendErrorToClient from "../utilities/errorhandler";
+import { databaseInstance as Database } from "../../database/mysql";
+import { UserSignUp } from "../../dtos/UserSignUp.dto";
+import sendErrorToClient from "../../utilities/errorhandler";
 import bcrypt from 'bcryptjs';
 
 
