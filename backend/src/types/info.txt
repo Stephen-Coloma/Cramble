@@ -1,0 +1,6 @@
+This folder types is used to define an extension to the modules found in node_modules/@types.
+This is useful when we want to make customization on the types propvided to cater our needs.
+
+Illustration
+
+customTypes extends typesFromNodeModules

@@ -4,7 +4,9 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import config from './config/config';
 import authRoutes from './routers/auth'
+import quizzesRouter from './routers/quizzes';
 import env from 'dotenv';
+import verifyToken from './middleware/verifyToken';
 
 // config
 env.config();
@@ -20,6 +22,7 @@ app.use(helmet());
 //prefix: /api
 app.use('/auth', authRoutes.loginRouter)
 app.use('/auth', authRoutes.signupRouter)
+app.use('/api', verifyToken, quizzesRouter)
 
 //custom 404
 app.use((req, res, next) => {
