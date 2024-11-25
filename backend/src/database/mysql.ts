@@ -1,5 +1,5 @@
 import config from "../config/config"
-import mysql from 'mysql'
+import mysql from 'mysql2'
 
 //database params
 const params = {

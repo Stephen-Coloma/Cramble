@@ -5,7 +5,6 @@ import helmet from 'helmet';
 import config from './config/config';
 import loginRouter from './routers/login';
 import signupRouter from './routers/signup';
-import homepageRouter from './routers/homepage';
 import env from 'dotenv';
 
 // config
@@ -20,7 +19,6 @@ app.use(helmet());
 
 // routers
 //prefix: /api/
-app.use('/api/', homepageRouter)
 app.use('/api/', signupRouter)
 app.use('/api/', loginRouter)  
 

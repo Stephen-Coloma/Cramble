@@ -28,7 +28,7 @@ function validateLogin(data: UserLogin): boolean | object{
     // If there is an error, collect invalid fields and return them
     if (error) {
           // Collect all fields with error
-          const invalidFields = error!.details.map(detail => detail.path[0]);
+          const invalidFields = error.details.map(detail => detail.path[0]);
           return {invalidFields};
     }
 
