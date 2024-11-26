@@ -3,12 +3,13 @@ import { UserLogin } from "../../dtos/UserLogin.dto";
 import { databaseInstance as Database } from "../../database/mysql";
 import sendErrorToClient  from "../../utilities/errorhandler";
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken'
 
 const loginController = async(req: Request<{}, {}, UserLogin>, res: Response) => {
     const { username, password } = req.body;
 
     const queryString = `
-        SELECT password
+        SELECT password, user_id
         FROM users
         WHERE username = ?;
     `;
@@ -24,10 +25,20 @@ const loginController = async(req: Request<{}, {}, UserLogin>, res: Response) =>
             res.status(401).json({message: "Username not found"}).end()
         }else{
             let hashedPassword = results[0].password;
-
+            
             if(bcrypt.compareSync(password, hashedPassword)){
-                //possible to sync cookies or sessions before redirecting to homapage
-                res.status(202).json({message: "Login successful"}).end()
+                let user_id = results[0].user_id;
+                //adding the JWT token
+                const payload = {userId: user_id} ;
+                const key = process.env.JWT_SECRET_KEY || "";
+                const token = jwt.sign(payload, key, {algorithm: 'HS256'}); //default encoding
+
+                res.cookie("token", token, {
+                    httpOnly: true,
+                    secure: process.env.NODE_ENV === 'production', //false if in development
+                    signed: true,
+                })
+                .status(202).json({message: "Login successful"}).end()
             }else{
                 res.status(401).json({message: "Incorrect password"}).end()
             }
