@@ -1,11 +1,7 @@
 import { NextFunction, Request, Response } from "express"
-import  jwt, {Jwt} from "jsonwebtoken";
+import  jwt from "jsonwebtoken";
 import sendErrorToClient from "../utilities/errorhandler";
-
-//adds new field to the Jwt interface because it does not have userId and we cannot reference it
-interface JWTToken extends Jwt {
-    userId: string;
-}
+import { JWTTokenContent } from "../dtos/JWTTokenContent";
 
 const verifyToken = (req: Request, res: Response, next: NextFunction) =>{
     const token = req.signedCookies.token;
@@ -15,7 +11,7 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) =>{
     }else{
         try{
             const key = process.env.JWT_SECRET_KEY || "";
-            const decoded = jwt.verify(token, key, {complete: true}) as JWTToken;
+            const decoded = jwt.verify(token, key, {complete: true}) as JWTTokenContent;
             req.userId = decoded.userId;
             next()
         }catch(error: unknown){
