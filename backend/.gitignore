@@ -8,7 +8,7 @@
 /.vscode/
 
 # environment files
-/.env
+/*.env
 
 # copy of the database
 /*.sql

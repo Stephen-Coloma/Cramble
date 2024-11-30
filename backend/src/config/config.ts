@@ -13,11 +13,6 @@ const MYSQL_DATABASE = process.env.MYSQL_DATABASE || 'cramble_db';
 const MYSQL_USER = process.env.MYSQL_USER || 'root';
 const MYSQL_PASSWORD = process.env.MYSQL_PASSWORD || '';
 
-//miscellaneous environment variables
-const COOKIE_PARSER_SECRET_KEY = process.env.COOKIE_PARSER_SECRET_KEY || undefined;
-const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
-const NODE_ENV = process.env.NODE_ENV;
-
 
 //server configuration
 const server = {
@@ -33,17 +28,9 @@ const database = {
     password: MYSQL_PASSWORD
 }
 
-//miscellaneous configuration
-const misc = {
-    cookieParserKey: COOKIE_PARSER_SECRET_KEY,
-    jwtSecretKet: JWT_SECRET_KEY,
-    nodeEnvirontment: NODE_ENV
-}
-
 const config = {
     server: server,
-    database: database,
-    misc: misc
+    database: database
 }
 
 export default config;

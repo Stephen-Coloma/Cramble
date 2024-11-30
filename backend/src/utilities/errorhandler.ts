@@ -1,4 +1,3 @@
-import config from "../config/config";
 import { Response } from "express";
 
 /**
@@ -10,7 +9,7 @@ import { Response } from "express";
  */
 export default function sendErrorToClient(error: unknown, res: Response, statusCode: number = 500){
     //do not sent errors to clients when in production
-    if(config.misc.nodeEnvirontment === 'production'){
+    if(process.env.NODE_ENV === 'production'){
         res.send("🚀");
         return;
     }

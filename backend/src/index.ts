@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import config from './config/config';
 import authRoutes from './routers/auth'
-import quizzesRouter from './routers/quizzes';
+import decksRouter from './routers/decks';
 import env from 'dotenv';
 import verifyToken from './middleware/verifyToken';
 
@@ -13,14 +13,14 @@ env.config();
 
 const app = express();
 app.use(bodyParser.json())
-app.use(cookieParser(config.misc.cookieParserKey))
+app.use(cookieParser(process.env.COOKIE_PARSER_SECRET_KEY))
 app.use(helmet());
 
 // routers
 //prefix: /api
 app.use('/auth', authRoutes.loginRouter)
 app.use('/auth', authRoutes.signupRouter)
-app.use('/api', verifyToken, quizzesRouter)
+app.use('/api', verifyToken, decksRouter)
 
 //custom 404
 app.use((req, res, next) => {
