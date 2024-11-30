@@ -11,8 +11,8 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) =>{
     }else{
         try{
             const key = process.env.JWT_SECRET_KEY || "";
-            const decoded = jwt.verify(token, key, {complete: true}) as JWTTokenContent;
-            req.userId = decoded.userId;
+            const decoded = jwt.verify(token, key, {complete: true});
+            req.userId = (decoded.payload as JWTTokenContent).userId;
             next()
         }catch(error: unknown){
             sendErrorToClient(error, res)

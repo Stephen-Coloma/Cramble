@@ -7,8 +7,8 @@ import bcrypt from 'bcryptjs';
 
 const signUpController = (req: Request<{}, {}, UserSignUp>, res: Response) => {
     const user: UserSignUp = {
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
         username: req.body.username,
         password: req.body.password,
         email: req.body.email,
@@ -27,8 +27,8 @@ async function saveToDatabase(user:UserSignUp, res: Response) {
         `;
 
     const values = [
-        user.first_name,
-        user.last_name,
+        user.firstName,
+        user.lastName,
         user.username,
         user.password,
         user.email,

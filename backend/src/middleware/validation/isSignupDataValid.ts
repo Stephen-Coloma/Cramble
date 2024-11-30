@@ -55,8 +55,8 @@ function validateSignup(data: UserSignUp): boolean | object{
 
 const isSignUpDataValid = (req: Request<{}, {}, UserSignUp>, res: Response, next: NextFunction) =>{
     const user: UserSignUp = {
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
         username: req.body.username,
         password: req.body.password,
         email: req.body.email,
