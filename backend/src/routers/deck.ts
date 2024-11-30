@@ -4,13 +4,11 @@ import createDeckController from "../controller/decks/createDeck";
 import updateDeckDetailsController from "../controller/decks/updateDeckDetails";
 import deleteDeckController from "../controller/decks/deleteDeck";
 
-const decksRouter = Router();
+const deckRouter = Router();
 
-decksRouter.get('/decks', getAllDecksController)
-decksRouter.post('/decks', createDeckController)
-decksRouter.put('/decks/:deck_id', updateDeckDetailsController)
-decksRouter.delete('/decks/:deck_id', deleteDeckController)
+deckRouter.get('/decks', getAllDecksController)
+deckRouter.post('/decks', createDeckController)
+deckRouter.put('/decks/:deck_id', updateDeckDetailsController)
+deckRouter.delete('/decks/:deck_id', deleteDeckController)
 
-
-
-export default decksRouter
+export default deckRouter;
