@@ -4,21 +4,21 @@ import Joi from "joi";
 
 /**
  * {
-    "first_name": "",
-    "last_name": "",
+    "firstName": "",
+    "lastName": "",
     "username": "",
     "password": "",
     "email": ""
     }
  */
 const signupSchema = Joi.object({
-    first_name: Joi.string()
+    firstName: Joi.string()
         .min(1)
         .max(50)
         .required(),
         
 
-    last_name: Joi.string()
+    lastName: Joi.string()
         .min(1)
         .max(50)
         .required(),

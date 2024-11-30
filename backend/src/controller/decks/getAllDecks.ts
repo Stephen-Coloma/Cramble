@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
 import sendErrorToClient from "../../utilities/errorhandler";
 import { databaseInstance as Database } from "../../database/mysql";
-import { Decks } from "../../dtos/Deck.dto";
+import { Deck } from "../../dtos/Deck.dto";
 
-const getAllDecksController = async (req: Request, res: Response<Decks>) =>{
+const getAllDecksController = async (req: Request, res: Response<Deck>) =>{
     //get user id from the jwt token stored in req.userID
     const userId = req.userId;
 
     const queryString = `
-        SELECT deck_id, title, description, created_at 
+        SELECT deck_id as deckId, title, description, created_at as createdAt
         FROM decks 
         WHERE user_id = ?;
     `
