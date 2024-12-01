@@ -4,6 +4,7 @@ import createDeckController from "../controller/decks/createDeck";
 import updateDeckDetailsController from "../controller/decks/updateDeckDetails";
 import deleteDeckController from "../controller/decks/deleteDeck";
 import isDeckDataValid from "../middleware/validation/isDeckDataValid";
+import isOwnerOfDeck from "../middleware/isOwnerOfDeck";
 
 const deckRouter = Router();
 
@@ -26,7 +27,7 @@ deckRouter.post('/decks', isDeckDataValid, createDeckController); //create a mid
      "editedAt": "";
     }   
  */
-deckRouter.put('/decks/:deck_id', isDeckDataValid, updateDeckDetailsController);
-deckRouter.delete('/decks/:deck_id', deleteDeckController);
+deckRouter.put('/decks/:deckId', isOwnerOfDeck, isDeckDataValid, updateDeckDetailsController);
+deckRouter.delete('/decks/:deckId', deleteDeckController);
 
 export default deckRouter;
