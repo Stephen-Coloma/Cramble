@@ -20,7 +20,7 @@ const updateDeckDetailsController = async(req: Request<{}, {}, Deck>, res: Respo
         const connection = await Database.connect();
         const result = await Database.processQuery(connection, queryString, values);
         
-        (result.affectedRows > 0) ? res.sendStatus(200).end() : res.sendStatus(400)
+        (result.affectedRows > 0) ? res.sendStatus(200).end() : res.sendStatus(400);
         
     }catch(error: unknown){
         sendErrorToClient(error, res)

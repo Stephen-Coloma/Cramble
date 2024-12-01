@@ -28,6 +28,6 @@ deckRouter.post('/decks', isDeckDataValid, createDeckController); //create a mid
     }   
  */
 deckRouter.put('/decks/:deckId', isOwnerOfDeck, isDeckDataValid, updateDeckDetailsController);
-deckRouter.delete('/decks/:deckId', deleteDeckController);
+deckRouter.delete('/decks/:deckId', isOwnerOfDeck, deleteDeckController);
 
 export default deckRouter;

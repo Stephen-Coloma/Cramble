@@ -1,19 +1,19 @@
 import config from "../config/config"
-import mysql from 'mysql2'
+import mysql2 from 'mysql2'
 
 //database params
 const params = {
     host: config.database.host,
     database: config.database.database,
-    user:  config.database.user,
+    user:  config.database.user,    
     password: config.database.password,
 }
 
 class Database{
-    private pool: mysql.Pool;
+    private pool: mysql2.Pool;
 
     private constructor(){
-        this.pool = mysql.createPool({
+        this.pool = mysql2.createPool({
             host: params.host,
             database: params.database,
             user: params.user,
@@ -46,8 +46,8 @@ class Database{
      * 
      * this.pool.getConnection --> needs a callback which params is MysqlError and PoolConnection
      */
-    async connect(): Promise<mysql.PoolConnection>{
-        return new Promise<mysql.PoolConnection>((resolve, reject) =>{
+    async connect(): Promise<mysql2.PoolConnection>{
+        return new Promise<mysql2.PoolConnection>((resolve, reject) =>{
             this.pool.getConnection((err, connection)=>{
                 if(err){
                     reject(err);
@@ -65,7 +65,7 @@ class Database{
      * 
      * return type is any: not sure how to make the result set a return type
     */
-    async processQuery(connection: mysql.PoolConnection, queryString: string, values: any[] = []): Promise<any> {
+    async processQuery(connection: mysql2.PoolConnection, queryString: string, values: any[] = []): Promise<any> {
         //connection is a PoolConnection from the pool
         return new Promise((resolve, reject) =>{
             connection.query(queryString, values, (err, result) => {
