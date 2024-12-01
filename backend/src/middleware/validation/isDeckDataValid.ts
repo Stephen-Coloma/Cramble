@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 import { Deck } from "../../dtos/Deck.dto";
-/**
- * {
-    "username": "",
-    "password": "",
-    }
- */
+
+/* { 
+    "title": "";
+    "description": "";
+    "createdAt": "";
+}   
+*/
 const createDeckSchema = Joi.object({
     title: Joi.string()
         .min(3)
@@ -19,11 +20,13 @@ const createDeckSchema = Joi.object({
         .required(),
  
     createdAt: Joi.string() //functional
-        .isoDate()
-        .required(),
+        .isoDate(),
+
+    editedAt: Joi.string() //functional
+    .isoDate()
 });
 
-function validateCreatingDeckData(data: Deck): boolean | object{
+function validateDeckData(data: Deck): boolean | object{
     const { error } = createDeckSchema.validate(data, { abortEarly: false });
 
     // If there is an error, collect invalid fields and return them
@@ -37,15 +40,16 @@ function validateCreatingDeckData(data: Deck): boolean | object{
     return true;
 }
 
-const isCreatingDeckDataValid = (req: Request<{}, {}, Deck>, res: Response, next: NextFunction) => {
+const isDeckDataValid = (req: Request<{}, {}, Deck>, res: Response, next: NextFunction) => {
     const deck: Deck = {
         title: req.body.title,
         description: req.body.description,
         createdAt: req.body.createdAt,
+        editedAt: req.body.editedAt,
     }
 
      //validate        
-     const results = validateCreatingDeckData(deck);
+     const results = validateDeckData(deck);
      if(typeof results === 'boolean'){
          next()
      }else{
@@ -54,4 +58,4 @@ const isCreatingDeckDataValid = (req: Request<{}, {}, Deck>, res: Response, next
      }    
 }
 
-export default isCreatingDeckDataValid;
+export default isDeckDataValid;

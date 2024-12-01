@@ -3,6 +3,7 @@ export type Deck = {
     userId?: number,
     title: string, 
     description: string,
-    createdAt?: string; // timestamp, can be string in ISO format
-    status?: string
+    createdAt?: string; // date in ISO format
+    status?: string,
+    editedAt?: string //date in ISO format
 }
