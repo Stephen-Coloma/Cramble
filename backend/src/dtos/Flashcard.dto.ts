@@ -1,0 +1,9 @@
+export type MASTERYVALUES = 'unsure' | 'familiar' | 'mastered' | 'unrated'
+
+export type Flashcard = {
+    flashcardId: number,
+    deckId: number, 
+    front: string, 
+    back: string,
+    mastery: MASTERYVALUES
+}

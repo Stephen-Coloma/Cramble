@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import sendErrorToClient from "../../utilities/errorhandler";
 import { databaseInstance as Database } from "../../database/mysql";
-import { Deck } from "../../dtos/Deck.dto";
 
-const getAllDecksController = async (req: Request, res: Response<Deck>) =>{
+const getAllDecksController = async (req: Request, res: Response) =>{
     //get user id from the jwt token stored in req.userID
     const userId = req.userId;
 
@@ -17,9 +16,10 @@ const getAllDecksController = async (req: Request, res: Response<Deck>) =>{
 
     try{
         const connection = await Database.connect();
-        const results = await Database.processQuery(connection, queryString, values)
-        
-        res.status(200).json(results)
+        const results = await Database.processQuery(connection, queryString, values);
+
+        (results.length > 0) ? res.status(200).json(results) : res.status(200).json({message: 'empty'})
+                
     }catch(error: unknown){
         sendErrorToClient(error, res)
     }

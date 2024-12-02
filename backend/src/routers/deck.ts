@@ -1,8 +1,8 @@
 import { Router } from "express";
-import getAllDecksController from "../controller/decks/getAllDecks";
-import createDeckController from "../controller/decks/createDeck";
-import updateDeckDetailsController from "../controller/decks/updateDeckDetails";
-import deleteDeckController from "../controller/decks/deleteDeck";
+import getAllDecksController from "../controller/deck/getAllDecks";
+import createDeckController from "../controller/deck/createDeck";
+import updateDeckDetailsController from "../controller/deck/updateDeckDetails";
+import deleteDeckController from "../controller/deck/deleteDeck";
 import isDeckDataValid from "../middleware/validation/isDeckDataValid";
 import isOwnerOfDeck from "../middleware/isOwnerOfDeck";
 

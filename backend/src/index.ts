@@ -7,6 +7,7 @@ import authRoutes from './routers/auth'
 import deckRouter from './routers/deck';
 import env from 'dotenv';
 import verifyToken from './middleware/verifyToken';
+import flashcardRouter from './routers/flashcard';
 
 // config
 env.config();
@@ -21,6 +22,7 @@ app.use(helmet());
 app.use('/auth', authRoutes.loginRouter)
 app.use('/auth', authRoutes.signupRouter)
 app.use('/api', verifyToken, deckRouter)
+app.use('/api', verifyToken, flashcardRouter)
 
 //custom 404
 app.use((req, res, next) => {

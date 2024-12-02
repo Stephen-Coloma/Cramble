@@ -24,7 +24,7 @@ const createDeckController = async(req: Request<{}, {}, Deck>, res: Response) =>
         const result = await Database.processQuery(connection, queryString, values);
 
         // 201 created
-        (result.affectedRows > 0) ? res.sendStatus(201) : res.sendStatus(400);   
+        (result.affectedRows > 0) ? res.sendStatus(201).end() : res.sendStatus(400).end();   
     }catch(error: unknown){
         sendErrorToClient(error, res)
     }
