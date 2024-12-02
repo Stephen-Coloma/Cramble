@@ -38,7 +38,7 @@ const loginController = async(req: Request<{}, {}, UserLogin>, res: Response) =>
                     secure: process.env.NODE_ENV === 'production', //false if in development
                     signed: true,
                 })
-                .status(202).json({message: "Login successful"}).end()
+                .status(200).json({message: "Login successful"}).end()
             }else{
                 res.status(401).json({message: "Incorrect password"}).end()
             }

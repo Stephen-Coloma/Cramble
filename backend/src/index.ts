@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import config from './config/config';
-import authRoutes from './routers/auth'
+import {loginRouter, signupRouter, logoutRouter} from './routers/auth'
 import deckRouter from './routers/deck';
 import env from 'dotenv';
 import verifyToken from './middleware/verifyToken';
@@ -19,8 +19,9 @@ app.use(helmet());
 
 // routers
 //prefix: /api
-app.use('/auth', authRoutes.loginRouter)
-app.use('/auth', authRoutes.signupRouter)
+app.use('/auth', loginRouter)
+app.use('/auth', signupRouter)
+app.use('/auth', logoutRouter)
 app.use('/api', verifyToken, deckRouter)
 app.use('/api', verifyToken, flashcardRouter)
 
