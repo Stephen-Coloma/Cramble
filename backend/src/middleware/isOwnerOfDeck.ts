@@ -5,9 +5,9 @@ import sendErrorToClient from "../utilities/errorhandler";
 const isOwnerOfDeck = async(req: Request, res: Response, next: NextFunction) =>{
     
     const queryString = `
-    SELECT user_id as userId
-    FROM decks
-    WHERE deck_id = ?
+        SELECT user_id as userId
+        FROM decks
+        WHERE deck_id = ?
     `
     const values = [req.params.deckId]
     try{
@@ -17,8 +17,7 @@ const isOwnerOfDeck = async(req: Request, res: Response, next: NextFunction) =>{
         //retrieve userId from request object, retrieve deckId from req.params
         const userId = req.userId;
         
-        (userId === result[0].userId) ? next() : res.sendStatus(401).end()
-        
+        (result[0] && userId === result[0].userId) ? next() : res.sendStatus(401); 
     }catch(error: unknown){
         sendErrorToClient(error, res)
     }
