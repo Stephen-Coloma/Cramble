@@ -8,7 +8,7 @@ const isOwnerOfDeck = async(req: Request, res: Response, next: NextFunction) =>{
         SELECT user_id as userId
         FROM decks
         WHERE deck_id = ?
-    `
+    `    
     const values = [req.params.deckId]
     try{
         const connection = await Database.connect();

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import sendErrorToClient from "../../utilities/errorhandler";
 import { databaseInstance as Database } from "../../database/mysql";
 
-const getAllDecksController = async (req: Request, res: Response) =>{
+const getDecksController = async (req: Request, res: Response) =>{
     //get user id from the jwt token stored in req.userID
     const userId = req.userId;
 
@@ -25,4 +25,4 @@ const getAllDecksController = async (req: Request, res: Response) =>{
     }
 }
 
-export default getAllDecksController;
+export default getDecksController;

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import getAllDecksController from "../controller/deck/getAllDecks";
+import getDecksController from "../controller/deck/getDecks";
 import createDeckController from "../controller/deck/createDeck";
 import updateDeckDetailsController from "../controller/deck/updateDeckDetails";
 import deleteDeckController from "../controller/deck/deleteDeck";
@@ -8,7 +8,7 @@ import isOwnerOfDeck from "../middleware/isOwnerOfDeck";
 
 const deckRouter = Router();
 
-deckRouter.get('/decks', getAllDecksController);
+deckRouter.get('/decks', getDecksController);
 /**
  * Request Body must have data:
  * { 
