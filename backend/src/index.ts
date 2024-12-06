@@ -8,6 +8,7 @@ import deckRouter from './routers/deck';
 import env from 'dotenv';
 import verifyToken from './middleware/verifyToken';
 import flashcardRouter from './routers/flashcard';
+import geminiRouter from './routers/gemini';
 
 // config
 env.config();
@@ -24,6 +25,7 @@ app.use('/auth', signupRouter)
 app.use('/auth', logoutRouter)
 app.use('/api', verifyToken, deckRouter)
 app.use('/api', verifyToken, flashcardRouter)
+app.use('/api', verifyToken, geminiRouter)
 
 //custom 404
 app.use((req, res, next) => {
