@@ -12,7 +12,7 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) =>{
         try{
             const key = process.env.JWT_SECRET_KEY || "";
             const decoded = jwt.verify(token, key, {complete: true});
-            req.userId = (decoded.payload as JWTTokenContent).userId;
+            req.userId = (decoded.payload as JWTTokenContent).userId; //make the userId from the token be a part of the request object
             next()
         }catch(error: unknown){
             sendErrorToClient(error, res)
