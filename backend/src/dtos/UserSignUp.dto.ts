@@ -5,7 +5,6 @@ export type UserSignUp = {
     username: string;
     password: string;
     email: string;
-    avatarBlob?: Buffer; // blob type corresponds to Buffer in Node.js
     avatarUrl?: Buffer; // blob type corresponds to Buffer in Node.js
     createdAt?: string; // timestamp, can be string in ISO format 
     lastLogin?: string; // timestamp, can be string in ISO format

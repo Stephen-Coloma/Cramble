@@ -9,7 +9,7 @@ const getDecksController = async (req: Request, res: Response) =>{
     const queryString = `
         SELECT deck_id as deckId, title, description, created_at as createdAt
         FROM decks 
-        WHERE user_id = ?;
+        WHERE user_id = ? and status = 'active';
     `
     
     const values = [userId]
