@@ -12,11 +12,13 @@ const signupRouter = Router();
 const logoutRouter = Router();
 
 /**
- * Request Body must have data:
- * {
-    "username": "",
-    "password": "",
-    }   
+ * @swagger
+ * /auth/login:
+ *    post: 
+ *       summary: Hello
+ *       responses:
+ *          200:
+ *             description: a successful response
  */
 loginRouter.post('/login', isLoginDataValid, loginController)
 

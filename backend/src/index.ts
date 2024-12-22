@@ -3,12 +3,13 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import config from './config/config';
-import {loginRouter, signupRouter, logoutRouter} from './routers/auth'
-import deckRouter from './routers/deck';
 import env from 'dotenv';
+import { specs, swaggerUi } from './documentation/swagger'
 import verifyToken from './middleware/verifyToken';
-import flashcardRouter from './routers/flashcard';
-import geminiRouter from './routers/gemini';
+import {loginRouter, signupRouter, logoutRouter} from './routes/auth'
+import deckRouter from './routes/deck';
+import flashcardRouter from './routes/flashcard';
+import geminiRouter from './routes/gemini';
 
 // config
 env.config();
@@ -19,13 +20,13 @@ app.use(cookieParser(process.env.COOKIE_PARSER_SECRET_KEY))
 app.use(helmet());
 
 // routers
-//prefix: /api
 app.use('/auth', loginRouter)
 app.use('/auth', signupRouter)
 app.use('/auth', logoutRouter)
 app.use('/api', verifyToken, deckRouter)
 app.use('/api', verifyToken, flashcardRouter)
 app.use('/api', verifyToken, geminiRouter)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 //custom 404
 app.use((req, res, next) => {
