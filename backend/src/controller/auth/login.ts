@@ -11,7 +11,7 @@ const loginController = async(req: Request<{}, {}, UserLogin>, res: Response) =>
     const queryString = `
         SELECT password, user_id
         FROM users
-        WHERE username = ?;
+        WHERE username = ? and status = 'active';
     `;
 
     const values = [username, password]; // username and password from the user input

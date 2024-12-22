@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 import { Deck } from "../../dtos/Deck.dto";
+import validate from "../../utilities/validate";
 
 /* { 
     "title": "";
@@ -23,39 +24,24 @@ const createDeckSchema = Joi.object({
         .isoDate(),
 
     editedAt: Joi.string() //functional
-    .isoDate()
+        .isoDate()
 });
 
-function validateDeckData(data: Deck): boolean | object{
-    const { error } = createDeckSchema.validate(data, { abortEarly: false });
-
-    // If there is an error, collect invalid fields and return them
-    if (error) {
-          // Collect all fields with error
-          const invalidFields = error.details.map(detail => detail.path[0]);
-          return {invalidFields};
-    }
-
-    // Validation passed
-    return true;
-}
-
 const isDeckDataValid = (req: Request<{}, {}, Deck>, res: Response, next: NextFunction) => {
-    const deck: Deck = {
+    const deck: Pick<Deck, 'title' | 'description' | 'createdAt' | 'editedAt'> = {
         title: req.body.title,
         description: req.body.description,
         createdAt: req.body.createdAt,
-        editedAt: req.body.editedAt,
+        editedAt: req.body.editedAt
     }
 
-     //validate        
-     const results = validateDeckData(deck);
-     if(typeof results === 'boolean'){
-         next()
-     }else{
-         res.status(400).json(results).end();
-         // sendErrorToClient(results, res, 400);
-     }    
+    //validate        
+    const results = validate(deck, createDeckSchema);
+    if (results === true) {
+        next();
+    } else {
+        res.status(400).json(results).end();
+    }       
 }
 
 export default isDeckDataValid;

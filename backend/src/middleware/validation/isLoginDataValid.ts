@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 import { UserLogin } from "../../dtos/UserLogin.dto";
+import validate from "../../utilities/validate";
 
 /**
  * {
@@ -22,20 +23,6 @@ const loginSchema = Joi.object({
         .required(),
 });
 
-function validateLogin(data: UserLogin): boolean | object{
-    const { error } = loginSchema.validate(data, { abortEarly: false });
-
-    // If there is an error, collect invalid fields and return them
-    if (error) {
-          // Collect all fields with error
-          const invalidFields = error.details.map(detail => detail.path[0]);
-          return {invalidFields};
-    }
-
-    // Validation passed
-    return true;
-}
-
 const isLoginDataValid = (req: Request<{}, {}, UserLogin>, res: Response, next: NextFunction) =>{
     const user: UserLogin = {
         username: req.body.username,
@@ -43,13 +30,12 @@ const isLoginDataValid = (req: Request<{}, {}, UserLogin>, res: Response, next: 
     }
        
     //validate        
-    const results = validateLogin(user);
-    if(typeof results === 'boolean'){
-        next()
-    }else{
+    const results = validate(user, loginSchema);
+    if (results === true) {
+        next();
+    } else {
         res.status(400).json(results).end();
-        // sendErrorToClient(results, res, 400);
-    }    
+    }   
 }
 
 export default isLoginDataValid;

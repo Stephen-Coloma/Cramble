@@ -31,7 +31,7 @@ async function saveToDatabase(user:UserSignUp, res: Response) {
         user.lastName,
         user.username,
         user.password,
-        user.email,
+        user.email
     ];
 
     try{

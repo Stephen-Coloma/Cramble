@@ -1,4 +1,3 @@
-export type UserLogin = {
-    username: string,
-    password: string
-}
+import { User } from './User'
+
+export type UserLogin = Pick<User, 'username' | 'password'>
