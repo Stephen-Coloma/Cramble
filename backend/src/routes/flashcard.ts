@@ -1,5 +1,4 @@
 import { Router } from "express";
-// import isOwnerOfDeck from "../middleware/isOwnerOfDeck";
 import getFlashcardsController from "../controller/flashcard/getFlashcards"
 import isOwnerOfDeck from "../middleware/isOwnerOfDeck";
 import addFlashcardToDeckController from "../controller/flashcard/addFlashcardToDeck";

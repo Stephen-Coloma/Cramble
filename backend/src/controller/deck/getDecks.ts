@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import sendErrorToClient from "../../utilities/errorhandler";
+import sendErrorToClient from "../../utilities/errorHandler";
 import { databaseInstance as Database } from "../../database/mysql";
 
 const getDecksController = async (req: Request, res: Response) =>{

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import sendErrorToClient from "../../utilities/errorHandler";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'null');
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -42,9 +43,7 @@ const generateFlashcardController = async(req: Request, res: Response) =>{
         const parsedJSON = JSON.parse(result.response.text())
         res.status(200).json(parsedJSON);
     }catch(error: unknown){
-        //debugging purposes
-        console.log(error);
-        res.status(503).json({message: 'Unknown error occured'})
+        sendErrorToClient(error, res)
     }
 }
 

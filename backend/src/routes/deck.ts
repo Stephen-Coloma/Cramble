@@ -9,24 +9,7 @@ import isOwnerOfDeck from "../middleware/isOwnerOfDeck";
 const deckRouter = Router();
 
 deckRouter.get('/decks', getDecksController);
-/**
- * Request Body must have data:
- * { 
-     "title": "";
-     "description": "";
-     "createdAt": "";
-    }   
- */
-deckRouter.post('/decks', isDeckDataValid, createDeckController); //create a middleware that validates the content of the request when creating a deck
-
-/**
- * Request Body must have data:
- * { 
-     "title": "";
-     "description": "";
-     "editedAt": "";
-    }   
- */
+deckRouter.post('/decks', isDeckDataValid, createDeckController); 
 deckRouter.put('/decks/:deckId', isOwnerOfDeck, isDeckDataValid, updateDeckDetailsController);
 deckRouter.delete('/decks/:deckId', isOwnerOfDeck, deleteDeckController);
 

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Deck } from "../../dtos/Deck.dto";
 import { databaseInstance as Database } from "../../database/mysql";
-import sendErrorToClient from "../../utilities/errorhandler";
+import sendErrorToClient from "../../utilities/errorHandler";
 
 const updateDeckDetailsController = async(req: Request<{}, {}, Deck>, res: Response) =>{
     //const retrieve userId from request

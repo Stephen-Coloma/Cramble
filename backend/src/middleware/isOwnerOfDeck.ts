@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { databaseInstance as Database } from "../database/mysql";
-import sendErrorToClient from "../utilities/errorhandler";
+import sendErrorToClient from "../utilities/errorHandler";
 
 const isOwnerOfDeck = async(req: Request, res: Response, next: NextFunction) =>{
     

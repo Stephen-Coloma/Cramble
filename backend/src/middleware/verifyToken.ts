@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import  jwt from "jsonwebtoken";
-import sendErrorToClient from "../utilities/errorhandler";
+import sendErrorToClient from "../utilities/errorHandler";
 import { JWTTokenContent } from "../dtos/JWTTokenContent";
 
 const verifyToken = (req: Request, res: Response, next: NextFunction) =>{
@@ -18,7 +18,6 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) =>{
             sendErrorToClient(error, res)
         }
     }
-
 } 
 
 export default verifyToken;
