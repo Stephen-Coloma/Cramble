@@ -23,11 +23,11 @@ const options = {
                 description: 'Everything about authentication.'
             },
             {
-                name: 'deck',
+                name: 'decks',
                 description: 'Everything about decks.'
             },
             {
-                name: 'flashcard',
+                name: 'flashcards',
                 description: 'Everything about flashcards.'
             },
             {

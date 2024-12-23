@@ -14,7 +14,7 @@ const deleteDeckController = async(req: Request, res: Response) =>{
         const connection = await Database.connect();
         const result = await Database.processQuery(connection, queryString, values);
         
-        (result.affectedRows > 0) ? res.sendStatus(200).end() : res.sendStatus(400).end();
+        (result.affectedRows > 0) ? res.sendStatus(200).end() : res.status(400).json({message: "Failed to delete the deck."}).end();
 
     }catch(error: unknown){
         sendErrorToClient(error, res)
