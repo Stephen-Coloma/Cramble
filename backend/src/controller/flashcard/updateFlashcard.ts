@@ -14,7 +14,7 @@ const updateFlashcardController = async(req: Request<{}, {}, Flashcard>, res: Re
         WHERE flashcard_id = ? AND deck_id = ?
     `
 
-    const values = [req.body.front, req.body.front, flashcardId, deckId];
+    const values = [req.body.front, req.body.back, flashcardId, deckId];
 
       try{
         const connection = await Database.connect();
