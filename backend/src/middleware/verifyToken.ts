@@ -7,7 +7,7 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) =>{
     const token = req.signedCookies.token;
     
     if(!token){
-        res.status(401).json({message: "Access denied"}).end();
+        res.status(401).json({message: "Access Denied"}).end();
     }else{
         try{
             const key = process.env.JWT_SECRET_KEY || "";

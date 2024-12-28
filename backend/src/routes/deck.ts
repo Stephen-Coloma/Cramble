@@ -67,7 +67,7 @@ const deckRouter = Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Access denied"
+ *                   example: "Access Denied"
  *       500:
  *         description: Internal server error.
  *         content:
@@ -77,7 +77,7 @@ const deckRouter = Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Internal server error"
+ *                   example: "Internal Server Error"
  *     middleware:
  *       - verifyToken:
  *           description: Validates the user's JWT token and attaches the user ID to the request.
@@ -138,7 +138,7 @@ deckRouter.get('/decks', getDecksController);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Access denied"
+ *                   example: "Access Denied"
  *       500:
  *         description: Internal server error.
  *         content:
@@ -148,7 +148,7 @@ deckRouter.get('/decks', getDecksController);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Internal server error"
+ *                   example: "Internal Server Error"
  */
 deckRouter.post('/decks', isDeckDataValid, createDeckController); 
 
@@ -214,7 +214,7 @@ deckRouter.post('/decks', isDeckDataValid, createDeckController);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Access denied"
+ *                   example: "Access Denied"
  *       500:
  *         description: Internal server error.
  *         content:
@@ -224,7 +224,7 @@ deckRouter.post('/decks', isDeckDataValid, createDeckController);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Internal server error"
+ *                   example: "Internal Server Error"
  */
 
 deckRouter.put('/decks/:deckId', isOwnerOfDeck, isDeckDataValid, updateDeckDetailsController);
@@ -269,7 +269,7 @@ deckRouter.put('/decks/:deckId', isOwnerOfDeck, isDeckDataValid, updateDeckDetai
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Access denied"
+ *                   example: "Access Denied"
  *       500:
  *         description: Internal server error.
  *         content:
@@ -279,7 +279,7 @@ deckRouter.put('/decks/:deckId', isOwnerOfDeck, isDeckDataValid, updateDeckDetai
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Internal server error"
+ *                   example: "Internal Server Error"
  */
 
 deckRouter.delete('/decks/:deckId', isOwnerOfDeck, deleteDeckController);

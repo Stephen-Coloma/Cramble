@@ -10,7 +10,7 @@ import { Response } from "express";
 export default function sendErrorToClient(error: unknown, res: Response, statusCode: number = 500){
     //do not send errors to clients when in production
     if(process.env.NODE_ENV === 'production'){
-        res.send("🚀");
+        res.status(statusCode).send("Internal Server Error");
         return;
     }
 

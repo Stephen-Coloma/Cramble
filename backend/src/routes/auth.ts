@@ -79,7 +79,7 @@ const logoutRouter = Router();
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: An error occurred during login.
+ *                     example: Internal Server Error
  */
 loginRouter.post('/login', isLoginDataValid, loginController)
 
@@ -166,7 +166,7 @@ loginRouter.post('/login', isLoginDataValid, loginController)
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: An error occurred during signup.
+ *                     example: Internal Server Error
  */
 signupRouter.post('/signup', isSignupDataValid, isUsernameExists, signUpController)
 
@@ -209,7 +209,7 @@ signupRouter.post('/signup', isSignupDataValid, isUsernameExists, signUpControll
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: An error occurred during logout.
+ *                     example: Internal Server Error
  */
 logoutRouter.post('/logout', verifyToken, logoutController)
 

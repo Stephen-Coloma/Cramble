@@ -49,13 +49,13 @@ const geminiRouter = Router();
  *         content:
  *           application/json:
  *             example:
- *               message: "Access denied."
+ *               message: "Access Denied"
  *       500:
  *         description: Server error or Gemini API failure
  *         content:
  *           application/json:
  *             example:
- *               message: "An unexpected error occurred while generating flashcards."
+ *               message: "Internal Server Error"
  *     security:
  *       - cookieAuth: []
  */

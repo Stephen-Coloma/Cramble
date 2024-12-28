@@ -60,7 +60,7 @@ const flashcardRouter = Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Access denied"
+ *                   example: "Access Denied"
  *       500:
  *         description: Internal server error.
  *         content:
@@ -70,7 +70,7 @@ const flashcardRouter = Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Internal server error."
+ *                   example: "Internal Server Error"
  */
 
 flashcardRouter.get('/flashcards/:deckId', isOwnerOfDeck, getFlashcardsController);
@@ -136,7 +136,7 @@ flashcardRouter.get('/flashcards/:deckId', isOwnerOfDeck, getFlashcardsControlle
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Access denied"
+ *                   example: "Access Denied"
  *       500:
  *         description: Internal server error.
  *         content:
@@ -146,7 +146,7 @@ flashcardRouter.get('/flashcards/:deckId', isOwnerOfDeck, getFlashcardsControlle
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Internal server error."
+ *                   example: "Internal Server Error."
  */
 
 flashcardRouter.post('/flashcards/:deckId', isOwnerOfDeck, isFlashCardDataValid, addFlashcardToDeckController);
@@ -211,7 +211,7 @@ flashcardRouter.post('/flashcards/:deckId', isOwnerOfDeck, isFlashCardDataValid,
  *               unauthorized:
  *                 summary: User is not authenticated
  *                 value:
- *                   message: "Access denied."
+ *                   message: "Access Denied."
  *               notOwner:
  *                 summary: User does not own the deck
  *                 value:
@@ -221,7 +221,7 @@ flashcardRouter.post('/flashcards/:deckId', isOwnerOfDeck, isFlashCardDataValid,
  *         content:
  *           application/json:
  *             example:
- *               message: "An unexpected error occurred. Please try again later."
+ *               message: "Internal Server Error"
  *     security:
  *       - cookieAuth: []
  */
@@ -262,7 +262,7 @@ flashcardRouter.put('/flashcards/:deckId/:flashcardId', isOwnerOfDeck, isFlashCa
  *               unauthorized:
  *                 summary: User is not authenticated
  *                 value:
- *                   message: "Access denied."
+ *                   message: "Access Denied."
  *               notOwner:
  *                 summary: User does not own the deck
  *                 value:
@@ -272,7 +272,7 @@ flashcardRouter.put('/flashcards/:deckId/:flashcardId', isOwnerOfDeck, isFlashCa
  *         content:
  *           application/json:
  *             example:
- *               message: "An unexpected error occurred. Please try again later."
+ *               message: "Internal Server Error"
  *     security:
  *       - cookieAuth: []
  */
