@@ -14,11 +14,11 @@ const generateFlashcardController = async(req: Request, res: Response) =>{
      */
 
     const text = req.body.text;
-    const maxCards = 40;
+    const count = (req.body.count > 50 || req.body.count < 1) ? 10 : req.body.count; //default count = 10 
 
     const prompt = `
-        Based from the text below, create a flashcard questionnaire with maximum of ${maxCards} items. 
-        Only create meaningful flashcards, do not meet the max if not needed.
+        Act like a teacher or a professor, Based from the text below, create a flashcard 
+        questionnaire with a total number of ${count} items. It is absolute that you must follow the total count.
 
         "${text}"
 

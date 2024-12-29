@@ -24,6 +24,10 @@ const geminiRouter = Router();
  *                 type: string
  *                 description: The source text for generating flashcards
  *                 example: "The mitochondria is the powerhouse of the cell."
+ *               count:
+ *                  type: number
+ *                  description: Maximum number of flashcards to be generated. If greater than 50, count will be 10 (default).
+ *                  exampple: 10
  *     responses:
  *       200:
  *         description: Successfully generated flashcards
