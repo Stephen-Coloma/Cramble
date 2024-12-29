@@ -8,7 +8,7 @@ import validate from "../../utilities/inputValidator";
     "back": "";
 }   
 */
-const addFlashcardToDeckSchema = Joi.object({
+export const addFlashcardToDeckSchema = Joi.object({
     front: Joi.string()
         .min(1)
         .max(400)

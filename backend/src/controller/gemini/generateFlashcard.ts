@@ -14,10 +14,10 @@ const generateFlashcardController = async(req: Request, res: Response) =>{
      */
 
     const text = req.body.text;
-    const max = 40;
+    const maxCards = 40;
 
     const prompt = `
-        Based from the text below, create a flashcard questionnaire with maximum of ${max} items. 
+        Based from the text below, create a flashcard questionnaire with maximum of ${maxCards} items. 
         Only create meaningful flashcards, do not meet the max if not needed.
 
         "${text}"

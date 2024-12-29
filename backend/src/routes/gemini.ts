@@ -1,11 +1,13 @@
 import { Router } from "express";
 import generateFlashcardController from "../controller/gemini/generateFlashcard";
+import saveGeneratedFlashcardController from '../controller/gemini/saveGeneratedFlashcards'
+import isGeneratedFlashcardsDataValid from "../middleware/validation/isGeneratedFlashcardsDataValid";
 
 const geminiRouter = Router();
 
 /**
  * @swagger
- * /api/gemini/flashcards/generate:
+ * /api/gemini/generate:
  *   post:
  *     summary: Generate flashcards based on provided text
  *     description: Generates a set of flashcards derived from the input text using the Gemini AI model. The flashcards are returned in JSON format.
@@ -60,6 +62,9 @@ const geminiRouter = Router();
  *       - cookieAuth: []
  */
 
-geminiRouter.post('/gemini/flashcards/generate', generateFlashcardController)
+geminiRouter.post('/gemini/generate', generateFlashcardController)
+
+
+geminiRouter.post('/gemini/save', isGeneratedFlashcardsDataValid, saveGeneratedFlashcardController)
 
 export default geminiRouter;

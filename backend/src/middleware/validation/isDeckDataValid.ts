@@ -9,7 +9,7 @@ import validate from "../../utilities/inputValidator";
     "createdAt": "";
 }   
 */
-const createDeckSchema = Joi.object({
+export const createDeckSchema = Joi.object({
     title: Joi.string()
         .min(3)
         .max(30)
