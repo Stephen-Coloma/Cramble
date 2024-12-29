@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import sendErrorToClient from "../../utilities/errorHandler";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'null');
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
@@ -13,11 +14,11 @@ const generateFlashcardController = async(req: Request, res: Response) =>{
      */
 
     const text = req.body.text;
-    const max = 40;
+    const count = (req.body.count > 50 || req.body.count < 1) ? 10 : req.body.count; //default count = 10 
 
     const prompt = `
-        Based from the text below, create a flashcard questionnaire with maximum of ${max} items. 
-        Only create meaningful flashcards, do not meet the max if not needed.
+        Act like a teacher or a professor, Based from the text below, create a flashcard 
+        questionnaire with a total number of ${count} items. It is absolute that you must follow the total count.
 
         "${text}"
 
@@ -42,9 +43,7 @@ const generateFlashcardController = async(req: Request, res: Response) =>{
         const parsedJSON = JSON.parse(result.response.text())
         res.status(200).json(parsedJSON);
     }catch(error: unknown){
-        //debugging purposes
-        console.log(error);
-        res.status(503).json({message: 'Unknown error occured'})
+        sendErrorToClient(error, res)
     }
 }
 

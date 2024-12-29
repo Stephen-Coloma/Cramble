@@ -8,9 +8,9 @@ import { Response } from "express";
  * @param statusCode - specified status code to be sent. default to 500
  */
 export default function sendErrorToClient(error: unknown, res: Response, statusCode: number = 500){
-    //do not sent errors to clients when in production
+    //do not send errors to clients when in production
     if(process.env.NODE_ENV === 'production'){
-        res.send("🚀");
+        res.status(statusCode).send("Internal Server Error");
         return;
     }
 

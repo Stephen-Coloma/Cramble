@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import sendErrorToClient from "../../utilities/errorhandler";
+import sendErrorToClient from "../../utilities/errorHandler";
 import { databaseInstance as Database } from "../../database/mysql";
 import { Flashcard } from "../../dtos/Flashcard.dto";
 import { Deck } from "../../dtos/Deck.dto";
@@ -14,7 +14,7 @@ const updateFlashcardController = async(req: Request<{}, {}, Flashcard>, res: Re
         WHERE flashcard_id = ? AND deck_id = ?
     `
 
-    const values = [req.body.front, req.body.front, flashcardId, deckId];
+    const values = [req.body.front, req.body.back, flashcardId, deckId];
 
       try{
         const connection = await Database.connect();

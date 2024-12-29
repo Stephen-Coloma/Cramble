@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { Deck } from "../../dtos/Deck.dto";
 import { databaseInstance as Database } from "../../database/mysql";
-import sendErrorToClient from "../../utilities/errorhandler";
+import sendErrorToClient from "../../utilities/errorHandler";
 
 const createDeckController = async(req: Request<{}, {}, Deck>, res: Response) =>{
     //get user id from the jwt token stored in req.userID

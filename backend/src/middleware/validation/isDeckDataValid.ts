@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 import { Deck } from "../../dtos/Deck.dto";
-import validate from "../../utilities/validate";
+import validate from "../../utilities/inputValidator";
 
 /* { 
     "title": "";
@@ -9,7 +9,7 @@ import validate from "../../utilities/validate";
     "createdAt": "";
 }   
 */
-const createDeckSchema = Joi.object({
+export const createDeckSchema = Joi.object({
     title: Joi.string()
         .min(3)
         .max(30)

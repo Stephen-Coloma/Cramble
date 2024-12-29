@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { databaseInstance as Database }  from "../database/mysql";
-import sendErrorToClient from "../utilities/errorhandler";
+import sendErrorToClient from "../utilities/errorHandler";
 
 /** isUsernameExists middleware checks whether an inputed username is already existing in the database or not.
  * 

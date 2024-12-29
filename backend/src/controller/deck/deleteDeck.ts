@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { databaseInstance as Database } from "../../database/mysql";
-import sendErrorToClient from "../../utilities/errorhandler";
+import sendErrorToClient from "../../utilities/errorHandler";
 
 const deleteDeckController = async(req: Request, res: Response) =>{
     const queryString = `
@@ -14,7 +14,7 @@ const deleteDeckController = async(req: Request, res: Response) =>{
         const connection = await Database.connect();
         const result = await Database.processQuery(connection, queryString, values);
         
-        (result.affectedRows > 0) ? res.sendStatus(200).end() : res.sendStatus(400).end();
+        (result.affectedRows > 0) ? res.sendStatus(200).end() : res.status(400).json({message: "Failed to delete the deck."}).end();
 
     }catch(error: unknown){
         sendErrorToClient(error, res)

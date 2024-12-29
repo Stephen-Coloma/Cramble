@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from "express"
 import  jwt from "jsonwebtoken";
-import sendErrorToClient from "../utilities/errorhandler";
+import sendErrorToClient from "../utilities/errorHandler";
 import { JWTTokenContent } from "../dtos/JWTTokenContent";
 
 const verifyToken = (req: Request, res: Response, next: NextFunction) =>{
     const token = req.signedCookies.token;
     
     if(!token){
-        res.status(401).json({message: "Access denied"}).end();
+        res.status(401).json({message: "Access Denied"}).end();
     }else{
         try{
             const key = process.env.JWT_SECRET_KEY || "";
@@ -18,7 +18,6 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) =>{
             sendErrorToClient(error, res)
         }
     }
-
 } 
 
 export default verifyToken;

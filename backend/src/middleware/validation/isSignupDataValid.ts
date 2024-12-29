@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { UserSignUp } from "../../dtos/UserSignUp.dto";
 import Joi from "joi";
-import validate from "../../utilities/validate";
+import validate from "../../utilities/inputValidator";
 
 /**
  * {

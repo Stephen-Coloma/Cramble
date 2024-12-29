@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { UserLogin } from "../../dtos/UserLogin.dto";
 import { databaseInstance as Database } from "../../database/mysql";
-import sendErrorToClient  from "../../utilities/errorhandler";
+import sendErrorToClient  from "../../utilities/errorHandler";
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken'
 
