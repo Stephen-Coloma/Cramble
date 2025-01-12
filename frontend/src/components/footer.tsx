@@ -2,7 +2,7 @@ import { Facebook, Linkedin, Github } from "lucide-react"
 
 export function Footer(){
     return (
-      <div className="p-4 justify-items-center text-xs text-balance md:text-sm">
+      <div className="flex flex-col p-4 items-center text-xs text-balance md:text-sm">
          <h1 className="mb-2">Developed by <a href="https://www.linkedin.com/in/stephen-coloma/" className="font-extrabold hover:text-primary">Stephen Coloma</a></h1>
 
          <div className="flex gap-2" >
