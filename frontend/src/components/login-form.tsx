@@ -1,14 +1,52 @@
+"use client"
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Facebook } from "lucide-react"
+import { useRef } from "react"
+import axios from "axios"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const usernameRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  //handle form submission
+  const handleSubmit = (e: React.FormEvent) =>{
+    e.preventDefault();
+    const username = usernameRef.current?.value; 
+    const password = passwordRef.current?.value; 
+  
+    let data = JSON.stringify({
+      username,
+      password
+    });
+
+    let config = {
+      method: 'post',
+      maxBodyLength: Infinity,
+      url: 'http://localhost:3001/auth/login',
+      headers: { 
+        'Content-Type': 'application/json'
+      },
+      data : data
+    };
+
+    axios.request(config)
+    .then((response) => {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+    
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden">
@@ -27,6 +65,7 @@ export function LoginForm({
                   id="username"
                   type="text"
                   placeholder="johndoe123"
+                  ref={usernameRef}
                   required
                 />
               </div>
@@ -42,9 +81,13 @@ export function LoginForm({
                     Forgot your password?
                   </a> */}
                 </div>
-                <Input id="password" type="password" required />
+                <Input 
+                  id="password" 
+                  type="password"
+                  ref={passwordRef} 
+                  required />
               </div>
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" onClick={handleSubmit}>
                 Login
               </Button>
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
