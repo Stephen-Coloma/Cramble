@@ -21,6 +21,7 @@ const corsOption = {
     origin: `http://${process.env.CLIENT_HOST}:${process.env.CLIENT_PORT}`,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
 }
+
 const app = express();
 app.use(cors(corsOption))
 app.use(bodyParser.json())
