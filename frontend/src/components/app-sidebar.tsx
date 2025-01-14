@@ -29,17 +29,11 @@ import { SidebarMenuButton } from "@/components/ui/sidebar"
 // Data for the side bar
 const data = {
   user: {
-    name: "shadcn",
+    firstname: "Stephen",
+    lastname: "Coloma",
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
-  },
-  appData:
-  {
-    name: "Cramble",
-    logo: Lightbulb,
-    plan: "Review Platform",
-  },
-  
+  },  
   navMain: [
     {
       title: "Playground",
@@ -151,19 +145,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenuButton
-        size="lg"
-        className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-default"
-      >
-        <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-          <data.appData.logo className="size-4" />
-        </div>
-        <div className="grid flex-1 text-left text-sm leading-tight">
-          <span className="truncate font-semibold">
-            {data.appData.name}
-          </span>
-          <span className="truncate text-xs">{data.appData.plan}</span>
-        </div>
-      </SidebarMenuButton>
+          size="lg"
+          className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-default"
+        >
+          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-seconary text-sidebar-primary-foreground">
+            <img src="/assets/Black-Cramble-Logo.svg" className="h-6 w-6" />
+          </div>
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <span className="truncate font-semibold">
+              Cramble
+            </span>
+            <span className="truncate text-xs">Your Review Platform</span>
+          </div>
+        </SidebarMenuButton>
       </SidebarHeader>
 
       <SidebarContent>
