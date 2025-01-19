@@ -10,7 +10,7 @@ export function Header() {
           <img src="/assets/Black-Cramble-Logo.svg" className="h-8 w-8" />
           <div>
             <h1 className="font-bold text-md text-muted-foreground md:text-lg">Cramble</h1>
-            <h1 className="text-xs hidden text-muted-foreground sm:block">Your Review Platform</h1>
+            <h1 className="text-xs hidden text-muted-foreground sm:block">v1.0.0-beta</h1>
           </div>
         </Link>
         <div className="flex gap-2 px-2 py-1 rounded-md bg-secondary sm:ml-auto border">

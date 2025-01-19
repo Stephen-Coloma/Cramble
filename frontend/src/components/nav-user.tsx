@@ -43,22 +43,22 @@ export function NavUser({
             <AvatarImage src={user.avatar} alt={user.firstname} />
             <AvatarFallback className="rounded-lg border-2">{user.firstname[0].toUpperCase() + user.lastname[0].toUpperCase()}</AvatarFallback>
           </Avatar>
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">{user.firstname + " " + user.lastname}</span>
+          <div className="grid flex-1 text-left leading-tight">
+            <span className="truncate text-base font-semibold">{user.firstname + " " + user.lastname}</span>
             <span className="truncate text-xs">{user.email}</span>
           </div>
         </SidebarMenuButton>
       </SidebarMenuItem>
       <Separator orientation="horizontal"></Separator>
       <SidebarMenuItem>
-        <div className="flex w-full gap-2">
+        <div className="flex w-full px-2">
           <Button variant={"secondary"} className="px-2 py-1 flex-grow bg-transparent hover:bg-secondary">
             <UserCog></UserCog>
-            <h1 className="text-xs">Settings</h1>
+            <h1 className="text-sm">Settings</h1>
           </Button>
           <Button variant={"secondary"} className="px-2 py-1 flex-grow bg-transparent hover:bg-secondary">
             <LogOut></LogOut>
-            <h1 className="text-xs">Log out</h1>
+            <h1 className="text-sm">Log out</h1>
           </Button>
         </div>
       </SidebarMenuItem>
