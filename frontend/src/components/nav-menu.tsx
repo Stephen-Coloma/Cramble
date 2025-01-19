@@ -30,7 +30,7 @@ export function NavMenu({
             <SidebarMenuButton className="h-12 px-4">
               <a href={item.url} className="flex items-center gap-2">
               <item.icon className="w-5 h-5" />
-              <span className="text-base">{item.name}</span>
+              <span className="font-light text-base">{item.name}</span>
             </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
