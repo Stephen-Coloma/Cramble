@@ -45,7 +45,7 @@ const data = {
       icon: Sparkles,
     },
     {
-      name: "FAQ",
+      name: "FAQs",
       url: "#",
       icon: CircleHelp,
     },
