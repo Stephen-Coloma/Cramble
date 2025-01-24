@@ -31,27 +31,27 @@ const data = {
   navItems: [
     {
       name: "My Decks",
-      url: "#",
+      url: "/dashboard/mydecks",
       icon: LibraryBig,
     },
     {
       name: "Explore Decks (Soon)",
-      url: "#",
+      url: "/dashboard/explore",
       icon: Compass,
     },
     {
       name: "Generate with AI",
-      url: "#",
+      url: "/dashboard/generate",
       icon: Sparkles,
     },
     {
       name: "FAQs",
-      url: "#",
+      url: "/dashboard/faqs",
       icon: CircleHelp,
     },
     {
       name: "Feedback",
-      url: "#",
+      url: "/dashboard/feedback",
       icon: MessageSquareText,
     }
   ]

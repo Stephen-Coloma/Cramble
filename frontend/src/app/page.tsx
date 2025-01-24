@@ -17,10 +17,12 @@ export default function Home() {
           <p className="text-center text-sm text-muted-foreground sm:text-base md:text-lg">
               Master your quizzes with personalized <br></br>flashcards — organized, trackable and <br></br>seamless.
           </p>
-          <Button variant={"default"} size={"lg"} className="w-fit">
-            <a href="/signup" className="text-white">Get Started</a>
-            <ArrowUpRight color="white"></ArrowUpRight>
-          </Button>
+          <a href="/signup">
+            <Button variant={"default"} className="text-white">
+              Get Started
+              <ArrowUpRight color="white"></ArrowUpRight>
+            </Button>
+          </a>
       </div> 
       <Footer></Footer>
     </div>

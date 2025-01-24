@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { Separator } from "./ui/separator"
+import { usePathname } from "next/navigation"
 
 export function NavMenu({
   navItems,
@@ -21,18 +22,20 @@ export function NavMenu({
     icon: LucideIcon
   }[]
 }) {
+  const path = usePathname()
+  
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <Separator className="mb-2"></Separator>
+      <Separator className="mb-4"></Separator>
       <SidebarMenu>
         {navItems.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton className="h-12 px-4">
-              <a href={item.url} className="flex items-center gap-2">
-              <item.icon className="w-5 h-5" />
-              <span className="font-light text-base">{item.name}</span>
+            <a href={item.url}>
+              <SidebarMenuButton className="flex h-12 px-4" variant={`${path.includes(item.url) ? 'selected' : 'default'}`}>
+                <item.icon className="w-5 h-5" />
+                <span className="font-light text-base">{item.name}</span>
+              </SidebarMenuButton>
             </a>
-            </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
       </SidebarMenu>

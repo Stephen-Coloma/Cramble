@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label"
 import { Facebook } from "lucide-react"
 import { useRef } from "react"
 import axios from "axios"
+import { useRouter,  } from "next/navigation"
 
 export function LoginForm({
   className,
@@ -15,6 +16,8 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+
+  const router = useRouter();
 
   //handle form submission
   const handleSubmit = (e: React.FormEvent) =>{
@@ -37,13 +40,18 @@ export function LoginForm({
       data : data
     };
 
-    axios.request(config)
-    .then((response) => {
-      console.log(JSON.stringify(response.data));
-    })
-    .catch((error) => {
-      console.log(error);
-    });
+    router.replace('/dashboard/mydecks')
+
+    // axios.request(config)
+    // .then((response) => {
+    //     if(response.status === 200){
+    //       router.replace('/dashboard/mydecks')
+    //     }
+    // })
+    // .catch((error) => {      
+    //   console.log(error.response.data);
+      
+    // });
     
   }
 

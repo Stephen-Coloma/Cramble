@@ -14,9 +14,9 @@ export function Header() {
           </div>
         </Link>
         <div className="flex gap-2 px-2 py-1 rounded-md bg-secondary sm:ml-auto border">
-          <Button variant="default">
-            <a href="/login" className="text-white text-xs">Login</a>
-          </Button>
+          <a href="/login">
+            <Button variant="default" className="text-white text-xs">Login</Button>
+          </a>
           <ModeToggle></ModeToggle>
         </div>
       </header>
