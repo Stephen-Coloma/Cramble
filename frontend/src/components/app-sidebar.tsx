@@ -16,7 +16,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarRail,
 } from "@/components/ui/sidebar"
 import { SidebarMenuButton } from "@/components/ui/sidebar"
 

@@ -1,12 +1,17 @@
+import {PageTitle, PageTitleProps} from "@/components/page-title"
+import { Sparkles } from 'lucide-react'
+
 export default function Generate() {
+  const pageDetails: PageTitleProps = {
+    title: 'Generate Flashcards',
+    desc: 'Create flashcards effortlessly with the power of AI, using the Gemini model',
+    iconColor: 'darkgreen',
+    iconBg: 'bg-green-100',
+    Icon: Sparkles
+  }
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0 border-red-400 border-4">
-      <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-          <div className="aspect-video rounded-xl bg-muted/50" />
-          <div className="aspect-video rounded-xl bg-muted/50" />
-          <div className="aspect-video rounded-xl bg-muted/50" />
-        </div>
-      <div className="min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min" />
+    <div className=" w-full border-2 border-blue-900">
+      <PageTitle {...pageDetails}/>
     </div>
   )
-}
+} 
