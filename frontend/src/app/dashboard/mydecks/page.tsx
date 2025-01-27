@@ -11,9 +11,9 @@ export default function MyDecks() {
     Icon: LibraryBig
   }
   return (
-    <div className=" w-full border-2 border-blue-900">
+    <div className=" w-full">
       <PageTitle {...pageDetails}/>
-      <Deck></Deck>
+      {/* <Deck></Deck> */}
     </div>
   )
 } 

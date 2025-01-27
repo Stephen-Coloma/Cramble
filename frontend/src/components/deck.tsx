@@ -9,35 +9,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Deck as DeckDTO } from "@/dtos/Deck.dto"
 
-export type DeckProp = Pick<DeckDTO, 'deckId' | 'title' | 'description' | 'createdAt'>;
+// Deck prop is baed on DeckDTO wherein it is a shared type for backend and frontend
+export type DeckProp = Pick<DeckDTO, 'deckId' | 'title' | 'description' | 'createdAt' | 'editedAt'>;
 
-export function Deck() {
+export function Deck({
+  deckId,
+  title,
+  description,
+  createdAt,
+  editedAt
+}: DeckProp) {
   return (
     <Card className="w-100">
       <CardHeader>
-        <CardTitle>Create project</CardTitle>
-        <CardDescription>Deploy your new project in one-click.</CardDescription>
+        <CardTitle>{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent>
-        <form>
-          <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="Name of your project" />
-            </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="framework">Framework</Label>
-            </div>
-          </div>
-        </form>
+        {/* content for metrics */}
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button variant="outline">Cancel</Button>
-        <Button>Deploy</Button>
+      <CardFooter className="flex justify-end">
+        <Button size={'sm'}>Start Review</Button>
       </CardFooter>
     </Card>
   )
