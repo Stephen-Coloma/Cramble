@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
-import { Flashcard } from "../../dtos/Flashcard.dto";
+import { Flashcard } from "../../dtos/flashcard/Flashcard.dto";
 import validate from "../../utilities/inputValidator";
 
 /* { 

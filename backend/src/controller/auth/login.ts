@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { UserLogin } from "../../dtos/UserLogin.dto";
+import { UserLogin } from "../../dtos/user/UserLogin.dto";
 import { databaseInstance as Database } from "../../database/mysql";
 import sendErrorToClient  from "../../utilities/errorHandler";
 import bcrypt from 'bcryptjs';
