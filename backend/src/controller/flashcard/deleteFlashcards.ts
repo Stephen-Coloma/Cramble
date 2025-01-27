@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import sendErrorToClient from "../../utilities/errorHandler";
 import { databaseInstance as Database } from "../../database/mysql";
-import { Flashcard } from "../../dtos/Flashcard.dto";
-import { Deck } from "../../dtos/Deck.dto";
+import { Flashcard } from "../../dtos/flashcard/Flashcard.dto";
+import { Deck } from "../../dtos/deck/Deck.dto";
 
 const deleteFlashcardController = async(req: Request<{}, {}, Flashcard>, res: Response) =>{
     const deckId = (req.params as Deck).deckId;
