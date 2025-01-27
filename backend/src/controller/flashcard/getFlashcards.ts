@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import sendErrorToClient from "../../utilities/errorHandler";
 import { databaseInstance as Database } from "../../database/mysql";
-import { Flashcard } from "../../dtos/Flashcard.dto";
+import { Flashcard } from "../../dtos/flashcard/Flashcard.dto";
 
 const getFlashcardsController = async(req: Request, res: Response) =>{
     const deckId = req.params.deckId;

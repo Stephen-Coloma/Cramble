@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import validate from "../../utilities/inputValidator";
-import { Flashcard } from "../../dtos/Flashcard.dto";
-import { Deck } from "../../dtos/Deck.dto";
+import { Flashcard } from "../../dtos/flashcard/Flashcard.dto";
+import { Deck } from "../../dtos/deck/Deck.dto";
 import sendErrorToClient from "../../utilities/errorHandler";
 import { createDeckSchema as deckSchema } from "./isDeckDataValid";
 import { addFlashcardToDeckSchema as flashcardSchema } from "./isFlashCardDataValid";
