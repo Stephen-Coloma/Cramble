@@ -1,5 +1,6 @@
 import {PageTitle, PageTitleProps} from "@/components/page-title"
 import { LibraryBig } from 'lucide-react'
+import { Deck } from "@/components/deck"
 
 export default function MyDecks() {
   const pageDetails: PageTitleProps = {
@@ -12,6 +13,7 @@ export default function MyDecks() {
   return (
     <div className=" w-full border-2 border-blue-900">
       <PageTitle {...pageDetails}/>
+      <Deck></Deck>
     </div>
   )
 } 
