@@ -12,7 +12,14 @@ import {
 import { Deck as DeckDTO } from "@/dtos/Deck.dto"
 
 // Deck prop is baed on DeckDTO wherein it is a shared type for backend and frontend
-export type DeckProp = Pick<DeckDTO, 'deckId' | 'title' | 'description' | 'createdAt' | 'editedAt'>;
+export type DeckProp = Pick<DeckDTO, 'deckId' | 'title' | 'description' | 'createdAt' | 'editedAt'> & {
+  // the extra fields 
+  totalCards: number,
+  unsureTotal: number,
+  familiarTotal: number,
+  masteredTotal: number,
+  unratedTotal: number
+};
 
 export function Deck({
   deckId,
