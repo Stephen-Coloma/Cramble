@@ -7,7 +7,7 @@ const getDecksController = async (req: Request, res: Response) =>{
     const userId = req.userId;
 
     const queryString = `
-        SELECT deck_id as deckId, title, description, created_at as createdAt
+        SELECT deck_id as deckId, title, description, created_at as createdAt, edited_at editedAt
         FROM decks 
         WHERE user_id = ? and status = 'active';
     `
