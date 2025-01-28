@@ -29,7 +29,7 @@ export function LoginForm({
       username,
       password
     });
-
+    
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -37,21 +37,19 @@ export function LoginForm({
       headers: { 
         'Content-Type': 'application/json'
       },
-      data : data
+      data : data,
+      withCredentials: true // Include cookies in the request
     };
 
-    router.replace('/dashboard/mydecks')
-
-    // axios.request(config)
-    // .then((response) => {
-    //     if(response.status === 200){
-    //       router.replace('/dashboard/mydecks')
-    //     }
-    // })
-    // .catch((error) => {      
-    //   console.log(error.response.data);
-      
-    // });
+    axios.request(config)
+    .then((response) => {
+        if(response.status === 200){
+          router.replace('/dashboard/mydecks')
+        }
+    })
+    .catch((error) => {      
+      console.log(error.response.data);
+    });
     
   }
 

@@ -9,25 +9,35 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Deck as DeckDTO } from "@/dtos/Deck.dto"
+
+import { DeckWithStatsDTO } from "@/dtos/deck/DeckWithStats.dto"
 
 // Deck prop is baed on DeckDTO wherein it is a shared type for backend and frontend
-export type DeckProp = Pick<DeckDTO, 'deckId' | 'title' | 'description' | 'createdAt' | 'editedAt'> & {
-  // the extra fields 
-  totalCards: number,
-  unsureTotal: number,
-  familiarTotal: number,
-  masteredTotal: number,
-  unratedTotal: number
-};
+export type DeckProps = Pick<DeckWithStatsDTO, 
+  'deckId' | 
+  'title' | 
+  'description' |
+  'createdAt' |
+  'editedAt' |
+  'totalCards' |
+  'unsureTotal' | 
+  'familiarTotal' |
+  'masteredTotal' |
+  'unratedTotal'
+>
 
 export function Deck({
   deckId,
   title,
   description,
   createdAt,
-  editedAt
-}: DeckProp) {
+  editedAt,
+  totalCards,
+  unsureTotal,
+  familiarTotal,
+  masteredTotal,
+  unratedTotal
+}: DeckProps) {
   return (
     <Card className="w-100">
       <CardHeader>
