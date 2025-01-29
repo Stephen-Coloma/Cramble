@@ -27,7 +27,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-import {Swords, TrendingUp} from 'lucide-react'
+import {Swords, Pencil } from 'lucide-react'
 
 import { DeckWithStatsDTO } from "@/dtos/deck/DeckWithStats.dto"
 
@@ -107,6 +107,7 @@ export function Deck({
           <CardTitle>{title}</CardTitle>
           <CardDescription>{'Cards: ' + totalCards}</CardDescription>
         </div>
+        <CardDescription className="text-xs text-muted-foreground/50">{`${(editedAt === null) ? 'Created at ' + formattedCreationDate : 'Edited at ' + formattedEditionDate }`}</CardDescription>
       </CardHeader>
 
       <CardContent className="">
@@ -149,12 +150,17 @@ export function Deck({
         </Popover>
       </CardContent>
 
-      <CardFooter className="flex justify-between">
-      <CardDescription className="text-xs text-muted-foreground/50">{`${(editedAt === null) ? 'Created at ' + formattedCreationDate : 'Edited at ' + formattedEditionDate }`}</CardDescription>
-        <Button size={'sm'}>
-        <Swords/>
+      <CardFooter className="flex justify-end">
+      <div className="">
+        <Button size={'xs'} variant={'secondary'} className="rounded-r-none">
+          <Pencil/>
+          Edit
+        </Button>
+        <Button size={'xs'} className="rounded-l-none">
+          <Swords/>
           Play
         </Button>
+      </div>
       </CardFooter>
     </Card>
   )
@@ -189,7 +195,7 @@ export function Decks(){
   }, []); // Run only once when the component mounts
 
   return(
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4  sm:grid sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
       {deckArray.map((deck, index) => (
           <Deck key={index} {...deck}></Deck>
       ))}
