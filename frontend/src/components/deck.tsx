@@ -4,7 +4,7 @@ import * as React from "react"
 import { useEffect, useState } from "react"
 import { AxiosError, AxiosResponse } from "axios"
 
-import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts"
+import { Bar, BarChart, XAxis, YAxis } from "recharts"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -72,19 +72,33 @@ export function Deck({
     day: 'numeric',
   });
 
-  const chartData = [{ month: "january", desktop: 1260, mobile: 570 }]
+  const chartData = [
+    { mastery: "mastered", tally: masteredTotal, fill: "var(--color-mastered)" },
+    { mastery: "familiar", tally: familiarTotal, fill: "var(--color-familiar)" },
+    { mastery: "unsure", tally: unsureTotal, fill: "var(--color-unsure)" },
+    { mastery: "unrated", tally: unratedTotal, fill: "var(--color-unrated)" },
+  ]
   const chartConfig = {
-    desktop: {
-      label: "Desktop",
-      color: "hsl(var(--chart-1))",
+    tally: {
+      label: "Count",
     },
-    mobile: {
-      label: "Mobile",
-      color: "hsl(var(--chart-2))",
+    mastered: {
+      label: "Mastered",
+      color: "hsl(220 70% 40%)",
     },
+    familiar: {
+      label: "Familiar",
+      color: "hsl(220 70% 50%)",
+    },
+    unsure: {
+      label: "Unsure",
+      color: "hsl(220 70% 60%)",
+    },
+    unrated: {
+      label: "Unrated",
+      color: "hsl(220 70% 70%)",
+    }
   } satisfies ChartConfig
-
-  const totalVisitors = chartData[0].desktop + chartData[0].mobile
 
   return (
     <Card className="w-100">
@@ -102,63 +116,35 @@ export function Deck({
         
         <Popover>
           <PopoverTrigger className="h-8 rounded-md px-3 text-xs bg-primary text-primary-foreground shadow hover:bg-primary/90">See your performance</PopoverTrigger>
-          <PopoverContent>
-            <ChartContainer
-                config={chartConfig}
-                className="mx-auto aspect-square w-full max-w-[250px]"
+          <PopoverContent className="w-[200px]">
+            <ChartContainer config={chartConfig}>
+              <BarChart
+                accessibilityLayer
+                data={chartData}
+                layout="vertical"
+                margin={{
+                  left: 10,
+                }}
               >
-                <RadialBarChart
-                  data={chartData}
-                  endAngle={180}
-                  innerRadius={80}
-                  outerRadius={130}
-                >
-                  <ChartTooltip
-                    cursor={false}
-                    content={<ChartTooltipContent hideLabel />}
-                  />
-                  <PolarRadiusAxis tick={false} tickLine={false} axisLine={false}>
-                    <Label
-                      content={({ viewBox }) => {
-                        if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                          return (
-                            <text x={viewBox.cx} y={viewBox.cy} textAnchor="middle">
-                              <tspan
-                                x={viewBox.cx}
-                                y={(viewBox.cy || 0) - 16}
-                                className="fill-foreground text-2xl font-bold"
-                              >
-                                {totalVisitors.toLocaleString()}
-                              </tspan>
-                              <tspan
-                                x={viewBox.cx}
-                                y={(viewBox.cy || 0) + 4}
-                                className="fill-muted-foreground"
-                              >
-                                Visitors
-                              </tspan>
-                            </text>
-                          )
-                        }
-                      }}
-                    />
-                  </PolarRadiusAxis>
-                  <RadialBar
-                    dataKey="desktop"
-                    stackId="a"
-                    cornerRadius={5}
-                    fill="var(--color-desktop)"
-                    className="stroke-transparent stroke-2"
-                  />
-                  <RadialBar
-                    dataKey="mobile"
-                    fill="var(--color-mobile)"
-                    stackId="a"
-                    cornerRadius={5}
-                    className="stroke-transparent stroke-2"
-                  />
-              </RadialBarChart>
+                <YAxis
+                  dataKey="mastery"
+                  type="category"
+                  tickLine={false}
+                  tickMargin={10}
+                  axisLine={false}
+                  tickFormatter={(value) =>
+                    chartConfig[value as keyof typeof chartConfig]?.label
+                  }
+                />
+                <XAxis dataKey="tally" type="number" hide />
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent hideLabel />}
+                />
+                <Bar dataKey="tally" layout="vertical" radius={5} />
+              </BarChart>
             </ChartContainer>
+
           </PopoverContent>
         </Popover>
       </CardContent>
