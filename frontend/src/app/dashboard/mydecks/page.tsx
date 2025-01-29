@@ -13,7 +13,7 @@ export default function MyDecks() {
   }
 
   return (
-    <div className=" w-full border-red-900 border-4">
+    <div className=" w-full">
       <PageTitle {...pageDetails}/>
       <Decks/>
     </div>
