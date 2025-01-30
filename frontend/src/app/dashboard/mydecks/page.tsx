@@ -1,7 +1,7 @@
 import {PageTitle, PageTitleProps} from "@/components/page-title"
 import { LibraryBig } from 'lucide-react'
 import { Decks} from "@/components/deck"
-import { AddDeckButton } from "@/components/add-deck-button"
+import { AddDeckDialog } from "@/components/dialog/add-deck-dialog"
 
 
 export default function MyDecks() {
@@ -16,9 +16,8 @@ export default function MyDecks() {
   return (
     <div className=" w-full">
       <PageTitle {...pageDetails}/>
-      <Decks children={ <AddDeckButton variant="primary"/> }/>
+      <Decks children={ <AddDeckDialog variant="deck-button"/> }/>
     </div>
   )
 } 
 
-// UPDATE THE SWAGGER DOCUMENTATION  FOR THE get /api/decks api
