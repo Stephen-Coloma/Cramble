@@ -27,7 +27,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-import {Swords, Pencil } from 'lucide-react'
+import {Swords, Pencil, Info } from 'lucide-react'
 
 import { DeckWithStatsDTO } from "@/dtos/deck/DeckWithStats.dto"
 
@@ -101,22 +101,29 @@ export function Deck({
   } satisfies ChartConfig
 
   return (
-    <Card className="w-100">
+    <Card className="w-100 border-4 border-transparent hover:border-primary shadow transition-colors duration-200">
       <CardHeader>
         <div className="flex justify-between">
           <CardTitle>{title}</CardTitle>
-          <CardDescription>{'Cards: ' + totalCards}</CardDescription>
+          <CardDescription>
+            <div className="text-xs bg-blue-100 dark:bg-blue-300 text-primary dark:text-primary-foreground px-2 py-1 rounded-lg">
+              {'Cards: ' + totalCards}
+            </div>
+          </CardDescription>
         </div>
         <CardDescription className="text-xs text-muted-foreground/50">{`${(editedAt === null) ? 'Created at ' + formattedCreationDate : 'Edited at ' + formattedEditionDate }`}</CardDescription>
       </CardHeader>
 
-      <CardContent className="">
-        <CardDescription className="mb-8">
+      <CardContent>
+        <CardDescription className="mb-8 min-h-16 max-h-16 line-clamp-3">
           {description}
         </CardDescription>
         
         <Popover>
-          <PopoverTrigger className="h-8 rounded-md px-3 text-xs bg-primary text-primary-foreground shadow hover:bg-primary/90">See your performance</PopoverTrigger>
+          <PopoverTrigger className="flex gap-2 justify-center items-center h-8 rounded-md px-2 text-xs bg-primary text-primary-foreground shadow hover:bg-primary/90">
+            <Info className="h-4 w-4"/>
+            Performance
+          </PopoverTrigger>
           <PopoverContent className="w-[200px]">
             <ChartContainer config={chartConfig}>
               <BarChart
@@ -195,7 +202,7 @@ export function Decks(){
   }, []); // Run only once when the component mounts
 
   return(
-    <div className="flex flex-col gap-4  sm:grid sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
       {deckArray.map((deck, index) => (
           <Deck key={index} {...deck}></Deck>
       ))}
@@ -204,4 +211,12 @@ export function Decks(){
 }
 
 
-// FIX THE CONTENT OF THE CARD!!!
+// CREATE AN ADD BUTTON FOR THE DECK AND AN ADD CARD
+// CREATE A SEARCH FIELD
+// CREATE  AN EDIT MODAL!!!!!! -> EDITS DECK CONTENT 
+// IMPLEMENT THE PLAY DECK
+// CREATE DECK UI
+// IMPLEMENT SKELETONS ON ALL CARDS
+
+// GENERATE WITH AI
+// 
