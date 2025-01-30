@@ -27,7 +27,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-import {Swords, Pencil, Info } from 'lucide-react'
+import {Swords, Pencil, Info, CirclePlus } from 'lucide-react'
 
 import { DeckWithStatsDTO } from "@/dtos/deck/DeckWithStats.dto"
 
@@ -44,6 +44,28 @@ export type DeckProps = Pick<DeckWithStatsDTO,
   'masteredTotal' |
   'unratedTotal'
 >
+
+const chartConfig = {
+  tally: {
+    label: "Count",
+  },
+  mastered: {
+    label: "Mastered",
+    color: "hsl(220 70% 40%)",
+  },
+  familiar: {
+    label: "Familiar",
+    color: "hsl(220 70% 50%)",
+  },
+  unsure: {
+    label: "Unsure",
+    color: "hsl(220 70% 60%)",
+  },
+  unrated: {
+    label: "Unrated",
+    color: "hsl(220 70% 70%)",
+  }
+} satisfies ChartConfig
 
 export function Deck({
   deckId,
@@ -78,27 +100,6 @@ export function Deck({
     { mastery: "unsure", tally: unsureTotal, fill: "var(--color-unsure)" },
     { mastery: "unrated", tally: unratedTotal, fill: "var(--color-unrated)" },
   ]
-  const chartConfig = {
-    tally: {
-      label: "Count",
-    },
-    mastered: {
-      label: "Mastered",
-      color: "hsl(220 70% 40%)",
-    },
-    familiar: {
-      label: "Familiar",
-      color: "hsl(220 70% 50%)",
-    },
-    unsure: {
-      label: "Unsure",
-      color: "hsl(220 70% 60%)",
-    },
-    unrated: {
-      label: "Unrated",
-      color: "hsl(220 70% 70%)",
-    }
-  } satisfies ChartConfig
 
   return (
     <Card className="w-100 border-4 border-transparent hover:border-primary shadow transition-colors duration-200">
@@ -206,6 +207,21 @@ export function Decks(){
       {deckArray.map((deck, index) => (
           <Deck key={index} {...deck}></Deck>
       ))}
+      {/* 306 px is fixed on all cards */}
+      <Card className="min-h-[306px] bg-muted border-2 border-primary/50 hover:border-primary hover:border-4 shadow transition-colors duration-200 relative">
+        <Button 
+          // immplement the modal that adds the decks of cards
+          onClick={() => { console.log('hi'); }} 
+          className="w-full h-full absolute top-0 left-0 opacity-0 pointer-events-auto bg-muted z-10"
+        />
+        <CardContent className="h-full w-full flex flex-col items-center justify-center gap-4 z-1">
+          <CirclePlus className="h-16 w-16 text-primary/90" />
+          <CardDescription className="text-muted-foreground items-center">
+            create new deck 
+          </CardDescription>
+        </CardContent>
+      </Card>
+
     </div>
   )
 }
