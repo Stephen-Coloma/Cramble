@@ -175,7 +175,12 @@ export function Deck({
 }
 
 // Container for the decks in the My Decks page
-export function Decks(){
+export function Decks({
+  children
+}: Readonly<
+  {children: React.ReactNode;
+}>){
+  
   const [deckArray, setDeckArray] = useState<DeckProps[]>([]); // Initialize as an empty array
 
   useEffect(() => {
@@ -207,21 +212,7 @@ export function Decks(){
       {deckArray.map((deck, index) => (
           <Deck key={index} {...deck}></Deck>
       ))}
-      {/* 306 px is fixed on all cards */}
-      <Card className="min-h-[306px] bg-muted border-2 border-primary/50 hover:border-primary hover:border-4 shadow transition-colors duration-200 relative">
-        <Button 
-          // immplement the modal that adds the decks of cards
-          onClick={() => { console.log('hi'); }} 
-          className="w-full h-full absolute top-0 left-0 opacity-0 pointer-events-auto bg-muted z-10"
-        />
-        <CardContent className="h-full w-full flex flex-col items-center justify-center gap-4 z-1">
-          <CirclePlus className="h-16 w-16 text-primary/90" />
-          <CardDescription className="text-muted-foreground items-center">
-            create new deck 
-          </CardDescription>
-        </CardContent>
-      </Card>
-
+      {children}
     </div>
   )
 }

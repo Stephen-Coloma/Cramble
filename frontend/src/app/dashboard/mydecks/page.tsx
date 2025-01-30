@@ -1,6 +1,7 @@
 import {PageTitle, PageTitleProps} from "@/components/page-title"
 import { LibraryBig } from 'lucide-react'
 import { Decks} from "@/components/deck"
+import { AddDeckButton } from "@/components/add-deck-button"
 
 
 export default function MyDecks() {
@@ -15,7 +16,7 @@ export default function MyDecks() {
   return (
     <div className=" w-full">
       <PageTitle {...pageDetails}/>
-      <Decks/>
+      <Decks children={ <AddDeckButton variant="primary"/> }/>
     </div>
   )
 } 
