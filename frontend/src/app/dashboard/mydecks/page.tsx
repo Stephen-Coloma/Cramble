@@ -1,5 +1,7 @@
 import {PageTitle, PageTitleProps} from "@/components/page-title"
 import { LibraryBig } from 'lucide-react'
+import { Decks} from "@/components/deck"
+
 
 export default function MyDecks() {
   const pageDetails: PageTitleProps = {
@@ -9,9 +11,13 @@ export default function MyDecks() {
     iconBg: 'bg-gray-200',
     Icon: LibraryBig
   }
+
   return (
-    <div className=" w-full border-2 border-blue-900">
+    <div className=" w-full">
       <PageTitle {...pageDetails}/>
+      <Decks/>
     </div>
   )
 } 
+
+// UPDATE THE SWAGGER DOCUMENTATION  FOR THE get /api/decks api

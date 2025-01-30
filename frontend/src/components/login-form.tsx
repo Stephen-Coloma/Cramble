@@ -5,15 +5,18 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Facebook } from "lucide-react"
-import { useRef } from "react"
+import { Facebook, EyeClosed, Eye } from "lucide-react"
+import { useRef, useState } from "react"
 import axios from "axios"
-import { useRouter,  } from "next/navigation"
+import { useRouter } from "next/navigation"
+import { Toggle } from "./ui/toggle"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [isVisible, setVisible] = useState<boolean>(false);
+
   const usernameRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
@@ -29,7 +32,7 @@ export function LoginForm({
       username,
       password
     });
-
+    
     let config = {
       method: 'post',
       maxBodyLength: Infinity,
@@ -37,21 +40,19 @@ export function LoginForm({
       headers: { 
         'Content-Type': 'application/json'
       },
-      data : data
+      data : data,
+      withCredentials: true // Include cookies in the request
     };
 
-    router.replace('/dashboard/mydecks')
-
-    // axios.request(config)
-    // .then((response) => {
-    //     if(response.status === 200){
-    //       router.replace('/dashboard/mydecks')
-    //     }
-    // })
-    // .catch((error) => {      
-    //   console.log(error.response.data);
-      
-    // });
+    axios.request(config)
+    .then((response) => {
+        if(response.status === 200){
+          router.replace('/dashboard/mydecks')
+        }
+    })
+    .catch((error) => {      
+      console.log(error.response.data);
+    });
     
   }
 
@@ -79,7 +80,17 @@ export function LoginForm({
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+                  <div className="flex w-full justify-between items-center">
+                    <Label htmlFor="password">Password</Label>
+                    <Toggle size={'sm'}  onClick={() => setVisible((prev) => !prev)}>
+                      {isVisible ? (
+                        <Eye className="h-6 w-6 " />
+                      ) : (
+                        <EyeClosed className="h-6 w-6 " />
+                      )}
+                      <span className="sr-only">Toggle theme</span>
+                    </Toggle>
+                  </div>
                   {/* 
                   //TO BE IMPLEMENTED
                   <a
@@ -91,7 +102,7 @@ export function LoginForm({
                 </div>
                 <Input 
                   id="password" 
-                  type="password"
+                  type={`${isVisible ? 'text' : 'password'}`}
                   ref={passwordRef} 
                   required />
               </div>

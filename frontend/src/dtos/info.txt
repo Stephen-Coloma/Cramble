@@ -1,0 +1,2 @@
+giving a type for response object just makes sures that in the client end, he can expect those fields specified by the dto.
+So, if you develop the frontend of the project in the future, make sure your frontend has access to the DTO used by the backend

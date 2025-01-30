@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { Deck } from "../../dtos/Deck.dto";
+import { Deck } from "../../dtos/deck/Deck.dto";
 import { databaseInstance as Database } from "../../database/mysql";
 import sendErrorToClient from "../../utilities/errorHandler";
 

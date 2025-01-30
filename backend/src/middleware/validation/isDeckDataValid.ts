@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
-import { Deck } from "../../dtos/Deck.dto";
+import { Deck } from "../../dtos/deck/Deck.dto";
 import validate from "../../utilities/inputValidator";
 
 /* { 
