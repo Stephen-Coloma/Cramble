@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
+import cors from 'cors'
 import config from './config/config';
 import env from 'dotenv';
 import { specs, swaggerUi } from './api-docs/swagger'
@@ -11,10 +12,19 @@ import deckRouter from './routes/deck';
 import flashcardRouter from './routes/flashcard';
 import geminiRouter from './routes/gemini';
 
-// config
+
+// env config
 env.config();
 
+//cors configuration
+const corsOption = {
+    origin: `http://${process.env.CLIENT_HOST}:${process.env.CLIENT_PORT}`,
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true
+}
+
 const app = express();
+app.use(cors(corsOption))
 app.use(bodyParser.json())
 app.use(cookieParser(process.env.COOKIE_PARSER_SECRET_KEY))
 app.use(helmet());
