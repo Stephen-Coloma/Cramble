@@ -7,6 +7,8 @@ import { AxiosError, AxiosResponse } from "axios"
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
 
 import { Button } from "@/components/ui/button"
+import { Input } from "./ui/input"
+import { AddDeckDialog } from "./dialog/add-deck-dialog"
 import {
   Card,
   CardContent,
@@ -27,7 +29,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-import {Swords, Pencil, Info, CirclePlus } from 'lucide-react'
+import {Swords, Pencil, Info, Filter } from 'lucide-react'
 
 import { DeckWithStatsDTO } from "@/dtos/deck/DeckWithStats.dto"
 
@@ -107,7 +109,7 @@ export function Deck({
         <div className="flex justify-between">
           <CardTitle>{title}</CardTitle>
           <CardDescription>
-            <div className="text-xs bg-blue-100 dark:bg-blue-300 text-primary dark:text-primary-foreground px-2 py-1 rounded-lg">
+            <div className="text-xs font-semibold bg-blue-100 dark:bg-blue-300 text-primary dark:text-primary-foreground px-2 py-1 rounded-lg">
               {'Cards: ' + totalCards}
             </div>
           </CardDescription>
@@ -208,11 +210,24 @@ export function Decks({
   }, []); // Run only once when the component mounts
 
   return(
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
-      {deckArray.map((deck, index) => (
-          <Deck key={index} {...deck}></Deck>
-      ))}
-      {children}
-    </div>
+    <>
+      <Card className="mb-4">
+        <CardContent className="flex gap-2 p-2">
+          {/* search, add button, filter */}
+            <Input placeholder="Search Card"></Input>
+            <AddDeckDialog variant="simple-button"></AddDeckDialog>
+            <Button size={'icon'} className="min-h-9 min-w-9">
+              <Filter></Filter>
+            </Button>
+        </CardContent>
+      </Card>
+      
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
+        {deckArray.map((deck, index) => (
+            <Deck key={index} {...deck}></Deck>
+        ))}
+        <AddDeckDialog variant="deck-button"/>
+      </div>
+    </>
   )
 }
