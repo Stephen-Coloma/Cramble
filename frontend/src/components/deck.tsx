@@ -177,11 +177,7 @@ export function Deck({
 }
 
 // Container for the decks in the My Decks page
-export function Decks({
-  children
-}: Readonly<
-  {children: React.ReactNode;
-}>){
+export function Decks(){
   
   const [deckArray, setDeckArray] = useState<DeckProps[]>([]); // Initialize as an empty array
 
@@ -198,16 +194,20 @@ export function Decks({
 
       axios.request(config)
       .then((response: AxiosResponse) => {
-        setDeckArray(response.data);    
-        console.log(deckArray);
-        
+        setDeckArray(response.data);            
       })
       .catch((error: AxiosError) => {
+        // handle error
         console.log(error.response?.data);
       });
     }
     fetchDecks();
   }, []); // Run only once when the component mounts
+
+  // function to run once a deck is added
+  const addNewDeck = (newlyAddedDeck: DeckProps) => {
+    setDeckArray([...deckArray, newlyAddedDeck])
+  }
 
   return(
     <>
@@ -215,7 +215,7 @@ export function Decks({
         <CardContent className="flex gap-2 p-2">
           {/* search, add button, filter */}
             <Input placeholder="Search Card"></Input>
-            <AddDeckDialog variant="simple-button"></AddDeckDialog>
+            <AddDeckDialog onDeckAdded={addNewDeck}  variant="simple-button"></AddDeckDialog>
             <Button size={'icon'} className="min-h-9 min-w-9">
               <Filter></Filter>
             </Button>

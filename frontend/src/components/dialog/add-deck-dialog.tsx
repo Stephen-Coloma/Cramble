@@ -1,5 +1,7 @@
 'use client'
 
+import { AxiosResponse, AxiosError } from "axios"
+
 import {
     Dialog,
     DialogContent,
@@ -24,9 +26,35 @@ import { Button } from "../ui/button"
 
 import { CirclePlus, Plus } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile"
+import { DeckProps } from "../deck"
 
-export function AddDeckDialog({variant="deck-button"} : {variant: 'simple-button' | 'deck-button'}){
+export type AddDeckDialogProps = {
+    variant: 'simple-button' | 'deck-button',
+    onDeckAdded: (newlyAddedDeck: DeckProps) => void;
+}
+
+export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDialogProps){
     const isMobile = useIsMobile()
+
+    const handleSubmit = async () => {
+        const axios = require('axios');
+        let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: 'http://localhost:3001/api/decks',
+            withCredentials: true
+        };
+
+        axios.request(config)
+        .then((response: AxiosResponse) => {
+            // create now the new deck if response is ok
+            // onDeckAdded();    
+        })
+        .catch((error: AxiosError) => {
+            console.log(error.response?.data);
+        });
+    };
+    
 
     return (
         // deck button and mobile view = button(hidden)
