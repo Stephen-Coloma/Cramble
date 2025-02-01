@@ -32,6 +32,7 @@ import {
 import {Swords, Pencil, Info, Filter } from 'lucide-react'
 
 import { DeckWithStatsDTO } from "@/dtos/deck/DeckWithStats.dto"
+import { ApiResponse, useFetch } from "@/hooks/use-request"
 
 // Deck prop is baed on DeckDTO wherein it is a shared type for backend and frontend
 export type DeckProps = Pick<DeckWithStatsDTO, 
@@ -178,31 +179,17 @@ export function Deck({
 
 // Container for the decks in the My Decks page
 export function Decks(){
+  const {status, statusText, data, error, loading}  = useFetch<DeckProps[]>('http://localhost:3001/api/decks')
+  const [deckArray, setDeckArray] = useState<DeckProps[]>([]);
   
-  const [deckArray, setDeckArray] = useState<DeckProps[]>([]); // Initialize as an empty array
+  console.log("Loading:", loading);
 
-  useEffect(() => {
-    // Fetch or load data here
-    const fetchDecks = async () => {
-      const axios = require('axios');
-      let config = {
-        method: 'get',
-        maxBodyLength: Infinity,
-        url: 'http://localhost:3001/api/decks',
-        withCredentials: true
-      };
-
-      axios.request(config)
-      .then((response: AxiosResponse) => {
-        setDeckArray(response.data);            
-      })
-      .catch((error: AxiosError) => {
-        // handle error
-        console.log(error.response?.data);
-      });
+  //update the deckArray when data is fetched
+  useEffect(()=>{
+    if(data){
+      setDeckArray(data)
     }
-    fetchDecks();
-  }, []); // Run only once when the component mounts
+  }, [data, loading])
 
   // function to run once a deck is added
   const addNewDeck = (newlyAddedDeck: DeckProps) => {
@@ -213,21 +200,31 @@ export function Decks(){
     <>
       <Card className="mb-4">
         <CardContent className="flex gap-2 p-2">
-          {/* search, add button, filter */}
-            <Input placeholder="Search Card"></Input>
-            <AddDeckDialog onDeckAdded={addNewDeck}  variant="simple-button"></AddDeckDialog>
-            <Button size={'icon'} className="min-h-9 min-w-9">
-              <Filter></Filter>
-            </Button>
+          {/* Search, add button, filter */}
+          <Input placeholder="Search Card" />
+          <AddDeckDialog onDeckAdded={addNewDeck} variant="simple-button" />
+          <Button size={'icon'} className="min-h-9 min-w-9">
+            <Filter />
+          </Button>
         </CardContent>
       </Card>
-      
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
-        {deckArray.map((deck, index) => (
-            <Deck key={index} {...deck}></Deck>
-        ))}
-        <AddDeckDialog variant="deck-button"/>
-      </div>
+
+      {/* Loading state div */}
+      {loading && (
+        <div className="w-full">
+          <p>Loading...</p> {/* This will render if loading is true */}
+        </div>
+      )}
+
+      {/* Only show the grid if it's not loading */}
+      {!loading && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
+          {deckArray.map((deck, index) => (
+            <Deck key={index} {...deck} />
+          ))}
+          <AddDeckDialog onDeckAdded={addNewDeck} variant="deck-button" />
+        </div>
+      )}
     </>
-  )
+  );
 }

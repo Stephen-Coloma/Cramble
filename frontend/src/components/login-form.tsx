@@ -35,7 +35,6 @@ export function LoginForm({
     
     let config = {
       method: 'post',
-      maxBodyLength: Infinity,
       url: 'http://localhost:3001/auth/login',
       headers: { 
         'Content-Type': 'application/json'
@@ -46,12 +45,14 @@ export function LoginForm({
 
     axios.request(config)
     .then((response) => {
+      console.log(response);
+      
         if(response.status === 200){
           router.replace('/dashboard/mydecks')
         }
     })
     .catch((error) => {      
-      console.log(error.response.data);
+      console.log(error);
     });
     
   }
