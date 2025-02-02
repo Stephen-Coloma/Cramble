@@ -7,7 +7,7 @@ import { createDeckSchema as deckSchema } from "./isDeckDataValid";
 import { addFlashcardToDeckSchema as flashcardSchema } from "./isFlashCardDataValid";
 
 
-const isGeneratedFlashcardsDataValid = (req: Request, res: Response, next: NextFunction) => {
+const isDeckFlashcardsDataValid = (req: Request, res: Response, next: NextFunction) => {
     try{
         const deck: Pick<Deck, 'title' | 'description' | 'createdAt' | 'editedAt'> = {
             title: req.body.title,
@@ -33,8 +33,6 @@ const isGeneratedFlashcardsDataValid = (req: Request, res: Response, next: NextF
             //deck data and flashcard data is good
             next();
         }else{
-            console.log('here');
-            
             res.status(400).json(isDeckValid).end();
         }  
     }catch(error: unknown){        
@@ -42,4 +40,4 @@ const isGeneratedFlashcardsDataValid = (req: Request, res: Response, next: NextF
     }
 }
 
-export default isGeneratedFlashcardsDataValid;
+export default isDeckFlashcardsDataValid;
