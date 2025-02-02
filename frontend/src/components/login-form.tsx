@@ -6,14 +6,14 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Facebook, EyeClosed, Eye } from "lucide-react"
-import { useState } from "react"
-import axios, { AxiosError } from "axios"
+import { useEffect, useState } from "react"
+import { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
 import { Toggle } from "./ui/toggle"
 import {SubmitHandler, useForm, ErrorOption} from 'react-hook-form' 
 import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
-import { usePost } from "@/hooks/use-request"
+import { PostApiResponse, usePost } from "@/hooks/use-request"
 
 const loginSchema = Joi.object({
   username: Joi.string()
@@ -33,7 +33,6 @@ type LoginFormData = {
   password: string
 }
 
-
 export function LoginForm({
   className,
   ...props
@@ -46,43 +45,33 @@ export function LoginForm({
     resolver: joiResolver(loginSchema)
   })
 
+  const { status, error, loading, callback }: PostApiResponse = usePost('http://localhost:3001/auth/login');
+
   //handle form submission
   const onSubmit: SubmitHandler<LoginFormData> = async (formData: LoginFormData) => {
-    // const {status, statusText, data, error, loading} = usePost('http://localhost:3001/auth/login', JSON.stringify(formData))
-    let config = {
-      method: 'post',
-      url: 'http://localhost:3001/auth/login',
-      headers: { 
-        'Content-Type': 'application/json'
-      },
-      data : JSON.stringify(formData),
-      withCredentials: true // Include cookies in the request
-    };
+    // frontend validation happens before firing the callback
+    // with delay. to be removed
+    await new Promise((resolve) => {setTimeout(() => callback(formData), 3000)});
+  }
 
-    //delay
-    await new Promise((resolve)=> setTimeout(resolve, 2000));
+  // update the ui based on loading change
+  useEffect(()=>{
+    if(status === 200){
+      router.replace('/dashboard/mydecks')
+    }
 
-    axios.request(config)
-    .then((response) => {
-
-      console.log(response);
-      
-        if(response.status === 200){
-          router.replace('/dashboard/mydecks')
-        }
-    })
-    .catch((error: AxiosError) => {     
-      if (error.response?.status === 401) {
+    if(error){
+      if ((error as AxiosError).response?.status === 401) {
         // Handle username not found error
         reset({password: ''})
         setError("username", (error.response.data as ErrorOption));
-      } else if (error.response?.status === 404) {
+      } else if ((error as AxiosError).response?.status === 404) {
         // Handle incorrect password error
         reset({password: ''})
         setError("password", (error.response.data as ErrorOption));
       }
-    });
-  }
+    }
+  }, [loading])
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
