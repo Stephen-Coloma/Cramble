@@ -1,6 +1,5 @@
 import { Router } from "express";
 import loginController from "../controller/auth/login"
-import isLoginDataValid from "../middleware/validation/isLoginDataValid";
 import signUpController from '../controller/auth/signup'
 import isUsernameExists from '../middleware/isUsernameExists ';
 import isSignupDataValid from '../middleware/validation/isSignupDataValid';
@@ -48,18 +47,6 @@ const logoutRouter = Router();
  *                   message:
  *                     type: string
  *                     example: Login successful
- *         '400':
- *           description: Invalid input data
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   invalidFields:
- *                     type: array
- *                     items:
- *                       type: string
- *                     example: ["username", "password"]
  *         '401':
  *           description: Unauthorized
  *           content:
@@ -81,7 +68,7 @@ const logoutRouter = Router();
  *                     type: string
  *                     example: Internal Server Error
  */
-loginRouter.post('/login', isLoginDataValid, loginController)
+loginRouter.post('/login', loginController)
 
 /**
  * @swagger

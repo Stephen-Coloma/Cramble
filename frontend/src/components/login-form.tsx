@@ -10,7 +10,7 @@ import { useState } from "react"
 import axios, { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
 import { Toggle } from "./ui/toggle"
-import {SubmitHandler, useForm} from 'react-hook-form' 
+import {SubmitHandler, useForm, ErrorOption} from 'react-hook-form' 
 import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
 import { usePost } from "@/hooks/use-request"
@@ -42,10 +42,9 @@ export function LoginForm({
 
   const router = useRouter();
 
-  const {register, handleSubmit, formState: {errors}} = useForm<LoginFormData>({
+  const {register, setError, handleSubmit, formState: {errors, isSubmitting}, reset} = useForm<LoginFormData>({
     resolver: joiResolver(loginSchema)
   })
-
 
   //handle form submission
   const onSubmit: SubmitHandler<LoginFormData> = async (formData: LoginFormData) => {
@@ -60,22 +59,29 @@ export function LoginForm({
       withCredentials: true // Include cookies in the request
     };
 
+    //delay
+    await new Promise((resolve)=> setTimeout(resolve, 2000));
+
     axios.request(config)
     .then((response) => {
+
       console.log(response);
       
         if(response.status === 200){
           router.replace('/dashboard/mydecks')
         }
     })
-    .catch((error: AxiosError) => {      
-      if(error.status === 401){
-        errors.password!.message = (error.response?.data as string)
-      } else if (error.status === 404) {
-        errors.username!.message = (error.response?.data as string)
+    .catch((error: AxiosError) => {     
+      if (error.response?.status === 401) {
+        // Handle username not found error
+        reset({password: ''})
+        setError("username", (error.response.data as ErrorOption));
+      } else if (error.response?.status === 404) {
+        // Handle incorrect password error
+        reset({password: ''})
+        setError("password", (error.response.data as ErrorOption));
       }
     });
-    
   }
 
   return (
@@ -93,6 +99,7 @@ export function LoginForm({
               <div className="grid gap-2">
                 <Label htmlFor="email">Username</Label>
                 <Input {...register('username')}
+                  className={errors.username ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
                   id="username"
                   type="text"
                   placeholder="johndoe123"
@@ -123,13 +130,14 @@ export function LoginForm({
                   </a> */}
                 </div>
                 <Input {...register('password')}
+                  className={errors.password ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
                   id="password" 
                   type={`${isVisible ? 'text' : 'password'}`}
                   required />
                 {errors.password && <Label className="text-xs text-destructive">{errors.password.message?.replaceAll('\"', "")}</Label>}
               </div>
-              <Button type="submit" className="w-full">
-                Login
+              <Button type="submit" disabled={isSubmitting ? true : false} className="w-full">
+                {isSubmitting ? 'Loading...': 'Login'}
               </Button>
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                 <span className="relative z-10 bg-background px-2 text-muted-foreground">

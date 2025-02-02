@@ -40,7 +40,7 @@ const loginController = async(req: Request<{}, {}, UserLogin>, res: Response) =>
                 })
                 .status(200).json({message: "Login successful"}).end()
             }else{
-                res.status(401).json({message: "Incorrect password"}).end()
+                res.status(404).json({message: "Incorrect password"}).end()
             }
         }
                 
