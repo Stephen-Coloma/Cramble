@@ -181,8 +181,8 @@ export function Deck({
 export function Decks(){
   const {status, statusText, data, error, loading}  = useFetch<DeckProps[]>('http://localhost:3001/api/decks')
   const [deckArray, setDeckArray] = useState<DeckProps[]>([]);
-  
-  //update the deckArray when data is fetched
+
+  // update the deckArray when data is fetched
   useEffect(()=>{
     if(data){
       setDeckArray(data)
@@ -217,9 +217,12 @@ export function Decks(){
       {/* Only show the grid if it's not loading */}
       {!loading && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
-          {deckArray.map((deck, index) => (
+          {deckArray.length > 0 ? deckArray.map((deck, index) => (
             <Deck key={index} {...deck} />
-          ))}
+          )) 
+          :
+            <>no cards  yet</>
+          }
           <AddDeckDialog onDeckAdded={addNewDeck} variant="deck-button" />
         </div>
       )}
