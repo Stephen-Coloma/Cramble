@@ -182,8 +182,6 @@ export function Decks(){
   const {status, statusText, data, error, loading}  = useFetch<DeckProps[]>('http://localhost:3001/api/decks')
   const [deckArray, setDeckArray] = useState<DeckProps[]>([]);
   
-  console.log("Loading:", loading);
-
   //update the deckArray when data is fetched
   useEffect(()=>{
     if(data){

@@ -6,10 +6,33 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Facebook, EyeClosed, Eye } from "lucide-react"
-import { useRef, useState } from "react"
-import axios from "axios"
+import { useState } from "react"
+import axios, { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
 import { Toggle } from "./ui/toggle"
+import {SubmitHandler, useForm} from 'react-hook-form' 
+import { joiResolver } from '@hookform/resolvers/joi'
+import Joi from 'joi'
+import { usePost } from "@/hooks/use-request"
+
+const loginSchema = Joi.object({
+  username: Joi.string()
+      .alphanum()
+      .min(3)
+      .max(30)
+      .required(),
+
+  password: Joi.string()
+      .min(8)
+      .max(100)
+      .required(),
+});
+
+type LoginFormData = {
+  username: string,
+  password: string
+}
+
 
 export function LoginForm({
   className,
@@ -17,29 +40,23 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const [isVisible, setVisible] = useState<boolean>(false);
 
-  const usernameRef = useRef<HTMLInputElement>(null);
-  const passwordRef = useRef<HTMLInputElement>(null);
-
   const router = useRouter();
 
+  const {register, handleSubmit, formState: {errors}} = useForm<LoginFormData>({
+    resolver: joiResolver(loginSchema)
+  })
+
+
   //handle form submission
-  const handleSubmit = (e: React.FormEvent) =>{
-    e.preventDefault();
-    const username = usernameRef.current?.value; 
-    const password = passwordRef.current?.value; 
-  
-    let data = JSON.stringify({
-      username,
-      password
-    });
-    
+  const onSubmit: SubmitHandler<LoginFormData> = async (formData: LoginFormData) => {
+    // const {status, statusText, data, error, loading} = usePost('http://localhost:3001/auth/login', JSON.stringify(formData))
     let config = {
       method: 'post',
       url: 'http://localhost:3001/auth/login',
       headers: { 
         'Content-Type': 'application/json'
       },
-      data : data,
+      data : JSON.stringify(formData),
       withCredentials: true // Include cookies in the request
     };
 
@@ -51,8 +68,12 @@ export function LoginForm({
           router.replace('/dashboard/mydecks')
         }
     })
-    .catch((error) => {      
-      console.log(error);
+    .catch((error: AxiosError) => {      
+      if(error.status === 401){
+        errors.password!.message = (error.response?.data as string)
+      } else if (error.status === 404) {
+        errors.username!.message = (error.response?.data as string)
+      }
     });
     
   }
@@ -61,7 +82,7 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-8">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -71,13 +92,13 @@ export function LoginForm({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Username</Label>
-                <Input
+                <Input {...register('username')}
                   id="username"
                   type="text"
                   placeholder="johndoe123"
-                  ref={usernameRef}
                   required
                 />
+                {errors.username && <Label className="text-xs text-destructive">{errors.username.message?.replaceAll('\"', "")}</Label>}
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
@@ -101,13 +122,13 @@ export function LoginForm({
                     Forgot your password?
                   </a> */}
                 </div>
-                <Input 
+                <Input {...register('password')}
                   id="password" 
                   type={`${isVisible ? 'text' : 'password'}`}
-                  ref={passwordRef} 
                   required />
+                {errors.password && <Label className="text-xs text-destructive">{errors.password.message?.replaceAll('\"', "")}</Label>}
               </div>
-              <Button type="submit" className="w-full" onClick={handleSubmit}>
+              <Button type="submit" className="w-full">
                 Login
               </Button>
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
