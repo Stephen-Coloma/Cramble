@@ -72,7 +72,7 @@ const DeckFlashcardsSchema = Joi.object({
     }),
   });
 
-type DeckFlashcardsFormData = {
+export type DeckFlashcardsFormData = {
     title: string,
     description: string,
     createdAt: string,
@@ -85,7 +85,7 @@ type DeckFlashcardsFormData = {
 export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDialogProps){
     const isMobile = useIsMobile()
 
-    const {register, setError, handleSubmit, formState: {errors, isLoading}, } = useForm<DeckFlashcardsFormData>({
+    const {register, setError, handleSubmit, formState: {errors, isLoading} } = useForm<DeckFlashcardsFormData>({
         resolver: joiResolver(DeckFlashcardsSchema)
     });
 
@@ -113,7 +113,9 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
         console.log(data);
     };
 
-    console.log(errors);
+    const removeFlashcard = (flashcardNo: number) =>{
+        console.log('removing card number: ' + flashcardNo);
+    }
        
 
     return (
@@ -173,15 +175,8 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                         </div>
 
                         {/* flashcards container */}
-                        <div>
-                            <FlashcardInputCard></FlashcardInputCard>
-                            <FlashcardInputCard></FlashcardInputCard>
-                            <FlashcardInputCard></FlashcardInputCard>
-                            <FlashcardInputCard></FlashcardInputCard>
-                            <FlashcardInputCard></FlashcardInputCard>
-                            <FlashcardInputCard></FlashcardInputCard>
-                            <FlashcardInputCard></FlashcardInputCard>
-                            <FlashcardInputCard></FlashcardInputCard>
+                        <div className="flex flex-col gap-4">
+                            <FlashcardInputCard formUtilities={{register, setError, errors, isLoading}} flashcardNo={1} onFlashcardRemove={removeFlashcard}></FlashcardInputCard>
                             {/* <div>
                                 <label>Flashcard Front</label>
                                 <input {...register("flashcards.0.front")} />
