@@ -41,17 +41,17 @@ export function LoginForm({
 
   const router = useRouter();
 
-  const {register, setError, handleSubmit, formState: {errors, isSubmitting}, reset} = useForm<LoginFormData>({
+  const {register, setError, handleSubmit, formState: {errors, isSubmitting }, reset} = useForm<LoginFormData>({
     resolver: joiResolver(loginSchema)
   })
 
   const { status, error, loading, callback }: PostApiResponse = usePost('http://localhost:3001/auth/login');
 
-  //handle form submission
+  //handle form validation and submission
   const onSubmit: SubmitHandler<LoginFormData> = async (formData: LoginFormData) => {
-    // frontend validation happens before firing the callback
     // with delay. to be removed
-    await new Promise((resolve) => {setTimeout(() => callback(formData), 3000)});
+    await new Promise((resolve) => {setTimeout(resolve, 2000)}); 
+    await callback(formData);
   }
 
   // update the ui based on loading change
@@ -69,9 +69,9 @@ export function LoginForm({
         // Handle incorrect password error
         reset({password: ''})
         setError("password", (error.response.data as ErrorOption));
-      }
+      }      
     }
-  }, [loading])
+  }, [loading])  
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
