@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import {Trash2} from 'lucide-react'
 import { Separator } from "./ui/separator";
 import { Textarea } from "./ui/textarea";
-import { UseFormRegister, UseFormSetError, FieldErrors } from "react-hook-form";
+import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { DeckFlashcardsFormData } from "./dialog/add-deck-dialog";
 
 
@@ -16,9 +16,7 @@ import { DeckFlashcardsFormData } from "./dialog/add-deck-dialog";
 export type FlashcardInputCardProps = {
     formUtilities: {
         register: UseFormRegister<DeckFlashcardsFormData>
-        setError: UseFormSetError<DeckFlashcardsFormData>,
         errors: FieldErrors<DeckFlashcardsFormData>
-        isLoading: boolean;
     },
     flashcardNo: number,
     onFlashcardRemove: (flashcardNo: number) => void
@@ -27,9 +25,7 @@ export type FlashcardInputCardProps = {
 export function FlashcardInputCard({
     formUtilities: {
         register,
-        setError,
         errors,
-        isLoading
     },
     flashcardNo,
     onFlashcardRemove

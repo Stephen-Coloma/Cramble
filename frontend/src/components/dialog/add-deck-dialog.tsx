@@ -84,11 +84,11 @@ export type DeckFlashcardsFormData = {
 
 export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDialogProps){
     const isMobile = useIsMobile()
-
-    const {register, setError, handleSubmit, formState: {errors, isLoading} } = useForm<DeckFlashcardsFormData>({
+    
+    const {register, setError, handleSubmit, formState: {errors, isLoading}, reset } = useForm<DeckFlashcardsFormData>({
         resolver: joiResolver(DeckFlashcardsSchema)
     });
-
+    
 
     // const onSubmit = async () => {
     //     const axios = require('axios');
@@ -143,59 +143,63 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                     </Button>
                 }
             </DialogTrigger>
-                <DialogContent className="sm:max-w-[1025px] h-full sm:h-3/4 pt-12">
-                    <form onSubmit={handleSubmit(onSubmit)} className="h-[92%] overflow-y-auto">
-                        <DialogHeader className="mb-4">
-                            <DialogTitle>Create Deck, Add Flashcards</DialogTitle>
-                            <DialogDescription>
-                                Add a title, a short description, and your first flashcard.        
-                            </DialogDescription>
-                        </DialogHeader>
-                            
-                        <div className="grid gap-2 mb-4">
-                            <Label htmlFor="title">Title</Label>
-                            <Input {...register('title')}
-                                className={errors.title ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
-                                id="title"
-                                type="text"
-                                placeholder="Enter a title (e.e Math Quiz 101)"
-                            />
-                            {errors.title && <Label className="text-xs text-destructive">{errors.title.message?.replaceAll('\"', "")}</Label>}
-                        </div>
+            <DialogContent className="h-full sm:h-fit sm:max-w-[1025px] pt-12">
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full sm:max-h-[700px] overflow-y-auto px-4">
+                    <DialogHeader className="mb-4">
+                        <DialogTitle>Create Deck, Add Flashcards</DialogTitle>
+                        <DialogDescription>
+                            Add a title, a short description, and your first flashcard.
+                        </DialogDescription>
+                    </DialogHeader>
 
-                        <div className="grid gap-2 mb-8">
-                            <Label htmlFor="description">Description</Label>
-                            <Textarea {...register('description')}
-                                className={errors.title ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
-                                id="description"
-                                placeholder="Add a description"
-                                
-                            />
-                            {errors.description && <Label className="text-xs text-destructive">{errors.description.message?.replaceAll('\"', "")}</Label>}
-                        </div>
+                    <div className="grid gap-2 mb-4">
+                        <Label htmlFor="title">Title</Label>
+                        <Input
+                            {...register('title')}
+                            className={errors.title ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
+                            id="title"
+                            type="text"
+                            placeholder="Enter a title (e.g., Math Quiz 101)"
+                        />
+                        {errors.title && (
+                            <Label className="text-xs text-destructive">
+                            {errors.title.message?.replaceAll('"', '')}
+                            </Label>)}
+                    </div>
 
-                        {/* flashcards container */}
-                        <div className="flex flex-col gap-4">
-                            <FlashcardInputCard formUtilities={{register, setError, errors, isLoading}} flashcardNo={1} onFlashcardRemove={removeFlashcard}></FlashcardInputCard>
-                            {/* <div>
-                                <label>Flashcard Front</label>
-                                <input {...register("flashcards.0.front")} />
-                                {errors.flashcards?.[0]?.front && <p>{errors.flashcards[0].front.message}</p>}
-                            </div>
+                    <div className="grid gap-2 mb-8">
+                        <Label htmlFor="description">Description</Label>
+                        <Textarea
+                            {...register('description')}
+                            className={`max-h-48 ${errors.description ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}`}
+                            placeholder="Add a description"
+                        />
+                        {errors.description && (
+                            <Label className="text-xs text-destructive">
+                            {errors.description.message?.replaceAll('"', '')}
+                            </Label>)}
+                    </div>
 
-                            <div>
-                                <label>Flashcard Back</label>
-                                <input {...register("flashcards.0.back")} />
-                                {errors.flashcards?.[0]?.back && <p>{errors.flashcards[0].back.message}</p>}
-                            </div> */}
-                        </div>
+                    <div className="flex flex-col flex-grow sm:flex-none gap-4 mb-4">
+                        <FlashcardInputCard formUtilities={{ register, errors }} flashcardNo={1} onFlashcardRemove={removeFlashcard} />
+                        <FlashcardInputCard formUtilities={{ register, errors }} flashcardNo={2} onFlashcardRemove={removeFlashcard} />
+                        <FlashcardInputCard formUtilities={{ register, errors }} flashcardNo={2} onFlashcardRemove={removeFlashcard} />
+                        <FlashcardInputCard formUtilities={{ register, errors }} flashcardNo={2} onFlashcardRemove={removeFlashcard} />
+                        <FlashcardInputCard formUtilities={{ register, errors }} flashcardNo={2} onFlashcardRemove={removeFlashcard} />
+                        <FlashcardInputCard formUtilities={{ register, errors }} flashcardNo={2} onFlashcardRemove={removeFlashcard} />
+                        <FlashcardInputCard formUtilities={{ register, errors }} flashcardNo={2} onFlashcardRemove={removeFlashcard} />
+                    </div>
 
-                        <DialogFooter className="absolute flex-row gap-2 bottom-4 right-4">
-                            <Button type="submit" variant={'destructive'}>Cancel</Button> 
-                            <Button type="submit">Create</Button>
-                        </DialogFooter>
-                    </form>
-                </DialogContent>
+                    <DialogFooter className="flex-row gap-2 justify-end">
+                    <DialogTrigger asChild>
+                        <Button variant={'destructive'} onClick={() => reset()}>
+                        Cancel
+                        </Button>
+                    </DialogTrigger>
+                    <Button type="submit">Create</Button>
+                    </DialogFooter>
+                </form>
+            </DialogContent>
         </Dialog>
     );
 }
