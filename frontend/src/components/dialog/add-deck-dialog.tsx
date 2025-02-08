@@ -1,6 +1,5 @@
 'use client'
 
-import { AxiosResponse, AxiosError } from "axios"
 import Joi from "joi"
 import { joiResolver } from "@hookform/resolvers/joi"
 
@@ -26,13 +25,13 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "../ui/button"
 
-import { CirclePlus, Plus } from "lucide-react";
+import { CirclePlus, Plus, Pickaxe } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile"
 import { DeckProps } from "../deck"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { Textarea } from "../ui/textarea"
 import { FlashcardInputCard } from "../flashcard-input-card"
-import { ScrollArea } from "@radix-ui/react-scroll-area"
+import { ChangeEvent, EventHandler, FormEventHandler, useState } from "react"
 
 export type AddDeckDialogProps = {
     variant: 'simple-button' | 'deck-button',
@@ -42,33 +41,33 @@ export type AddDeckDialogProps = {
 // Define schemas
 const FlashcardsSchema = Joi.object({
     front: Joi.string().min(1).max(400).required().messages({
-      "string.empty": "Front text is required",
-      "string.min": "Front must be at least 1 character",
-      "string.max": "Front cannot exceed 400 characters",
+      "string.empty": "question is required",
+      "string.min": "question must be at least 1 character",
+      "string.max": "question cannot exceed 400 characters",
     }),
     back: Joi.string().min(1).max(400).required().messages({
-      "string.empty": "Back text is required",
-      "string.min": "Back must be at least 1 character",
-      "string.max": "Back cannot exceed 400 characters",
+      "string.empty": "answer is required",
+      "string.min": "answer must be at least 1 character",
+      "string.max": "answer cannot exceed 400 characters",
     }),
   });
   
 const DeckFlashcardsSchema = Joi.object({
     title: Joi.string().min(3).max(30).required().messages({
-        "string.empty": "Title is required",
-        "string.min": "Title must be at least 3 characters",
-        "string.max": "Title cannot exceed 30 characters",
+        "string.empty": "title is required",
+        "string.min": "title must be at least 3 characters",
+        "string.max": "title cannot exceed 30 characters",
     }),
     description: Joi.string().min(3).max(250).required().messages({
-        "string.empty": "Description is required",
-        "string.min": "Description must be at least 3 characters",
-        "string.max": "Description cannot exceed 250 characters",
+        "string.empty": "description is required",
+        "string.min": "description must be at least 3 characters",
+        "string.max": "description cannot exceed 250 characters",
     }),
     createdAt: Joi.string().isoDate().required().messages({
-        "string.isoDate": "Invalid date format",
+        "string.isoDate": "invalid date format",
     }),
     flashcards: Joi.array().items(FlashcardsSchema).min(1).required().messages({
-        "array.min": "At least one flashcard is required",
+        "array.min": "at least one flashcard is required",
     }),
   });
 
@@ -82,44 +81,29 @@ export type DeckFlashcardsFormData = {
     }[]
 }
 
+
 export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDialogProps){
-    const isMobile = useIsMobile()
+    const isMobile = useIsMobile();
     
-    const {register, setError, handleSubmit, formState: {errors, isLoading}, reset } = useForm<DeckFlashcardsFormData>({
+    // array of flashcard numbers only. cannot pass multiple instances of form utilities
+    const [flashcardArray, setFlashcardArray] = useState<number[]>([1,2]);
+    
+    const {register, setError, setValue, handleSubmit, formState: {errors, isSubmitting}, reset, clearErrors } = useForm<DeckFlashcardsFormData>({
         resolver: joiResolver(DeckFlashcardsSchema)
     });
     
-
-    // const onSubmit = async () => {
-    //     const axios = require('axios');
-    //     let config = {
-    //         method: 'post',
-    //         maxBodyLength: Infinity,
-    //         url: 'http://localhost:3001/api/decks',
-    //         withCredentials: true
-    //     };
-
-    //     axios.request(config)
-    //     .then((response: AxiosResponse) => {
-    //         // create now the new deck if response is ok
-    //         // onDeckAdded();    
-    //     })
-    //     .catch((error: AxiosError) => {
-    //         console.log(error.response?.data);
-    //     });
-    // };
-
     const onSubmit: SubmitHandler<DeckFlashcardsFormData> = (data: DeckFlashcardsFormData) => {
+        console.log('i am called');
+        
         console.log(data);
     };
-
+    
     const removeFlashcard = (flashcardNo: number) =>{
         console.log('removing card number: ' + flashcardNo);
     }
-       
-
+    
     return (
-        // deck button and mobile view = button(hidden)
+        // deck button and mobile view = deck button hidden
         // deck button !mobile view = deck button
         // !deck-button = simple button
         <Dialog>
@@ -144,12 +128,17 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                 }
             </DialogTrigger>
             <DialogContent className="h-full sm:h-fit sm:max-w-[1025px] pt-12">
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full sm:max-h-[700px] overflow-y-auto px-4">
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full sm:max-h-[600px] overflow-y-auto px-4">
                     <DialogHeader className="mb-4">
-                        <DialogTitle>Create Deck, Add Flashcards</DialogTitle>
-                        <DialogDescription>
-                            Add a title, a short description, and your first flashcard.
-                        </DialogDescription>
+                        <DialogTitle className="flex items-center gap-2">
+                            <div className='bg-gray-200 p-2 rounded-md'>
+                                <Pickaxe color="#303030"/>
+                            </div>
+                            <div>
+                                <h1>Create Deck, Add Flashcards</h1>
+                                <h1 className="font-normal text-xs text-muted-foreground mt-1">Add a title, a short description, and your first flashcard.</h1>
+                            </div>
+                        </DialogTitle>
                     </DialogHeader>
 
                     <div className="grid gap-2 mb-4">
@@ -167,28 +156,48 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                             </Label>)}
                     </div>
 
+
                     <div className="grid gap-2 mb-8">
                         <Label htmlFor="description">Description</Label>
                         <Textarea
                             {...register('description')}
-                            className={`max-h-48 ${errors.description ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}`}
+                            className={`max-h-24 min-h-1 overflow-hidden resize-none ${errors.description ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}`}
                             placeholder="Add a description"
-                        />
+                            id="description"
+                            rows={1}                  
+                            onInput={(e: ChangeEvent<HTMLTextAreaElement>) => {
+                                const target = e.target as HTMLTextAreaElement;
+                                target.style.height = 'auto';
+                                target.style.height = `${target.scrollHeight}px`;
+                                
+                                if(target.value.length > 250){
+                                    setError('description', {type: 'max', message: 'description cannot exceed 250 characters'})
+                                }else{
+                                    clearErrors('description')
+                                }
+                            }}
+                            />
                         {errors.description && (
                             <Label className="text-xs text-destructive">
-                            {errors.description.message?.replaceAll('"', '')}
+                            {errors.description.message?.replaceAll('\"', '')}
                             </Label>)}
                     </div>
 
+                    <Label className="mb-4">{`Total: ${flashcardArray.length}`}</Label>
+
                     <div className="flex flex-col flex-grow sm:flex-none gap-4 mb-4">
-                        <FlashcardInputCard formUtilities={{ register, errors }} flashcardNo={1} onFlashcardRemove={removeFlashcard} />
-                        <FlashcardInputCard formUtilities={{ register, errors }} flashcardNo={2} onFlashcardRemove={removeFlashcard} />
-                        <FlashcardInputCard formUtilities={{ register, errors }} flashcardNo={2} onFlashcardRemove={removeFlashcard} />
-                        <FlashcardInputCard formUtilities={{ register, errors }} flashcardNo={2} onFlashcardRemove={removeFlashcard} />
-                        <FlashcardInputCard formUtilities={{ register, errors }} flashcardNo={2} onFlashcardRemove={removeFlashcard} />
-                        <FlashcardInputCard formUtilities={{ register, errors }} flashcardNo={2} onFlashcardRemove={removeFlashcard} />
-                        <FlashcardInputCard formUtilities={{ register, errors }} flashcardNo={2} onFlashcardRemove={removeFlashcard} />
+                       {flashcardArray.map((flashcardNo, index) => (
+                            <FlashcardInputCard key={index} flashcardNo={flashcardNo} formUtilities={{register, errors}} onFlashcardRemove={removeFlashcard}></FlashcardInputCard>
+                       ))}
                     </div>
+
+                    {/* input for createdAt */}
+                    <Input
+                        {...register('createdAt')}
+                        id="createdAt"
+                        type="hidden"
+                        value={new Date().toISOString()}
+                    />
 
                     <DialogFooter className="flex-row gap-2 justify-end">
                     <DialogTrigger asChild>
@@ -196,7 +205,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                         Cancel
                         </Button>
                     </DialogTrigger>
-                    <Button type="submit">Create</Button>
+                        <Button type="submit">Create</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
