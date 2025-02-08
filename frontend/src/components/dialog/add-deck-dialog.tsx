@@ -31,7 +31,7 @@ import { DeckProps } from "../deck"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { Textarea } from "../ui/textarea"
 import { FlashcardInputCard } from "../flashcard-input-card"
-import { ChangeEvent, EventHandler, FormEventHandler, useState } from "react"
+import { ChangeEvent, useState } from "react"
 
 export type AddDeckDialogProps = {
     variant: 'simple-button' | 'deck-button',
@@ -86,21 +86,36 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
     const isMobile = useIsMobile();
     
     // array of flashcard numbers only. cannot pass multiple instances of form utilities
-    const [flashcardArray, setFlashcardArray] = useState<number[]>([1,2]);
+    const [flashcardArray, setFlashcardArray] = useState<number[]>([1,2,3,4,5]);
     
-    const {register, setError, setValue, handleSubmit, formState: {errors, isSubmitting}, reset, clearErrors } = useForm<DeckFlashcardsFormData>({
+    const {register, unregister, setValue, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
         resolver: joiResolver(DeckFlashcardsSchema)
     });
     
-    const onSubmit: SubmitHandler<DeckFlashcardsFormData> = (data: DeckFlashcardsFormData) => {
-        console.log('i am called');
-        
+    const onSubmit: SubmitHandler<DeckFlashcardsFormData> = (data: DeckFlashcardsFormData) => {        
         console.log(data);
     };
     
-    const removeFlashcard = (flashcardNo: number) =>{
-        console.log('removing card number: ' + flashcardNo);
-    }
+    const removeFlashcard = (flashcardNo: number) => {
+        const index = flashcardArray.indexOf(flashcardNo);
+
+        //get the trailing elements
+        const trailing = flashcardArray.slice(index)
+        
+        // adjust values to left
+        trailing.forEach((flashcard)=> {
+            setValue( `flashcards.${flashcard - 1}`, getValues(`flashcards.${flashcard}`));
+        })      
+        
+        // unregister the last flashcard because it doesnt have data anymore
+        unregister(`flashcards.${flashcardArray.length-1}`)
+        
+
+        // remove now the last flashcard 
+        flashcardArray.splice(flashcardArray.length-1)
+
+        setFlashcardArray([...flashcardArray])    
+    };
     
     return (
         // deck button and mobile view = deck button hidden
@@ -130,7 +145,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
             <DialogContent className="h-full sm:h-fit sm:max-w-[1025px] pt-12">
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full sm:max-h-[600px] overflow-y-auto px-4">
                     <DialogHeader className="mb-4">
-                        <DialogTitle className="flex items-center gap-2">
+                        <DialogTitle className="flex items-center gap-2 text-left">
                             <div className='bg-gray-200 p-2 rounded-md'>
                                 <Pickaxe color="#303030"/>
                             </div>
@@ -202,10 +217,10 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                     <DialogFooter className="flex-row gap-2 justify-end">
                     <DialogTrigger asChild>
                         <Button variant={'destructive'} onClick={() => reset()}>
-                        Cancel
+                            Cancel
                         </Button>
                     </DialogTrigger>
-                        <Button type="submit">Create</Button>
+                    <Button type="submit">Create</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
