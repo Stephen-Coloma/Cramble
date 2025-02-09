@@ -92,7 +92,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
     // array of flashcard numbers only. cannot pass multiple instances of form utilities
     const [flashcardArray, setFlashcardArray] = useState<number[]>([1,2,3]);
 
-    const {status, statusText, error, loading, callback, resetStates } = usePost('http://localhost:3002/api/decks');
+    const {status, statusText, data, error, loading, callback, resetStates } = usePost('http://localhost:3001/api/decks');
     
     const {register, unregister, setValue, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
         resolver: joiResolver(DeckFlashcardsSchema)
@@ -103,20 +103,48 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
         await callback(formData)
     };
 
-    // toaster pops when deck is added
+    // toaster pops when deck is added, closes the dialog
     useEffect(()=>{        
-        if(status === 999){
+        if(status === 200){
             toast.success('Deck created', {
-                description: new Date(getValues('createdAt')).toLocaleString()
+                description: new Date(getValues('createdAt')).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                })
             })
-
-            // todo: get the data to be added in the main decks
 
             // Close the dialog
             setIsDialogOpen(false);
 
             // reset state so that next request is not tied with past requests
             resetStates()
+
+            // add the on deck added
+            const newlyAddedDeck: DeckProps = {
+                deckId: data.deckId,
+                title: getValues('title'),
+                description: getValues('description'),
+                createdAt: getValues('createdAt'),
+                editedAt: 'null',
+                totalCards: flashcardArray.length,
+                unsureTotal: 0,
+                familiarTotal: 0,
+                masteredTotal: 0,
+                unratedTotal: flashcardArray.length,
+            }
+
+            // render the newly added deck on the list using the callback function
+            onDeckAdded(newlyAddedDeck)
+
+            // reset all form states
+            reset()
+            
+            // unregister all flashcard input forms
+            unregister('flashcards')
+
+            // set new flashcard arra
+            setFlashcardArray([1,2,3])
         }
     }, [loading])
     
@@ -251,7 +279,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                         value={new Date().toISOString()}
                     />
 
-                    <Button type='button' className="text-white sm:min-h-24 sm:text-base bg-primary/85 hover:bg-primary mb-4" onClick={addFlashcard}>
+                    <Button type='button' disabled={isSubmitting ? true : false} className="text-white sm:min-h-24 sm:text-base bg-primary/85 hover:bg-primary mb-4" onClick={addFlashcard}>
                         Add Flashcard
                     </Button>
 
@@ -260,7 +288,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
 
                     <DialogFooter className="flex-row gap-2 justify-end">
                         <DialogTrigger asChild>
-                            <Button variant={'destructive'} onClick={() => reset()}>
+                            <Button type='button' disabled={isSubmitting ? true : false} variant={'destructive'} onClick={() => reset()}>
                                 Cancel
                             </Button>
                         </DialogTrigger>

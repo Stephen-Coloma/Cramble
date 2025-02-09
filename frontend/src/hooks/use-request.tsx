@@ -58,7 +58,7 @@ export type PostApiResponse = ApiResponse & {
 export function usePost(url: string, options?: AxiosRequestConfig ): PostApiResponse {
     const [status, setStatus] = useState<number>(0);
     const [statusText, setStatusText] = useState<string>('');
-    const [data, setData] = useState<null>(null);
+    const [data, setData] = useState<any>(null);
     const [error, setError] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -79,10 +79,12 @@ export function usePost(url: string, options?: AxiosRequestConfig ): PostApiResp
             const response: AxiosResponse = await axios.post(url, dataToSend, config);
             setStatus(response.status);
             setStatusText(response.statusText);
+            if(response.data){
+                setData(response.data)
+            }
         } catch(error: unknown){
             setError(error)
         } finally{
-            setStatus(999)
             setLoading(false);
         }
     }

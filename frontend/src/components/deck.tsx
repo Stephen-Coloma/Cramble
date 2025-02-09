@@ -114,7 +114,7 @@ export function Deck({
             </div>
           </CardDescription>
         </div>
-        <CardDescription className="text-xs text-muted-foreground/50">{`${(editedAt === null) ? 'Created at ' + formattedCreationDate : 'Edited at ' + formattedEditionDate }`}</CardDescription>
+        <CardDescription className="text-xs text-muted-foreground/50">{`${(!editedAt || editedAt === 'null') ? 'Created at ' + formattedCreationDate : 'Edited at ' + formattedEditionDate }`}</CardDescription>
       </CardHeader>
 
       <CardContent>

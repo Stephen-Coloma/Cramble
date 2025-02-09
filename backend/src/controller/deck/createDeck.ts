@@ -54,7 +54,7 @@ const createDeckController = async (req: Request, res: Response) =>{
         });
 
         // Send success response
-        res.status(200).json({message: "Deck successfully created"});
+        res.status(200).json({deckId: deckId});
     }catch (error) {
         // Rollback transaction on error
         await connection.promise().rollback()
