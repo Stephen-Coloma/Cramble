@@ -52,6 +52,7 @@ export function useFetch<T>(url: string, options?: AxiosRequestConfig): ApiRespo
 // when it is invoked in the component usePost hook is used
 export type PostApiResponse = ApiResponse & {
     callback: (dataToSend: any) => Promise<void>
+    resetStates: () => Promise<void>
 }
 
 export function usePost(url: string, options?: AxiosRequestConfig ): PostApiResponse {
@@ -81,9 +82,17 @@ export function usePost(url: string, options?: AxiosRequestConfig ): PostApiResp
         } catch(error: unknown){
             setError(error)
         } finally{
+            setStatus(999)
             setLoading(false);
         }
     }
 
-    return {status, statusText, data, error, loading, callback };    
+    // reset states so that next request is not tied with past request's state
+    const resetStates = async() => {
+        setStatus(0);
+        setStatusText('');
+        setError(null)
+    } 
+
+    return {status, statusText, data, error, loading, callback, resetStates };    
 }

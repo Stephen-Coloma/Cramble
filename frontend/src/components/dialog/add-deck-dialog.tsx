@@ -31,7 +31,10 @@ import { DeckProps } from "../deck"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { Textarea } from "../ui/textarea"
 import { FlashcardInputCard } from "../flashcard-input-card"
-import { ChangeEvent, useState } from "react"
+import { ChangeEvent, useEffect, useState } from "react"
+import { usePost } from "@/hooks/use-request"
+import { toast } from "sonner"
+import { stat } from "fs"
 
 export type AddDeckDialogProps = {
     variant: 'simple-button' | 'deck-button',
@@ -84,17 +87,38 @@ export type DeckFlashcardsFormData = {
 
 export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDialogProps){
     const isMobile = useIsMobile();
+    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
     
     // array of flashcard numbers only. cannot pass multiple instances of form utilities
-    const [flashcardArray, setFlashcardArray] = useState<number[]>([1,2,3,4,5,6,7]);
+    const [flashcardArray, setFlashcardArray] = useState<number[]>([1,2,3]);
+
+    const {status, statusText, error, loading, callback, resetStates } = usePost('http://localhost:3002/api/decks');
     
     const {register, unregister, setValue, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
         resolver: joiResolver(DeckFlashcardsSchema)
     });
     
-    const onSubmit: SubmitHandler<DeckFlashcardsFormData> = (data: DeckFlashcardsFormData) => {        
-        console.log(data);
+    const onSubmit: SubmitHandler<DeckFlashcardsFormData> = async (formData: DeckFlashcardsFormData) => {
+        await new Promise((resolve) => {setTimeout(resolve, 2000)}); 
+        await callback(formData)
     };
+
+    // toaster pops when deck is added
+    useEffect(()=>{        
+        if(status === 999){
+            toast.success('Deck created', {
+                description: new Date(getValues('createdAt')).toLocaleString()
+            })
+
+            // todo: get the data to be added in the main decks
+
+            // Close the dialog
+            setIsDialogOpen(false);
+
+            // reset state so that next request is not tied with past requests
+            resetStates()
+        }
+    }, [loading])
     
     const removeFlashcard = (flashcardNo: number) => {
         // do not remove card if less than 3
@@ -131,12 +155,13 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
         // deck button and mobile view = deck button hidden
         // deck button !mobile view = deck button
         // !deck-button = simple button
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
                 {variant === 'deck-button' && !isMobile ? 
                     <Card className="min-h-[306px] bg-muted border-2 border-primary/50 hover:border-primary hover:border-4 shadow transition-colors duration-200 relative">
                         <Button 
-                        className="w-full h-full absolute top-0 left-0 opacity-0 pointer-events-auto bg-muted z-10"
+                            className="w-full h-full absolute top-0 left-0 opacity-0 pointer-events-auto bg-muted z-10"
+                            onClick={() => setIsDialogOpen(true)} // Opens the dialog
                         />
                         <CardContent className="h-full w-full flex flex-col items-center justify-center gap-2 z-1">
                             <CirclePlus className="h-16 w-16 text-primary/90" />
@@ -147,7 +172,9 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                     </Card>
                     :
                     // change the layout
-                    <Button variant={'default'} size={'icon'} className={`${variant === 'deck-button' && isMobile ? 'hidden' : ''} min-h-9 min-w-9`}>
+                    <Button variant={'default'} size={'icon'} 
+                        className={`${variant === 'deck-button' && isMobile ? 'hidden' : ''} min-h-9 min-w-9`}
+                        onClick={() => setIsDialogOpen(true)}>
                         <Plus></Plus>
                     </Button>
                 }
@@ -237,7 +264,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                                 Cancel
                             </Button>
                         </DialogTrigger>
-                        <Button type="submit">Create</Button>
+                        <Button type="submit" disabled={isSubmitting ? true : false}>{isSubmitting ? 'Creating' : 'Create'}</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
