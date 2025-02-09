@@ -86,7 +86,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
     const isMobile = useIsMobile();
     
     // array of flashcard numbers only. cannot pass multiple instances of form utilities
-    const [flashcardArray, setFlashcardArray] = useState<number[]>([1,2,3]);
+    const [flashcardArray, setFlashcardArray] = useState<number[]>([1,2,3,4,5,6,7]);
     
     const {register, unregister, setValue, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
         resolver: joiResolver(DeckFlashcardsSchema)
@@ -121,6 +121,11 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
         }
 
     };
+
+    const addFlashcard = () => {
+        // last element + 1 becomes the new last element
+        setFlashcardArray([...flashcardArray, flashcardArray[flashcardArray.length-1]+1])
+    }
     
     return (
         // deck button and mobile view = deck button hidden
@@ -219,6 +224,10 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                         value={new Date().toISOString()}
                     />
 
+                    <Button type='button' className="text-white sm:min-h-24 sm:text-base bg-primary/85 hover:bg-primary mb-4" onClick={addFlashcard}>
+                        Add Flashcard
+                    </Button>
+
                     {/* error message for less than three cards */}
                     {errors.root?.message && <Label className="text-sm text-destructive">{errors.root.message}</Label>}
 
@@ -235,7 +244,3 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
         </Dialog>
     );
 }
-
-
-// WORK ON THE CARD THAT ALLOWS USERS TO ADD AS MANY FLASHCARDS THEY WANT!!!!!
-// MAKE SURE THAT THE CONTENT IS SCROLLABLE. EITHER THE FLASHCARDS IS SCROLLABLE ONLY OR WITH THE WHOLE DIALOF
