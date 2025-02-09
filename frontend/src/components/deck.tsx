@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import { useEffect, useState } from "react"
-import { AxiosError, AxiosResponse } from "axios"
 
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
 
@@ -32,7 +31,7 @@ import {
 import {Swords, Pencil, Info, Filter } from 'lucide-react'
 
 import { DeckWithStatsDTO } from "@/dtos/deck/DeckWithStats.dto"
-import { ApiResponse, useFetch } from "@/hooks/use-request"
+import { useFetch } from "@/hooks/use-request"
 
 // Deck prop is baed on DeckDTO wherein it is a shared type for backend and frontend
 export type DeckProps = Pick<DeckWithStatsDTO, 

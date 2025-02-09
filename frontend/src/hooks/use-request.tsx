@@ -39,6 +39,7 @@ export function useFetch<T>(url: string, options?: AxiosRequestConfig): ApiRespo
         }
       }
 
+    // todo: remove the delay
     useEffect(() => {
         setTimeout(()=>{fireGetRequest();}, 3000)
     }, [url]); // run when url is changed
@@ -48,7 +49,7 @@ export function useFetch<T>(url: string, options?: AxiosRequestConfig): ApiRespo
 
 // This type is an extension of the ApiResponse type where a callback 
 // function is provided so that posts requests will only be triggered 
-// when it is invoked in the component usePost is used
+// when it is invoked in the component usePost hook is used
 export type PostApiResponse = ApiResponse & {
     callback: (dataToSend: any) => Promise<void>
 }
