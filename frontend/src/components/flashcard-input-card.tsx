@@ -6,7 +6,7 @@ import { Separator } from "./ui/separator";
 import { Textarea } from "./ui/textarea";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { DeckFlashcardsFormData } from "./dialog/add-deck-dialog";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useState } from "react";
 
 export type FlashcardInputCardProps = {
     formUtilities: {
@@ -25,11 +25,21 @@ export function FlashcardInputCard({
     flashcardNo,
     onFlashcardRemove
 }: FlashcardInputCardProps){
+    const [isRemoving, setIsRemoving] = useState<boolean>(false);
+
+    const handleRemove = () => {      
+        setIsRemoving(true)
+        setTimeout(()=> {
+            onFlashcardRemove(flashcardNo)
+            setIsRemoving(false)
+        }, 300)   
+    }
     return(
-        <Card className="w-full min-h-64 sm:min-h-40 px-4 bg-muted border-2 border-transparent hover:border-primary shadow transition-colors duration-200">
+        <Card className={`w-full min-h-64 sm:min-h-40 px-4 bg-muted border-2 border-transparent hover:border-primary shadow transition-colors transition-opacity duration-300 ease-in-out
+                    ${isRemoving ? "opacity-0" : ""}`}>
             <CardHeader className="flex-row justify-between items-baseline p-0">
                 <Label className="h-9 w-9 text-xl font-bold  text-center">{flashcardNo}</Label>
-                <Button type='button' variant={'ghost'} size={'icon'} onClick={()=> onFlashcardRemove(flashcardNo)}> 
+                <Button type='button' variant={'ghost'} size={'icon'} onClick={handleRemove}> 
                     <Trash2></Trash2>
                 </Button>
             </CardHeader>

@@ -86,7 +86,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
     const isMobile = useIsMobile();
     
     // array of flashcard numbers only. cannot pass multiple instances of form utilities
-    const [flashcardArray, setFlashcardArray] = useState<number[]>([1,2,3,4,5]);
+    const [flashcardArray, setFlashcardArray] = useState<number[]>([1,2,3]);
     
     const {register, unregister, setValue, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
         resolver: joiResolver(DeckFlashcardsSchema)
@@ -97,24 +97,29 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
     };
     
     const removeFlashcard = (flashcardNo: number) => {
-        const index = flashcardArray.indexOf(flashcardNo);
+        // do not remove card if less than 3
+        if(flashcardArray.length < 4){
+            setError('root', {message: 'need atleast 3 cards'})
+        }else{
+            const index = flashcardArray.indexOf(flashcardNo);
+    
+            //get the trailing elements
+            const trailing = flashcardArray.slice(index)
+            
+            // adjust values to left
+            trailing.forEach((flashcard)=> {
+                setValue( `flashcards.${flashcard - 1}`, getValues(`flashcards.${flashcard}`));
+            })      
+            
+            // unregister the last flashcard because it doesnt have data anymore
+            unregister(`flashcards.${flashcardArray.length-1}`)
+    
+            // remove now the last flashcard 
+            flashcardArray.splice(flashcardArray.length-1)
+    
+            setFlashcardArray([...flashcardArray])    
+        }
 
-        //get the trailing elements
-        const trailing = flashcardArray.slice(index)
-        
-        // adjust values to left
-        trailing.forEach((flashcard)=> {
-            setValue( `flashcards.${flashcard - 1}`, getValues(`flashcards.${flashcard}`));
-        })      
-        
-        // unregister the last flashcard because it doesnt have data anymore
-        unregister(`flashcards.${flashcardArray.length-1}`)
-        
-
-        // remove now the last flashcard 
-        flashcardArray.splice(flashcardArray.length-1)
-
-        setFlashcardArray([...flashcardArray])    
     };
     
     return (
@@ -214,13 +219,16 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                         value={new Date().toISOString()}
                     />
 
+                    {/* error message for less than three cards */}
+                    {errors.root?.message && <Label className="text-sm text-destructive">{errors.root.message}</Label>}
+
                     <DialogFooter className="flex-row gap-2 justify-end">
-                    <DialogTrigger asChild>
-                        <Button variant={'destructive'} onClick={() => reset()}>
-                            Cancel
-                        </Button>
-                    </DialogTrigger>
-                    <Button type="submit">Create</Button>
+                        <DialogTrigger asChild>
+                            <Button variant={'destructive'} onClick={() => reset()}>
+                                Cancel
+                            </Button>
+                        </DialogTrigger>
+                        <Button type="submit">Create</Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
