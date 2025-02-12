@@ -1,6 +1,7 @@
+import DeckBoard from "@/components/deck"
 import {PageTitle, PageTitleProps} from "@/components/page-title"
 import { LibraryBig } from 'lucide-react'
-import { DeckBoard} from "@/components/deck"
+
 
 export default function MyDecks() {
   const pageDetails: PageTitleProps = {
@@ -14,7 +15,7 @@ export default function MyDecks() {
   return (
     <div className=" w-full">
       <PageTitle {...pageDetails}/>
-      <DeckBoard/>
+      <DeckBoard></DeckBoard>
     </div>
   )
 } 

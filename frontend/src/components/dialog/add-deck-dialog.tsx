@@ -176,11 +176,11 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
     return (
         // deck button and mobile view = deck button hidden
         // deck button !mobile view = deck button
-        // !deck-button = simple button
+        // not deck-button = simple button
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
                 {variant === 'deck-button' && !isMobile ? 
-                    <Card className="min-h-[306px] bg-muted border-2 border-primary/50 hover:border-primary hover:border-4 shadow transition-colors duration-200 relative">
+                    <Card className="min-h-[306px] bg-muted border-2 border-primary/50 hover:border-primary shadow transition-colors duration-200 relative">
                         <Button 
                             className="w-full h-full absolute top-0 left-0 opacity-0 pointer-events-auto bg-muted z-10"
                             onClick={() => setIsDialogOpen(true)} // Opens the dialog

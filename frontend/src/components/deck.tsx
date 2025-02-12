@@ -28,10 +28,12 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-import {Swords, Pencil, Info, Filter } from 'lucide-react'
+import {Swords, Pencil, Info, Filter, PackagePlus } from 'lucide-react'
 
 import { DeckWithStatsDTO } from "@/dtos/deck/DeckWithStats.dto"
 import { useFetch } from "@/hooks/use-request"
+import DeckLoading from "./deck-loading"
+import { Label } from "./ui/label"
 
 // Deck prop is baed on DeckDTO wherein it is a shared type for backend and frontend
 export type DeckProps = Pick<DeckWithStatsDTO, 
@@ -104,7 +106,7 @@ export function Deck({
   ]
 
   return (
-    <Card className="w-100 border-4 border-transparent hover:border-primary shadow transition-colors duration-200">
+    <Card className="w-100 border-2 hover:border-primary shadow transition-colors duration-200">
       <CardHeader>
         <div className="flex justify-between">
           <CardTitle>{title}</CardTitle>
@@ -176,30 +178,28 @@ export function Deck({
   )
 }
 
-// Container for the decks in the My Decks page
-// RENAME DECKS TO DECKS CONTAINER
-export function DeckBoard(){
+export default function DeckBoard(){
   const {status, statusText, data, error, loading}  = useFetch<DeckProps[]>('http://localhost:3001/api/decks')
   const [deckArray, setDeckArray] = useState<DeckProps[]>([]);
 
-  // update the deckArray when data is fetched
+  // update the deckArray when data is fetched & when it is an array only
   useEffect(()=>{
-    if(data){
+    if(Array.isArray(data)){
       setDeckArray(data)
     }
   }, [data, loading])
-
-  // adds the created deck from add-deck dialog
+  
+  // adds the created deck from add-deck dialoggi
   const addNewDeck = (newlyAddedDeck: DeckProps) => {
     setDeckArray([...deckArray, newlyAddedDeck])
   }
-
+  
+  // todo: implement search and filter (filder depends on what I can filter) 
   return(
     <>
-      <Card className="mb-4">
+      <Card className="mb-12">
         <CardContent className="flex gap-2 p-2">
-          {/* Search, add button, filter */}
-          <Input placeholder="Search Card" />
+          <Input placeholder="Search Deck" />
           <AddDeckDialog onDeckAdded={addNewDeck} variant="simple-button" />
           <Button size={'icon'} className="min-h-9 min-w-9">
             <Filter />
@@ -207,30 +207,34 @@ export function DeckBoard(){
         </CardContent>
       </Card>
 
-      {/* Loading state div */}
+      {/* loading ui */}
       {loading && (
-        <div className="w-full">
-          <p>Loading...</p> {/* This will render if loading is true */}
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
+          {[1,2,3,4,5,6].map((_, index)=> (
+            <DeckLoading key={index}></DeckLoading>
+          ))}
         </div>
       )}
 
-      {/* Only show the grid if it's not loading */}
-      {!loading && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
-          {deckArray.length > 0 ? deckArray.map((deck, index) => (
+      {/* non empty decks*/}
+      {!loading && (deckArray.length > 0) && (
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
+          {deckArray.map((deck, index) => (
             <Deck key={index} {...deck} />
-          )) 
-          :
-            <>no cards  yet</>
-          }
-          <AddDeckDialog onDeckAdded={addNewDeck} variant="deck-button" />
+          ))}
+          <AddDeckDialog onDeckAdded={addNewDeck} variant="deck-button" />         
         </div>
       )}
+
+      {/* empty decks*/}
+      {!loading && deckArray.length === 0 && (
+        <div className="flex flex-col text-center items-center justify-center h-64 w-full gap-2">
+          <div className='dark:bg-gray-200 p-2 rounded-md'><PackagePlus size={50} color="#303030"/></div>
+          <Label className="text-lg">No decks created yet</Label>
+          <Label className="text-sm text-muted-foreground">Create your first deck to practice learning</Label>
+        </div>
+      )}
+
     </>
   );
 }
-
-// TODO: fix placeholders for no card yet
-// TODO: loading skeletons
-// TODO: add border hint on flashcards. it is not seen on black background
-// bug: cannot spread [...deckArray, newlyAddedDeck ] when deckArray is empty

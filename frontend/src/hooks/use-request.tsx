@@ -37,11 +37,11 @@ export function useFetch<T>(url: string, options?: AxiosRequestConfig): ApiRespo
         } finally{
             setLoading(false);
         }
-      }
+    }
 
     // todo: remove the delay
     useEffect(() => {
-        setTimeout(()=>{executeGetRequest();}, 3000)
+        setTimeout(()=>{executeGetRequest();}, 1000)
     }, [url]); // run when url is changed
 
     return {status, statusText, data, error, loading};    

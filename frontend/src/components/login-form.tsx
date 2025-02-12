@@ -49,7 +49,7 @@ export function LoginForm({
 
   //handle form validation and submission
   const onSubmit: SubmitHandler<LoginFormData> = async (formData: LoginFormData) => {
-    // with delay. to be removed
+    // todo: delay to be removed
     await new Promise((resolve) => {setTimeout(resolve, 2000)}); 
     await executePostRequest(formData);
   }
