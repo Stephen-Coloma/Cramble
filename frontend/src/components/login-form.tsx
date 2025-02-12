@@ -45,13 +45,13 @@ export function LoginForm({
     resolver: joiResolver(loginSchema)
   })
 
-  const { status, error, loading, callback }: PostApiResponse = usePost('http://localhost:3001/auth/login');
+  const { status, error, loading, executePostRequest }: PostApiResponse = usePost('http://localhost:3001/auth/login');
 
   //handle form validation and submission
   const onSubmit: SubmitHandler<LoginFormData> = async (formData: LoginFormData) => {
     // with delay. to be removed
     await new Promise((resolve) => {setTimeout(resolve, 2000)}); 
-    await callback(formData);
+    await executePostRequest(formData);
   }
 
   // update the ui based on loading change

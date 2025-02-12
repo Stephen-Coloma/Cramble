@@ -177,7 +177,8 @@ export function Deck({
 }
 
 // Container for the decks in the My Decks page
-export function Decks(){
+// RENAME DECKS TO DECKS CONTAINER
+export function DeckBoard(){
   const {status, statusText, data, error, loading}  = useFetch<DeckProps[]>('http://localhost:3001/api/decks')
   const [deckArray, setDeckArray] = useState<DeckProps[]>([]);
 
@@ -188,7 +189,7 @@ export function Decks(){
     }
   }, [data, loading])
 
-  // function to run once a deck is added
+  // adds the created deck from add-deck dialog
   const addNewDeck = (newlyAddedDeck: DeckProps) => {
     setDeckArray([...deckArray, newlyAddedDeck])
   }
@@ -228,3 +229,8 @@ export function Decks(){
     </>
   );
 }
+
+// TODO: fix placeholders for no card yet
+// TODO: loading skeletons
+// TODO: add border hint on flashcards. it is not seen on black background
+// bug: cannot spread [...deckArray, newlyAddedDeck ] when deckArray is empty

@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { useEffect, useState } from "react"
 
-// T is the expected type to be returned and converted as props for rendering component.
+// T is the expected type to be returned and converted as props for rendering component (get requests).
 // T = any makes it optional to provide a generic. Good for post requests
 export type ApiResponse<T = any> = {
     status: number,
@@ -24,7 +24,7 @@ export function useFetch<T>(url: string, options?: AxiosRequestConfig): ApiRespo
     };
 
     // This method is used for firing the get request
-    const fireGetRequest = async () => {
+    const executeGetRequest = async () => {
         setLoading(true);
 
         try{
@@ -41,7 +41,7 @@ export function useFetch<T>(url: string, options?: AxiosRequestConfig): ApiRespo
 
     // todo: remove the delay
     useEffect(() => {
-        setTimeout(()=>{fireGetRequest();}, 3000)
+        setTimeout(()=>{executeGetRequest();}, 3000)
     }, [url]); // run when url is changed
 
     return {status, statusText, data, error, loading};    
@@ -51,8 +51,8 @@ export function useFetch<T>(url: string, options?: AxiosRequestConfig): ApiRespo
 // function is provided so that posts requests will only be triggered 
 // when it is invoked in the component usePost hook is used
 export type PostApiResponse = ApiResponse & {
-    callback: (dataToSend: any) => Promise<void>
-    resetStates: () => Promise<void>
+    executePostRequest : (dataToSend: any) => Promise<void>
+    clearResponseState: () => void
 }
 
 export function usePost(url: string, options?: AxiosRequestConfig ): PostApiResponse {
@@ -72,7 +72,7 @@ export function usePost(url: string, options?: AxiosRequestConfig ): PostApiResp
     };
 
     // This method is used for firing the put request
-    const callback = async (dataToSend: any) => {
+    const executePostRequest  = async (dataToSend: any) => {
         setLoading(true);
         
         try{
@@ -90,11 +90,11 @@ export function usePost(url: string, options?: AxiosRequestConfig ): PostApiResp
     }
 
     // reset states so that next request is not tied with past request's state
-    const resetStates = async() => {
+    const clearResponseState  = () => {
         setStatus(0);
         setStatusText('');
         setError(null)
     } 
 
-    return {status, statusText, data, error, loading, callback, resetStates };    
+    return {status, statusText, data, error, loading, executePostRequest , clearResponseState  };    
 }

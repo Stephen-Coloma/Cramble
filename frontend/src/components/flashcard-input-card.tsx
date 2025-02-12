@@ -28,6 +28,7 @@ export function FlashcardInputCard({
     const [questionTextLength, setQuestionTextLength] = useState<number>(400);
     const [answerTextLength, setAnswerTextLength] = useState<number>(400);
 
+    // for animation purposes. 300 ms = duration-300
     const handleRemove = () => {      
         setIsRemoving(true)
         setTimeout(()=> {

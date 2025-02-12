@@ -145,9 +145,9 @@ deckRouter.get('/decks', getDecksController);
  *             schema:
  *               type: object
  *               properties:
- *                 message:
- *                   type: string
- *                   example: "Deck successfully created"
+ *                 deckId:
+ *                   type: number
+ *                   example: 1
  *       400:
  *         description: Invalid input data, validation failed.
  *         content:

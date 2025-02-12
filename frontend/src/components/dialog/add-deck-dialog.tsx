@@ -6,7 +6,6 @@ import { joiResolver } from "@hookform/resolvers/joi"
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -16,15 +15,11 @@ import {
     Card,
     CardContent,
     CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
 } from "@/components/ui/card"
 
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "../ui/button"
-
 import { CirclePlus, Plus, Pickaxe } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile"
 import { DeckProps } from "../deck"
@@ -34,7 +29,6 @@ import { FlashcardInputCard } from "../flashcard-input-card"
 import { ChangeEvent, useEffect, useState } from "react"
 import { usePost } from "@/hooks/use-request"
 import { toast } from "sonner"
-import { stat } from "fs"
 
 export type AddDeckDialogProps = {
     variant: 'simple-button' | 'deck-button',
@@ -92,7 +86,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
     // array of flashcard numbers only. cannot pass multiple instances of form utilities
     const [flashcardArray, setFlashcardArray] = useState<number[]>([1,2,3]);
 
-    const {status, statusText, data, error, loading, callback, resetStates } = usePost('http://localhost:3001/api/decks');
+    const {status, statusText, data, error, loading, executePostRequest , clearResponseState } = usePost('http://localhost:3001/api/decks');
     
     const {register, unregister, setValue, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
         resolver: joiResolver(DeckFlashcardsSchema)
@@ -100,7 +94,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
     
     const onSubmit: SubmitHandler<DeckFlashcardsFormData> = async (formData: DeckFlashcardsFormData) => {
         await new Promise((resolve) => {setTimeout(resolve, 2000)}); 
-        await callback(formData)
+        await executePostRequest(formData)
     };
 
     // toaster pops when deck is added, closes the dialog
@@ -118,7 +112,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
             setIsDialogOpen(false);
 
             // reset state so that next request is not tied with past requests
-            resetStates()
+            clearResponseState()
 
             // add the on deck added
             const newlyAddedDeck: DeckProps = {
