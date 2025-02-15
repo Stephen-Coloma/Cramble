@@ -5,6 +5,7 @@ import updateDeckDetailsController from "../controller/deck/updateDeckDetails";
 import deleteDeckController from "../controller/deck/deleteDeck";
 import isDeckDataValid from "../middleware/validation/isDeckDataValid";
 import isOwnerOfDeck from "../middleware/isOwnerOfDeck";
+import isDeckFlashcardsDataValid from "../middleware/validation/isDeckFlashcardsDataValid";
 
 const deckRouter = Router();
 
@@ -12,15 +13,15 @@ const deckRouter = Router();
  * @swagger
  * /api/decks:
  *   get:
- *     summary: Retrieve a list of active decks for the authenticated user.
- *     description: This endpoint fetches all active decks for the user identified by the JWT token.
+ *     summary: Retrieve all active decks for the authenticated user.
+ *     description: This endpoint allows the authenticated user to fetch their active decks along with total flashcards and mastery breakdown.
  *     tags:
  *       - decks
  *     security:
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: A list of active decks for the user.
+ *         description: Successfully retrieved the user's decks.
  *         content:
  *           application/json:
  *             schema:
@@ -30,36 +31,48 @@ const deckRouter = Router();
  *                 properties:
  *                   deckId:
  *                     type: integer
- *                     description: The unique identifier of the deck.
+ *                     description: The unique ID of the deck.
+ *                     example: 123
  *                   title:
  *                     type: string
  *                     description: The title of the deck.
+ *                     example: "Science Flashcards"
  *                   description:
  *                     type: string
- *                     description: A description of the deck.
+ *                     description: The description of the deck.
+ *                     example: "A deck covering basic science concepts."
  *                   createdAt:
  *                     type: string
  *                     format: date-time
  *                     description: The timestamp when the deck was created.
- *             examples:
- *               success:
- *                 value: 
- *                   [
- *                     {
- *                       "deckId": 1,
- *                       "title": "Math Deck",
- *                       "description": "A deck of math-related flashcards.",
- *                       "createdAt": "2024-12-23T10:00:00Z"
- *                     },
- *                     {
- *                       "deckId": 2,
- *                       "title": "History Deck",
- *                       "description": "A deck of history-related flashcards.",
- *                       "createdAt": "2024-12-22T14:00:00Z"
- *                     }
- *                   ]
+ *                     example: "2024-01-01T10:00:00Z"
+ *                   editedAt:
+ *                     type: string
+ *                     format: date-time
+ *                     description: The timestamp when the deck was last edited.
+ *                     example: "2024-01-02T15:30:00Z"
+ *                   totalCards:
+ *                     type: integer
+ *                     description: The total number of flashcards in the deck.
+ *                     example: 50
+ *                   unsureTotal:
+ *                     type: integer
+ *                     description: Number of flashcards marked as 'unsure'.
+ *                     example: 10
+ *                   familiarTotal:
+ *                     type: integer
+ *                     description: Number of flashcards marked as 'familiar'.
+ *                     example: 20
+ *                   masteredTotal:
+ *                     type: integer
+ *                     description: Number of flashcards marked as 'mastered'.
+ *                     example: 15
+ *                   unratedTotal:
+ *                     type: integer
+ *                     description: Number of flashcards that are not rated.
+ *                     example: 5
  *       401:
- *         description: Unauthorized, token is missing or invalid.
+ *         description: Unauthorized, user token is missing or invalid.
  *         content:
  *           application/json:
  *             schema:
@@ -78,9 +91,6 @@ const deckRouter = Router();
  *                 message:
  *                   type: string
  *                   example: "Internal Server Error"
- *     middleware:
- *       - verifyToken:
- *           description: Validates the user's JWT token and attaches the user ID to the request.
  */
 deckRouter.get('/decks', getDecksController);
 
@@ -88,8 +98,8 @@ deckRouter.get('/decks', getDecksController);
  * @swagger
  * /api/decks:
  *   post:
- *     summary: Create a new deck for the authenticated user.
- *     description: This endpoint allows the user to create a new deck by providing a title, description, and created date.
+ *     summary: Create a new deck with flashcards.
+ *     description: This endpoint allows authenticated users to create a new deck and add flashcards to it.
  *     tags:
  *       - decks
  *     security:
@@ -104,19 +114,40 @@ deckRouter.get('/decks', getDecksController);
  *               title:
  *                 type: string
  *                 description: The title of the deck.
- *                 example: "Math Deck"
+ *                 example: "Math Basics"
  *               description:
  *                 type: string
- *                 description: A brief description of the deck.
- *                 example: "A deck of math-related flashcards."
+ *                 description: A short description of the deck.
+ *                 example: "A deck of basic math flashcards."
  *               createdAt:
  *                 type: string
  *                 format: date-time
- *                 description: The date and time when the deck was created.
+ *                 description: The timestamp when the deck was created.
  *                 example: "2024-12-23T10:00:00Z"
+ *               flashcards:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     front:
+ *                       type: string
+ *                       description: The front side of the flashcard.
+ *                       example: "2 + 2"
+ *                     back:
+ *                       type: string
+ *                       description: The back side of the flashcard.
+ *                       example: "4"
  *     responses:
- *       201:
+ *       200:
  *         description: Deck successfully created.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 deckId:
+ *                   type: number
+ *                   example: 1
  *       400:
  *         description: Invalid input data, validation failed.
  *         content:
@@ -124,13 +155,11 @@ deckRouter.get('/decks', getDecksController);
  *             schema:
  *               type: object
  *               properties:
- *                 invalidFields:
- *                   type: array
- *                   items:
- *                     type: string
- *                   example: ["title", "description"]
+ *                 message:
+ *                   type: string
+ *                   example: "Error saving generated flashcards"
  *       401:
- *         description: Unauthorized, token is missing or invalid.
+ *         description: Unauthorized, missing or invalid token.
  *         content:
  *           application/json:
  *             schema:
@@ -150,7 +179,7 @@ deckRouter.get('/decks', getDecksController);
  *                   type: string
  *                   example: "Internal Server Error"
  */
-deckRouter.post('/decks', isDeckDataValid, createDeckController); 
+deckRouter.post('/decks', isDeckFlashcardsDataValid, createDeckController); 
 
 /**
  * @swagger

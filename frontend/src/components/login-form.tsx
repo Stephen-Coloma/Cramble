@@ -6,10 +6,32 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Facebook, EyeClosed, Eye } from "lucide-react"
-import { useRef, useState } from "react"
-import axios from "axios"
+import { useEffect, useState } from "react"
+import { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
 import { Toggle } from "./ui/toggle"
+import {SubmitHandler, useForm, ErrorOption} from 'react-hook-form' 
+import { joiResolver } from '@hookform/resolvers/joi'
+import Joi from 'joi'
+import { PostApiResponse, usePost } from "@/hooks/use-request"
+
+const loginSchema = Joi.object({
+  username: Joi.string()
+      .alphanum()
+      .min(3)
+      .max(30)
+      .required(),
+
+  password: Joi.string()
+      .min(8)
+      .max(100)
+      .required(),
+});
+
+type LoginFormData = {
+  username: string,
+  password: string
+}
 
 export function LoginForm({
   className,
@@ -17,50 +39,45 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
   const [isVisible, setVisible] = useState<boolean>(false);
 
-  const usernameRef = useRef<HTMLInputElement>(null);
-  const passwordRef = useRef<HTMLInputElement>(null);
-
   const router = useRouter();
 
-  //handle form submission
-  const handleSubmit = (e: React.FormEvent) =>{
-    e.preventDefault();
-    const username = usernameRef.current?.value; 
-    const password = passwordRef.current?.value; 
-  
-    let data = JSON.stringify({
-      username,
-      password
-    });
-    
-    let config = {
-      method: 'post',
-      maxBodyLength: Infinity,
-      url: 'http://localhost:3001/auth/login',
-      headers: { 
-        'Content-Type': 'application/json'
-      },
-      data : data,
-      withCredentials: true // Include cookies in the request
-    };
+  const {register, setError, handleSubmit, formState: {errors, isSubmitting }, reset} = useForm<LoginFormData>({
+    resolver: joiResolver(loginSchema)
+  })
 
-    axios.request(config)
-    .then((response) => {
-        if(response.status === 200){
-          router.replace('/dashboard/mydecks')
-        }
-    })
-    .catch((error) => {      
-      console.log(error.response.data);
-    });
-    
+  const { status, error, loading, executePostRequest }: PostApiResponse = usePost('http://localhost:3001/auth/login');
+
+  //handle form validation and submission
+  const onSubmit: SubmitHandler<LoginFormData> = async (formData: LoginFormData) => {
+    // todo: delay to be removed
+    await new Promise((resolve) => {setTimeout(resolve, 2000)}); 
+    await executePostRequest(formData);
   }
+
+  // update the ui based on loading change
+  useEffect(()=>{
+    if(status === 200){
+      router.replace('/dashboard/mydecks')
+    }
+
+    if(error){
+      if ((error as AxiosError).response?.status === 401) {
+        // Handle username not found error
+        reset({password: ''})
+        setError("username", (error.response.data as ErrorOption));
+      } else if ((error as AxiosError).response?.status === 404) {
+        // Handle incorrect password error
+        reset({password: ''})
+        setError("password", (error.response.data as ErrorOption));
+      }      
+    }
+  }, [loading])  
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-8">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -70,13 +87,14 @@ export function LoginForm({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Username</Label>
-                <Input
+                <Input {...register('username')}
+                  className={errors.username ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
                   id="username"
                   type="text"
                   placeholder="johndoe123"
-                  ref={usernameRef}
                   required
                 />
+                {errors.username && <Label className="text-xs text-destructive">{errors.username.message?.replaceAll('\"', "")}</Label>}
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
@@ -100,14 +118,15 @@ export function LoginForm({
                     Forgot your password?
                   </a> */}
                 </div>
-                <Input 
+                <Input {...register('password')}
+                  className={errors.password ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
                   id="password" 
                   type={`${isVisible ? 'text' : 'password'}`}
-                  ref={passwordRef} 
                   required />
+                {errors.password && <Label className="text-xs text-destructive">{errors.password.message?.replaceAll('\"', "")}</Label>}
               </div>
-              <Button type="submit" className="w-full" onClick={handleSubmit}>
-                Login
+              <Button type="submit" disabled={isSubmitting ? true : false} className="w-full">
+                {isSubmitting ? 'Loading...': 'Login'}
               </Button>
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                 <span className="relative z-10 bg-background px-2 text-muted-foreground">

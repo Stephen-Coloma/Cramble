@@ -2,11 +2,12 @@
 
 import * as React from "react"
 import { useEffect, useState } from "react"
-import { AxiosError, AxiosResponse } from "axios"
 
 import { Bar, BarChart, XAxis, YAxis } from "recharts"
 
 import { Button } from "@/components/ui/button"
+import { Input } from "./ui/input"
+import { AddDeckDialog } from "./dialog/add-deck-dialog"
 import {
   Card,
   CardContent,
@@ -27,9 +28,12 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-import {Swords, Pencil, Info } from 'lucide-react'
+import {Swords, Pencil, Info, Filter, PackagePlus } from 'lucide-react'
 
 import { DeckWithStatsDTO } from "@/dtos/deck/DeckWithStats.dto"
+import { useFetch } from "@/hooks/use-request"
+import DeckLoading from "./deck-loading"
+import { Label } from "./ui/label"
 
 // Deck prop is baed on DeckDTO wherein it is a shared type for backend and frontend
 export type DeckProps = Pick<DeckWithStatsDTO, 
@@ -44,6 +48,28 @@ export type DeckProps = Pick<DeckWithStatsDTO,
   'masteredTotal' |
   'unratedTotal'
 >
+
+const chartConfig = {
+  tally: {
+    label: "Count",
+  },
+  mastered: {
+    label: "Mastered",
+    color: "hsl(220 70% 40%)",
+  },
+  familiar: {
+    label: "Familiar",
+    color: "hsl(220 70% 50%)",
+  },
+  unsure: {
+    label: "Unsure",
+    color: "hsl(220 70% 60%)",
+  },
+  unrated: {
+    label: "Unrated",
+    color: "hsl(220 70% 70%)",
+  }
+} satisfies ChartConfig
 
 export function Deck({
   deckId,
@@ -78,40 +104,19 @@ export function Deck({
     { mastery: "unsure", tally: unsureTotal, fill: "var(--color-unsure)" },
     { mastery: "unrated", tally: unratedTotal, fill: "var(--color-unrated)" },
   ]
-  const chartConfig = {
-    tally: {
-      label: "Count",
-    },
-    mastered: {
-      label: "Mastered",
-      color: "hsl(220 70% 40%)",
-    },
-    familiar: {
-      label: "Familiar",
-      color: "hsl(220 70% 50%)",
-    },
-    unsure: {
-      label: "Unsure",
-      color: "hsl(220 70% 60%)",
-    },
-    unrated: {
-      label: "Unrated",
-      color: "hsl(220 70% 70%)",
-    }
-  } satisfies ChartConfig
 
   return (
-    <Card className="w-100 border-4 border-transparent hover:border-primary shadow transition-colors duration-200">
+    <Card className="w-100 border-2 hover:border-primary shadow transition-colors duration-200">
       <CardHeader>
         <div className="flex justify-between">
           <CardTitle>{title}</CardTitle>
           <CardDescription>
-            <div className="text-xs bg-blue-100 dark:bg-blue-300 text-primary dark:text-primary-foreground px-2 py-1 rounded-lg">
+            <div className="text-xs font-semibold bg-blue-100 dark:bg-blue-300 text-primary dark:text-primary-foreground px-2 py-1 rounded-lg">
               {'Cards: ' + totalCards}
             </div>
           </CardDescription>
         </div>
-        <CardDescription className="text-xs text-muted-foreground/50">{`${(editedAt === null) ? 'Created at ' + formattedCreationDate : 'Edited at ' + formattedEditionDate }`}</CardDescription>
+        <CardDescription className="text-xs text-muted-foreground/50">{`${(!editedAt || editedAt === 'null') ? 'Created at ' + formattedCreationDate : 'Edited at ' + formattedEditionDate }`}</CardDescription>
       </CardHeader>
 
       <CardContent>
@@ -173,50 +178,63 @@ export function Deck({
   )
 }
 
-// Container for the decks in the My Decks page
-export function Decks(){
-  const [deckArray, setDeckArray] = useState<DeckProps[]>([]); // Initialize as an empty array
+export default function DeckBoard(){
+  const {status, statusText, data, error, loading}  = useFetch<DeckProps[]>('http://localhost:3001/api/decks')
+  const [deckArray, setDeckArray] = useState<DeckProps[]>([]);
 
-  useEffect(() => {
-    // Fetch or load data here
-    const fetchDecks = async () => {
-      const axios = require('axios');
-      let config = {
-        method: 'get',
-        maxBodyLength: Infinity,
-        url: 'http://localhost:3001/api/decks',
-        withCredentials: true
-      };
-
-      axios.request(config)
-      .then((response: AxiosResponse) => {
-        setDeckArray(response.data);    
-        console.log(deckArray);
-        
-      })
-      .catch((error: AxiosError) => {
-        console.log(error.response?.data);
-      });
+  // update the deckArray when data is fetched & when it is an array only
+  useEffect(()=>{
+    if(Array.isArray(data)){
+      setDeckArray(data)
     }
-    fetchDecks();
-  }, []); // Run only once when the component mounts
-
+  }, [data, loading])
+  
+  // adds the created deck from add-deck dialoggi
+  const addNewDeck = (newlyAddedDeck: DeckProps) => {
+    setDeckArray([...deckArray, newlyAddedDeck])
+  }
+  
+  // todo: implement search and filter (filder depends on what I can filter) 
   return(
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
-      {deckArray.map((deck, index) => (
-          <Deck key={index} {...deck}></Deck>
-      ))}
-    </div>
-  )
+    <>
+      <Card className="mb-12">
+        <CardContent className="flex gap-2 p-2">
+          <Input placeholder="Search Deck" />
+          <AddDeckDialog onDeckAdded={addNewDeck} variant="simple-button" />
+          <Button size={'icon'} className="min-h-9 min-w-9">
+            <Filter />
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* loading ui */}
+      {loading && (
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
+          {[1,2,3,4,5,6].map((_, index)=> (
+            <DeckLoading key={index}></DeckLoading>
+          ))}
+        </div>
+      )}
+
+      {/* non empty decks*/}
+      {!loading && (deckArray.length > 0) && (
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
+          {deckArray.map((deck, index) => (
+            <Deck key={index} {...deck} />
+          ))}
+          <AddDeckDialog onDeckAdded={addNewDeck} variant="deck-button" />         
+        </div>
+      )}
+
+      {/* empty decks*/}
+      {!loading && deckArray.length === 0 && (
+        <div className="flex flex-col text-center items-center justify-center h-64 w-full gap-2">
+          <div className='dark:bg-gray-200 p-2 rounded-md'><PackagePlus size={50} color="#303030"/></div>
+          <Label className="text-lg">No decks created yet</Label>
+          <Label className="text-sm text-muted-foreground">Create your first deck to practice learning</Label>
+        </div>
+      )}
+
+    </>
+  );
 }
-
-
-// CREATE AN ADD BUTTON FOR THE DECK AND AN ADD CARD
-// CREATE A SEARCH FIELD
-// CREATE  AN EDIT MODAL!!!!!! -> EDITS DECK CONTENT 
-// IMPLEMENT THE PLAY DECK
-// CREATE DECK UI
-// IMPLEMENT SKELETONS ON ALL CARDS
-
-// GENERATE WITH AI
-// 

@@ -11,7 +11,7 @@ export default function Home() {
           <Button size={"sm"} className="text-white hover:none cursor-default rounded-full">
             Online Flashcards Reviewer
           </Button>
-          <h1 className="text-center text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none bg-gradient-to-r from-muted-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
+          <h1 className="text-center text-4xl font-bold py-2 tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl/none bg-gradient-to-r from-muted-foreground via-foreground to-muted-foreground bg-clip-text text-transparent">
             Redefining how you learn, practice and grow.
           </h1>
           <p className="text-center text-sm text-muted-foreground sm:text-base md:text-lg">

@@ -1,6 +1,6 @@
+import DeckBoard from "@/components/deck"
 import {PageTitle, PageTitleProps} from "@/components/page-title"
 import { LibraryBig } from 'lucide-react'
-import { Decks} from "@/components/deck"
 
 
 export default function MyDecks() {
@@ -15,9 +15,8 @@ export default function MyDecks() {
   return (
     <div className=" w-full">
       <PageTitle {...pageDetails}/>
-      <Decks/>
+      <DeckBoard></DeckBoard>
     </div>
   )
 } 
 
-// UPDATE THE SWAGGER DOCUMENTATION  FOR THE get /api/decks api
