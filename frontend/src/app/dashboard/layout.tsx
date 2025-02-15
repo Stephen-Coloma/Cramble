@@ -22,7 +22,7 @@ export default function SidebarLayout({
             <ModeToggle></ModeToggle>
           </header>
           <Separator></Separator>
-          <div className="p-8 pt-2 md:pt-8"> 
+          <div className="h-full p-8 pt-2 md:pt-8"> 
             {children}
           </div>
         </SidebarInset>

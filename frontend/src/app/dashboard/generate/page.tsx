@@ -1,3 +1,4 @@
+import GenerateBoard from "@/components/generate-board"
 import {PageTitle, PageTitleProps} from "@/components/page-title"
 import { Sparkles } from 'lucide-react'
 
@@ -10,8 +11,9 @@ export default function Generate() {
     Icon: Sparkles
   }
   return (
-    <div className=" w-full border-2 border-blue-900">
+    <div className="w-full h-full">
       <PageTitle {...pageDetails}/>
+      <GenerateBoard></GenerateBoard>
     </div>
   )
 } 
