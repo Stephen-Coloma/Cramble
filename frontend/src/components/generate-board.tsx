@@ -6,23 +6,45 @@ import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import { Label } from "./ui/label"
 import { Bot, Sparkles } from "lucide-react"
-import { ChangeEvent, useState} from "react"
+import { ChangeEvent, useEffect, useState} from "react"
+import { useForm, SubmitHandler } from "react-hook-form"
 import {
     Select,
     SelectContent,
     SelectItem,
     SelectTrigger,
     SelectValue,
-  } from "@/components/ui/select"
+} from "@/components/ui/select"
+import { joiResolver } from "@hookform/resolvers/joi"
+import Joi from "joi"
   
 
-export default function GenerateBoard(){
-    const [count, setCount] = useState<number>(10);
+const generateSchema = Joi.object({
+    text: Joi.string()
+        .required()
+        .min(1500),
 
-    const handleSubmit = (event: React.FormEvent) => {
-        event.preventDefault(); 
-        console.log(count);
-    };
+    count: Joi.number()
+        .required()
+        .min(10)
+})
+
+type GenerateCardsFormData = {
+    text: string
+    count: number
+}
+
+export default function GenerateBoard(){
+    const [remanining, setRemaining] = useState<number>(1500);
+
+    const {register, setValue, clearErrors, handleSubmit, formState: {errors, isSubmitting}} = useForm<GenerateCardsFormData>({resolver: joiResolver(generateSchema)})
+
+    const onSubmit: SubmitHandler<GenerateCardsFormData> = async (formData: GenerateCardsFormData) => {
+        // todo: delay to be removed
+        await new Promise((resolve) => {setTimeout(resolve, 1000)})
+        console.log(formData);
+        
+    }    
 
     return(
         <div className="flex flex-col justify-start md:justify-center  md:h-1/2 lg:h-3/4">
@@ -31,8 +53,10 @@ export default function GenerateBoard(){
                     <Bot></Bot>    
                     AI Creates, You Learn!
                 </CardTitle>
-                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                    <Textarea
+                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+                    <Textarea {...register('text', {
+                        
+                    })}
                     // phones must have longer heights than desktop 
                         className="min-h-64 max-h-96 sm:min-h-32 sm:max-h-80 text-sm md:text-base overflow-auto resize-none bg-primary-foreground"
                         id="text"
@@ -41,17 +65,22 @@ export default function GenerateBoard(){
                             const target = e.target as HTMLTextAreaElement
                             target.style.height = 'auto'
                             target.style.height = `${target.scrollHeight}px`
+                            setRemaining(1500 - e.target.value.length)
                         }}
                     >
                     </Textarea>
 
+                    {remanining > 1 && 
+                        <Label className={`text-xs ${errors.text ? 'text-destructive animate-bounce' : 'text-muted-foreground'}`}>{`Need more ${remanining} more characters`}</Label>
+                    }
+
                     <div className="w-full flex justify-between items-center">
 
                         <div className="flex items-center gap-2">
-                            <Label className="text-xs sm:text-sm text-muted-foreground">Set Count</Label>
-                            <Select onValueChange={(value: string) => setCount(Number(value))} defaultValue={"10"}>
+                            <Label className="text-xs sm:text-sm text-muted-foreground">Total Cards</Label>
+                            <Select onValueChange={(value: string) => {setValue('count', Number(value))}}>
                                 <SelectTrigger className="w-auto">
-                                    <SelectValue placeholder="10" />
+                                    <SelectValue defaultValue={'10'} placeholder={10}/>
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="10">10</SelectItem>
@@ -63,7 +92,7 @@ export default function GenerateBoard(){
                             </Select>
                         </div>
 
-                        <Input type="hidden" value={count}></Input>
+                        <Input {...register('count')} type="hidden" id='count' defaultValue={10}></Input>
 
                         <Button type="submit">
                             Generate
@@ -71,7 +100,6 @@ export default function GenerateBoard(){
                         </Button>  
 
                     </div>
-
                 </form>
             </Card>
         </div>
