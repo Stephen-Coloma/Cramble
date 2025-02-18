@@ -1,19 +1,19 @@
 'use client'
 
+import { DeckFlashcardsSchema } from "./add-deck-dialog";
+import { DeckFlashcardsFormData } from "./add-deck-dialog";
+import { FlashcardInputCard } from "../flashcard-input-card";
+import { usePost } from "@/hooks/use-request";
+import { useState, useEffect, ChangeEvent } from "react";
+import { joiResolver } from "@hookform/resolvers/joi";
+import {useForm} from 'react-hook-form'
+import { SubmitHandler } from "react-hook-form";
+import {toast} from 'sonner'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "../ui/button"
-import { CirclePlus, Plus, Pickaxe } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile"
-import { DeckProps } from "../deck-board"
-import { SubmitHandler, useForm } from "react-hook-form"
-import { Textarea } from "../ui/textarea"
-import { FlashcardInputCard } from "../flashcard-input-card"
-import { ChangeEvent, useEffect, useState } from "react"
-import { usePost } from "@/hooks/use-request"
-import { toast } from "sonner"
-import Joi from "joi"
-import { joiResolver } from "@hookform/resolvers/joi"
+import { Pickaxe, TypeOutline } from "lucide-react";
+import { Textarea } from "../ui/textarea";
 
 import {
     Dialog,
@@ -23,68 +23,22 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import {
-    Card,
-    CardContent,
-    CardDescription,
-} from "@/components/ui/card"
 
-export type AddDeckDialogProps = {
-    variant: 'simple-button' | 'deck-button',
-    onDeckAdded: (newlyAddedDeck: DeckProps) => void;
+export type ShowGeneratedDeckDialogProps = {
+    deckFlashcardsData: DeckFlashcardsFormData,
+    onDialogClose: ()=> void
 }
 
-// Define schemas
-export const FlashcardsSchema = Joi.object({
-    front: Joi.string().min(1).max(400).required().messages({
-        "string.empty": "question is required",
-        "string.min": "question must be at least 1 character",
-        "string.max": "question cannot exceed 400 characters",
-    }),
-    back: Joi.string().min(1).max(400).required().messages({
-        "string.empty": "answer is required",
-        "string.min": "answer must be at least 1 character",
-        "string.max": "answer cannot exceed 400 characters",
-    }),
-});
-
-export const DeckFlashcardsSchema = Joi.object({
-    title: Joi.string().min(3).max(30).required().messages({
-        "string.empty": "title is required",
-        "string.min": "title must be at least 3 characters",
-        "string.max": "title cannot exceed 30 characters",
-    }),
-    description: Joi.string().min(3).max(250).required().messages({
-        "string.empty": "description is required",
-        "string.min": "description must be at least 3 characters",
-        "string.max": "description cannot exceed 250 characters",
-    }),
-    createdAt: Joi.string().isoDate().required().messages({
-        "string.isoDate": "invalid date format",
-    }),
-    flashcards: Joi.array().items(FlashcardsSchema).min(1).required().messages({
-        "array.min": "at least one flashcard is required",
-    }),
-});
-
-export type DeckFlashcardsFormData = {
-    title: string,
-    description: string,
-    createdAt: string,
-    flashcards: {
-        front: string,
-        back: string
-    }[]
-}
-
-export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDialogProps){
-    const isMobile = useIsMobile();
-    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-    
+// this dialog will handle generated flashcards data from the generate flashcards. basically it only holds the form and the dialog
+export default function ShowGeneratedDeckDialog({
+    deckFlashcardsData,
+    onDialogClose
+}: ShowGeneratedDeckDialogProps){    
     // array of flashcard numbers only. cannot pass multiple instances of form utilities
-    const [flashcardArray, setFlashcardArray] = useState<number[]>([1,2,3]);
+    // converts flashcard array length n to array of 1-n
+    const [flashcardArray, setFlashcardArray] = useState<number[]>(Array(deckFlashcardsData.flashcards.length).fill(0).map((_, i)=> i+1));
 
-    const {status, data, loading, executePostRequest , clearResponseState } = usePost('http://localhost:3001/api/decks');
+    const {status, loading, executePostRequest , clearResponseState } = usePost('http://localhost:3001/api/decks');
     
     const {register, unregister, setValue, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
         resolver: joiResolver(DeckFlashcardsSchema)
@@ -95,7 +49,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
         await executePostRequest(formData)
     };
 
-    // toaster pops when deck is added, closes the dialog
+    // toaster pops when deck is ADDED, closes the dialog
     useEffect(()=>{        
         if(status === 200){
             toast.success('Deck created', {
@@ -106,37 +60,17 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                 })
             })
 
-            // Close the dialog
-            setIsDialogOpen(false);
+            // close the dialog on the parent
+            onDialogClose()
 
             // reset state so that next request is not tied with past requests
             clearResponseState()
-
-            // add the on deck added
-            const newlyAddedDeck: DeckProps = {
-                deckId: data.deckId,
-                title: getValues('title'),
-                description: getValues('description'),
-                createdAt: getValues('createdAt'),
-                editedAt: 'null',
-                totalCards: flashcardArray.length,
-                unsureTotal: 0,
-                familiarTotal: 0,
-                masteredTotal: 0,
-                unratedTotal: flashcardArray.length,
-            }
-
-            // render the newly added deck on the list using the callback function
-            onDeckAdded(newlyAddedDeck)
 
             // reset all form states
             reset()
             
             // unregister all flashcard input forms
             unregister('flashcards')
-
-            // set new flashcard arra
-            setFlashcardArray([1,2,3])
         }
     }, [loading])
     
@@ -171,34 +105,16 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
         setFlashcardArray([...flashcardArray, flashcardArray[flashcardArray.length-1]+1])
     }
     
+    // when dialog changes, reset the form and close dialog from the parent component
+    const onDialogOpenChange = ()=>{
+        reset()
+        unregister('flashcards')
+        onDialogClose()
+    }
+
     return (
-        // deck button and mobile view = deck button hidden
-        // deck button !mobile view = deck button
-        // not deck-button = simple button
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-                {variant === 'deck-button' && !isMobile ? 
-                    <Card className="min-h-[306px] bg-muted border-2 border-primary/50 hover:border-primary shadow transition-colors duration-200 relative">
-                        <Button 
-                            className="w-full h-full absolute top-0 left-0 opacity-0 pointer-events-auto bg-muted z-10"
-                            onClick={() => setIsDialogOpen(true)} // Opens the dialog
-                        />
-                        <CardContent className="h-full w-full flex flex-col items-center justify-center gap-2 z-1">
-                            <CirclePlus className="h-16 w-16 text-primary/90" />
-                            <CardDescription className="text-muted-foreground items-center">
-                                create new deck 
-                            </CardDescription>
-                        </CardContent>
-                    </Card>
-                    :
-                    // change the layout
-                    <Button variant={'default'} size={'icon'} 
-                        className={`${variant === 'deck-button' && isMobile ? 'hidden' : ''} min-h-9 min-w-9`}
-                        onClick={() => setIsDialogOpen(true)}>
-                        <Plus></Plus>
-                    </Button>
-                }
-            </DialogTrigger>
+        // a dialog that do not have trigger, dialog open = true important because we dont have triggers already
+        <Dialog open={true} onOpenChange={onDialogOpenChange}>
             <DialogContent className="h-full sm:h-fit sm:max-w-[1025px] pt-12">
                 <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col h-full sm:max-h-[600px] overflow-y-auto px-4">
                     <DialogHeader className="mb-4">
@@ -220,6 +136,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                             className={errors.title ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
                             id="title"
                             type="text"
+                            defaultValue={deckFlashcardsData.title}
                             placeholder="Enter a title (e.g., Math Quiz 101)"
                         />
                         {errors.title && (
@@ -234,6 +151,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                         <Textarea
                             {...register('description')}
                             className={`max-h-24 min-h-1 overflow-hidden resize-none ${errors.description ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}`}
+                            defaultValue={deckFlashcardsData.description}
                             placeholder="Add a description"
                             id="description"
                             rows={1}                  
@@ -259,7 +177,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
 
                     <div className="flex flex-col flex-grow sm:flex-none gap-4 mb-4">
                         {flashcardArray.map((flashcardNo, index) => (
-                            <FlashcardInputCard key={index} flashcardNo={flashcardNo} formUtilities={{register, errors}} onFlashcardRemove={removeFlashcard}></FlashcardInputCard>
+                            <FlashcardInputCard key={index} flashcardNo={flashcardNo} formUtilities={{register, errors}} onFlashcardRemove={removeFlashcard} data={deckFlashcardsData.flashcards[index]}></FlashcardInputCard>
                         ))} 
                     </div>
 
@@ -280,7 +198,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
 
                     <DialogFooter className="flex-row gap-2 justify-end">
                         <DialogTrigger asChild>
-                            <Button type='button' disabled={isSubmitting ? true : false} variant={'destructive'} onClick={() => reset()}>
+                            <Button type='button' disabled={isSubmitting ? true : false} variant={'destructive'} onClick={onDialogOpenChange}>
                                 Cancel
                             </Button>
                         </DialogTrigger>

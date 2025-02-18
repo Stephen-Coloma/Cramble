@@ -13,7 +13,11 @@ export type FlashcardInputCardProps = {
         errors: FieldErrors<DeckFlashcardsFormData>
     },
     flashcardNo: number,
-    onFlashcardRemove: (flashcardNo: number) => void
+    onFlashcardRemove: (flashcardNo: number) => void,
+    data?: {
+        front: string,
+        back: string
+    }
 }
 
 export function FlashcardInputCard({
@@ -22,7 +26,16 @@ export function FlashcardInputCard({
         errors,
     },
     flashcardNo,
-    onFlashcardRemove
+    onFlashcardRemove,
+    // data is optional, if we try to destructure, we might destructure an undefined data. 
+    // that is why we have = to set a default values whenever data is undefined
+    data: {
+        front,
+        back
+    } = {
+        front: '',
+        back: ''
+    }
 }: FlashcardInputCardProps){
     const [isRemoving, setIsRemoving] = useState<boolean>(false);
     const [questionTextLength, setQuestionTextLength] = useState<number>(400);
@@ -56,6 +69,7 @@ export function FlashcardInputCard({
                         className={`max-h-64 min-h-1 overflow-hidden resize-none mb-4 text-muted-foreground text-justify border-x-0 border-t-0 shadow-none border-b-ring rounded-none focus-visible:border-b-4 focus-visible:ring-0
                             ${errors?.flashcards?.[flashcardNo - 1]?.front ? 'border-b-destructive focus-visible:ring-0' : ''}`}
                         id={`flashcards.${flashcardNo-1}.front`}
+                        defaultValue={front}
                         placeholder="Enter question here..."
                         rows={1}
                         onInput={(e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -81,6 +95,7 @@ export function FlashcardInputCard({
                         className={`max-h-64 min-h-1 overflow-hidden resize-none mb-4 text-muted-foreground text-justify border-x-0 border-t-0 shadow-none border-b-ring rounded-none focus-visible:border-b-4 focus-visible:ring-0
                             ${errors?.flashcards?.[flashcardNo - 1]?.back ? 'border-b-destructive focus-visible:ring-0' : ''}`}
                             id={`flashcards.${flashcardNo-1}.back`}
+                            defaultValue={back}
                             placeholder="Enter answer here..."
                             rows={1}
                             onInput={(e: ChangeEvent<HTMLTextAreaElement>) => {
