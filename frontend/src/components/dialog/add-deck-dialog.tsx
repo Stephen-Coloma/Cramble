@@ -22,7 +22,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "../ui/button"
 import { CirclePlus, Plus, Pickaxe } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile"
-import { DeckProps } from "../deck"
+import { DeckProps } from "../deck-board"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { Textarea } from "../ui/textarea"
 import { FlashcardInputCard } from "../flashcard-input-card"
@@ -32,7 +32,7 @@ import { toast } from "sonner"
 
 export type AddDeckDialogProps = {
     variant: 'simple-button' | 'deck-button',
-    onDeckAdded: (newlyAddedDeck: DeckProps) => void;
+    onDeckAdded?: (newlyAddedDeck: DeckProps) => void;
 }
 
 // Define schemas
@@ -129,7 +129,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
             }
 
             // render the newly added deck on the list using the callback function
-            onDeckAdded(newlyAddedDeck)
+            onDeckAdded!(newlyAddedDeck)
 
             // reset all form states
             reset()

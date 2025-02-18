@@ -1,4 +1,5 @@
 import { Router } from "express";
+import generateFlashcardController from "../controller/gemini/generateFlashcard";
 
 const geminiRouter = Router();
 
@@ -62,5 +63,5 @@ const geminiRouter = Router();
  *     security:
  *       - cookieAuth: []
  */
-
+geminiRouter.post('/gemini/generate', generateFlashcardController)
 export default geminiRouter;

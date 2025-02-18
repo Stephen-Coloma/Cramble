@@ -17,7 +17,8 @@ import {
 } from "@/components/ui/select"
 import { joiResolver } from "@hookform/resolvers/joi"
 import Joi from "joi"
-  
+import { usePost } from "@/hooks/use-request"
+import { AddDeckDialog } from "./dialog/add-deck-dialog"
 
 const generateSchema = Joi.object({
     text: Joi.string()
@@ -39,12 +40,23 @@ export default function GenerateBoard(){
 
     const {register, setValue, clearErrors, handleSubmit, formState: {errors, isSubmitting}} = useForm<GenerateCardsFormData>({resolver: joiResolver(generateSchema)})
 
-    const onSubmit: SubmitHandler<GenerateCardsFormData> = async (formData: GenerateCardsFormData) => {
+    const {status, statusText, data, error, loading, executePostRequest, clearResponseState} = usePost('http://localhost:3001/api/gemini/generate')
+
+    const onSubmit: SubmitHandler<GenerateCardsFormData> = async (formData: GenerateCardsFormData) => {                
         // todo: delay to be removed
         await new Promise((resolve) => {setTimeout(resolve, 1000)})
-        console.log(formData);
-        
-    }    
+        await executePostRequest(formData)
+    }
+    
+    // useEffect to handle loading changes
+    useEffect(()=> {
+        if(status === 200){
+            console.log(data);
+            clearResponseState()
+        }else if(error){
+
+        }
+    }, [loading])
 
     return(
         <div className="flex flex-col justify-start md:justify-center  md:h-1/2 lg:h-3/4">
@@ -70,8 +82,14 @@ export default function GenerateBoard(){
                     >
                     </Textarea>
 
+                    {/* form errors */}
                     {remanining > 1 && 
-                        <Label className={`text-xs ${errors.text ? 'text-destructive animate-bounce' : 'text-muted-foreground'}`}>{`Need more ${remanining} more characters`}</Label>
+                        <Label className={`text-sm ${errors.text ? 'text-destructive' : 'text-muted-foreground'}`}>{`Need more ${remanining} more characters`}</Label>
+                    }
+
+                    {/* error from server */}
+                    {error && !isSubmitting &&
+                        <Label className='text-destructive text-sm'>Something went wrong. Please try again later.</Label>
                     }
 
                     <div className="w-full flex justify-between items-center">
@@ -93,12 +111,10 @@ export default function GenerateBoard(){
                         </div>
 
                         <Input {...register('count')} type="hidden" id='count' defaultValue={10}></Input>
-
-                        <Button type="submit">
+                        <Button type='submit' disabled={isSubmitting ? true : false} >
                             Generate
-                            <Sparkles></Sparkles>
+                            <Sparkles className={`${isSubmitting ? 'animate-pulse' : ''}`}></Sparkles>
                         </Button>  
-
                     </div>
                 </form>
             </Card>

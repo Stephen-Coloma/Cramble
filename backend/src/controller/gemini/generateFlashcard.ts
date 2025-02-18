@@ -19,6 +19,8 @@ const generateFlashcardController = async(req: Request, res: Response) =>{
     const prompt = `
         Act like a teacher or a professor, Based from the text below, create a flashcard 
         questionnaire with a total number of ${count} items. It is absolute that you must follow the total count.
+        provide a title with a minimum of 3 and a maximum of 30 characters. 
+        provide a description that is about what is included in the topic with a minimum of 3 and a maximum of 250 characters. 
 
         "${text}"
 
@@ -27,16 +29,20 @@ const generateFlashcardController = async(req: Request, res: Response) =>{
         2. remove the "\`\`\`json\`\`\` on each ends. 
         3. pretty printing is disabled
 
-        [
-            {
-                "front": "Question here",
-                "back": "Answer here"
-            },
-            {
-                "front": "Question here",
-                "back": "Answer here"
-            }
-        ]    
+        {
+            "title": "Your Title Here",
+            "description": "Your description here",
+            "flashcards": [
+                {
+                    "front": "Question here",
+                    "back": "Answer here"
+                },
+                {
+                    "front": "Question here",
+                    "back": "Answer here"
+                }
+            ]
+        }    
     `;
     try{
         const result = await model.generateContent(prompt);
