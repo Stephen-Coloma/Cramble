@@ -233,7 +233,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                         <Label htmlFor="description">Description</Label>
                         <Textarea
                             {...register('description')}
-                            className={`max-h-24 min-h-1 overflow-hidden resize-none ${errors.description ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}`}
+                            className={`max-h-64 min-h-1 overflow-hidden resize-none ${errors.description ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}`}
                             placeholder="Add a description"
                             id="description"
                             rows={1}                  

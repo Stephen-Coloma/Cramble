@@ -4,7 +4,7 @@ import { DeckFlashcardsSchema } from "./add-deck-dialog";
 import { DeckFlashcardsFormData } from "./add-deck-dialog";
 import { FlashcardInputCard } from "../flashcard-input-card";
 import { usePost } from "@/hooks/use-request";
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect, ChangeEvent, useRef, useLayoutEffect } from "react";
 import { joiResolver } from "@hookform/resolvers/joi";
 import {useForm} from 'react-hook-form'
 import { SubmitHandler } from "react-hook-form";
@@ -12,7 +12,7 @@ import {toast} from 'sonner'
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "../ui/button"
-import { Pickaxe, TypeOutline } from "lucide-react";
+import { Pickaxe } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 
 import {
@@ -33,7 +33,9 @@ export type ShowGeneratedDeckDialogProps = {
 export default function ShowGeneratedDeckDialog({
     deckFlashcardsData,
     onDialogClose
-}: ShowGeneratedDeckDialogProps){    
+}: ShowGeneratedDeckDialogProps){   
+    const descTextareaRef = useRef<HTMLTextAreaElement>(null);
+
     // array of flashcard numbers only. cannot pass multiple instances of form utilities
     // converts flashcard array length n to array of 1-n
     const [flashcardArray, setFlashcardArray] = useState<number[]>(Array(deckFlashcardsData.flashcards.length).fill(0).map((_, i)=> i+1));
@@ -50,7 +52,7 @@ export default function ShowGeneratedDeckDialog({
     };
 
     // toaster pops when deck is ADDED, closes the dialog
-    useEffect(()=>{        
+    useEffect(()=>{
         if(status === 200){
             toast.success('Deck created', {
                 description: new Date(getValues('createdAt')).toLocaleDateString('en-US', {
@@ -92,10 +94,13 @@ export default function ShowGeneratedDeckDialog({
             // unregister the last flashcard because it doesnt have data anymore
             unregister(`flashcards.${flashcardArray.length-1}`)
     
-            // remove now the last flashcard 
+            // remove now the last flashcard from array of numbers
             flashcardArray.splice(flashcardArray.length-1)
+
+            // remove from the last flashcard in the fetched data array
+            deckFlashcardsData.flashcards.splice(deckFlashcardsData.flashcards.length - 1)
     
-            setFlashcardArray([...flashcardArray])    
+            setFlashcardArray([...flashcardArray])
         }
 
     };
@@ -150,7 +155,7 @@ export default function ShowGeneratedDeckDialog({
                         <Label htmlFor="description">Description</Label>
                         <Textarea
                             {...register('description')}
-                            className={`max-h-24 min-h-1 overflow-hidden resize-none ${errors.description ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}`}
+                            className={`max-h-64 min-h-[90px] sm:min-h-[60px] lg:min-h-1 overflow-hidden resize-none ${errors.description ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}`}
                             defaultValue={deckFlashcardsData.description}
                             placeholder="Add a description"
                             id="description"
