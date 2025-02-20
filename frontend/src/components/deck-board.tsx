@@ -28,7 +28,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-import {Swords, Pencil, Info, Filter, PackagePlus } from 'lucide-react'
+import {Swords, Info, Filter, PackagePlus, Wrench, Pencil, Trash2 } from 'lucide-react'
 
 import { DeckWithStatsDTO } from "@/dtos/deck/DeckWithStats.dto"
 import { useFetch } from "@/hooks/use-request"
@@ -125,7 +125,7 @@ export function Deck({
         </CardDescription>
         
         <Popover>
-          <PopoverTrigger className="flex gap-2 justify-center items-center h-8 rounded-md px-2 text-xs bg-primary text-primary-foreground shadow hover:bg-primary/90">
+          <PopoverTrigger className="flex gap-2 justify-center items-center h-6 rounded-sm px-2 text-xs bg-primary text-primary-foreground shadow hover:bg-primary/90">
             <Info className="h-4 w-4"/>
             Performance
           </PopoverTrigger>
@@ -163,16 +163,34 @@ export function Deck({
       </CardContent>
 
       <CardFooter className="flex justify-end">
-      <div className="">
-        <Button size={'xs'} variant={'secondary'} className="rounded-r-none">
-          <Pencil/>
-          Edit
-        </Button>
-        <Button size={'xs'} className="rounded-l-none">
+
+      {/* edit and play buttons */}
+      <div>
+        <Popover>
+
+          <PopoverTrigger className="h-9 px-4 py-2 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 rounded-r-none inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0">
+            <Wrench/>
+          </PopoverTrigger>
+
+          <PopoverContent className="w-fit flex flex-col p-2">
+            <Button size={'default'} variant={'ghost'} className="justify-start px-2 text-muted-foreground">
+              <Pencil/>
+              Edit title and description
+            </Button>
+            <Button size={'default'} variant={'ghost'} className="justify-start px-2 text-muted-foreground">
+              <Trash2/>
+              Delete deck
+            </Button>
+            
+          </PopoverContent>
+        </Popover>
+
+        <Button className="rounded-l-none">
           <Swords/>
           Play
         </Button>
       </div>
+
       </CardFooter>
     </Card>
   )
