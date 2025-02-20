@@ -3,7 +3,7 @@ import { Skeleton } from "./ui/skeleton"
 
 export default function DeckLoading(){
     return(
-        <Card className="w-100">
+        <Card className="w-100 border-none">
             <CardHeader>
                 <div className="flex justify-between">
                 <Skeleton className="h-5 w-[65%]"></Skeleton>

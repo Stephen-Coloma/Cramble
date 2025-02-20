@@ -25,7 +25,7 @@ const corsOption = {
 
 const app = express();
 app.use(cors(corsOption))
-app.use(bodyParser.json())
+app.use(bodyParser.json({limit: '500kb'}))
 app.use(cookieParser(process.env.COOKIE_PARSER_SECRET_KEY))
 app.use(helmet());
 

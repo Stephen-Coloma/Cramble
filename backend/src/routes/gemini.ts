@@ -1,4 +1,5 @@
 import { Router } from "express";
+import generateFlashcardController from "../controller/gemini/generateFlashcard";
 
 const geminiRouter = Router();
 
@@ -31,16 +32,20 @@ const geminiRouter = Router();
  *         content:
  *           application/json:
  *             example:
- *               [
- *                 {
- *                   "front": "What is the mitochondria known for?",
- *                   "back": "The powerhouse of the cell."
- *                 },
- *                 {
- *                   "front": "What is the primary role of the mitochondria?",
- *                   "back": "To generate energy for the cell."
- *                 }
- *               ]
+ *               {
+ *                  "title": "Your Title Here",
+ *                  "description": "Your description here",
+ *                  "flashcards": [
+ *                        {
+ *                           "front": "Question here",
+ *                           "back": "Answer here"
+ *                        },
+ *                        {
+ *                          "front": "Question here",
+ *                          "back": "Answer here"
+ *                        }
+ *                   ]
+ *               }  
  *       400:
  *         description: Invalid input or malformed request
  *         content:
@@ -62,5 +67,5 @@ const geminiRouter = Router();
  *     security:
  *       - cookieAuth: []
  */
-
+geminiRouter.post('/gemini/generate', generateFlashcardController)
 export default geminiRouter;

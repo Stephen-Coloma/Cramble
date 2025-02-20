@@ -1,4 +1,4 @@
-import DeckBoard from "@/components/deck"
+import DeckBoard from "@/components/deck-board"
 import {PageTitle, PageTitleProps} from "@/components/page-title"
 import { LibraryBig } from 'lucide-react'
 

@@ -51,7 +51,7 @@ export type DeckProps = Pick<DeckWithStatsDTO,
 
 const chartConfig = {
   tally: {
-    label: "Count",
+    label: "Total Cards",
   },
   mastered: {
     label: "Mastered",
