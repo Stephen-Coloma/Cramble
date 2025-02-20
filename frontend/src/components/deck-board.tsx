@@ -49,7 +49,9 @@ export type DeckProps = Pick<DeckWithStatsDTO,
   'familiarTotal' |
   'masteredTotal' |
   'unratedTotal'
->
+> & {
+  onDeckDelete?: (deckid: number) => void
+}
 
 const chartConfig = {
   tally: {
@@ -83,7 +85,8 @@ export function Deck({
   unsureTotal,
   familiarTotal,
   masteredTotal,
-  unratedTotal
+  unratedTotal,
+  onDeckDelete
 }: DeckProps) {
 
   const formattedCreationDate = new Date(createdAt)
@@ -176,7 +179,7 @@ export function Deck({
 
           <PopoverContent className="w-fit flex flex-col p-2">
             <EditDeckDialog/>
-            <DeleteDeckDialog deckId={deckId}/>
+            <DeleteDeckDialog deckId={deckId} onDeckDelete={onDeckDelete}/>
           </PopoverContent>
 
         </Popover>
@@ -207,6 +210,11 @@ export default function DeckBoard(){
   const addNewDeck = (newlyAddedDeck: DeckProps) => {
     setDeckArray([...deckArray, newlyAddedDeck])
   }
+
+  // deletes/filters out the card in the ui
+  const deleteDeck = (deckId: number) => {
+    setDeckArray(deckArray.filter((deck)=>deck.deckId !== deckId))
+  }
   
   // todo: implement search and filter (filder depends on what I can filter) 
   return(
@@ -234,7 +242,7 @@ export default function DeckBoard(){
       {!loading && (deckArray.length > 0) && (
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
           {deckArray.map((deck, index) => (
-            <Deck key={index} {...deck} />
+            <Deck key={index} {...deck} onDeckDelete={deleteDeck}/>
           ))}
           <AddDeckDialog onDeckAdded={addNewDeck} variant="deck-button" />         
         </div>

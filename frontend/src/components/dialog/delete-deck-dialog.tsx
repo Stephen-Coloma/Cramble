@@ -8,14 +8,39 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { usePost } from "@/hooks/use-request"
+import { useDelete } from "@/hooks/use-request"
 import { Trash2, TriangleAlert, X } from "lucide-react"
+import { useEffect, useState } from "react"
+import { toast, Toaster } from "sonner"
 
-export default function DeleteDeckDialog( { deckId }: {deckId: number} ){
-    // const {} = useDelete(`http://localhost:3001/api/decks/${deckId}`)
+export type DeleteDeckDialogProps = {
+    deckId: number, 
+    onDeckDelete?: (deckId: number) => void
+}
+
+export default function DeleteDeckDialog( { deckId, onDeckDelete }: DeleteDeckDialogProps ){
+    const {status, statusText, error, loading, executeDeleteRequest, clearResponseState} = useDelete(`http://localhost:3001/api/decks/${deckId}`);
+
+    const [isDialogOpen, setIsDialogOpen]= useState<boolean>(false);
+
+    // updates the ui based on dependency change
+    useEffect(()=>{
+        if(status === 200){
+            toast.success('Deck deleted successfuly', {
+                description: new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                })
+            })
+            clearResponseState();
+            setIsDialogOpen(false);
+            onDeckDelete!(deckId)
+        }
+    }, [loading])
 
     return(
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
                 <Button size={'default'} variant={'ghost'} className="justify-start px-2 text-muted-foreground">
                     <Trash2/>
@@ -34,11 +59,22 @@ export default function DeleteDeckDialog( { deckId }: {deckId: number} ){
                     <DialogDescription>Are you sure you want to delete this item?</DialogDescription>
                     <DialogDescription>This action cannot be undone.</DialogDescription>
 
+                    {error && 
+                        <DialogDescription className="text-xs text-destructive">Something went wrong. Try agan later.</DialogDescription>
+                    }
+
                 </div>
 
                 <DialogFooter className="gap-2">
-                    <Button variant={'secondary'}><X/>Cancel</Button>
-                    <Button variant={'destructive'}><Trash2/>Delete</Button>
+                    <DialogTrigger asChild>
+                        <Button variant={'secondary'} disabled={loading ? true : false} onClick={()=>{setIsDialogOpen(false)}}>
+                            <X/>Cancel
+                        </Button>
+                    </DialogTrigger>
+
+                    <Button variant={'destructive'} disabled={loading ? true : false} onClick={executeDeleteRequest}>
+                        <Trash2/>Delete
+                    </Button>
                 </DialogFooter>
 
             </DialogContent>
