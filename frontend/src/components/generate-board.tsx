@@ -43,7 +43,7 @@ export default function GenerateBoard(){
 
     const {status, statusText, data, error, loading, executePostRequest, clearResponseState} = usePost('http://localhost:3001/api/gemini/generate')
 
-    const onSubmit: SubmitHandler<GenerateCardsFormData> = async (formData: GenerateCardsFormData) => {                
+    const onSubmit: SubmitHandler<GenerateCardsFormData> = async (formData: GenerateCardsFormData) => {
         // todo: delay to be removed
         await new Promise((resolve) => {setTimeout(resolve, 1000)})
         await executePostRequest(formData)
@@ -72,11 +72,10 @@ export default function GenerateBoard(){
                         AI Creates, You Learn!
                     </CardTitle>
                     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-                        <Textarea {...register('text', {
-                            
-                        })}
+                        <Textarea {...register('text', {})}
                         // phones must have longer heights than desktop 
                             className="min-h-64 max-h-96 sm:min-h-32 sm:max-h-80 text-sm md:text-base overflow-auto resize-none bg-primary-foreground"
+                            disabled={isSubmitting ? true : false}
                             id="text"
                             placeholder="Start typing or paste your notes here..."
                             onInput={(e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -102,7 +101,7 @@ export default function GenerateBoard(){
 
                             <div className="flex items-center gap-2">
                                 <Label className="text-xs sm:text-sm text-muted-foreground">Total Cards</Label>
-                                <Select onValueChange={(value: string) => {setValue('count', Number(value))}}>
+                                <Select disabled={isSubmitting ? true : false } onValueChange={(value: string) => {setValue('count', Number(value))}}>
                                     <SelectTrigger className="w-auto">
                                         <SelectValue defaultValue={'10'} placeholder={10}/>
                                     </SelectTrigger>
@@ -117,9 +116,9 @@ export default function GenerateBoard(){
                             </div>
 
                             <Input {...register('count')} type="hidden" id='count' defaultValue={10}></Input>
-                            <Button type='submit' disabled={isSubmitting ? true : false} >
+                            <Button type={`${isSubmitting ? 'button' : 'submit'}`} className={`${isSubmitting ? 'animate-pulse cursor-progress' : ''}`} >
                                 Generate
-                                <Sparkles className={`${isSubmitting ? 'animate-pulse' : ''}`}></Sparkles>
+                                <Sparkles className={`${isSubmitting ? 'animate-spin' : ''}`}></Sparkles>
                             </Button>  
                         </div>
                     </form>
