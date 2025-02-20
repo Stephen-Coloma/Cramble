@@ -34,6 +34,8 @@ import { DeckWithStatsDTO } from "@/dtos/deck/DeckWithStats.dto"
 import { useFetch } from "@/hooks/use-request"
 import DeckLoading from "./deck-loading"
 import { Label } from "./ui/label"
+import DeleteDeckDialog from "./dialog/delete-deck-dialog"
+import EditDeckDialog from "./dialog/edit-deck-dialog"
 
 // Deck prop is baed on DeckDTO wherein it is a shared type for backend and frontend
 export type DeckProps = Pick<DeckWithStatsDTO, 
@@ -173,16 +175,10 @@ export function Deck({
           </PopoverTrigger>
 
           <PopoverContent className="w-fit flex flex-col p-2">
-            <Button size={'default'} variant={'ghost'} className="justify-start px-2 text-muted-foreground">
-              <Pencil/>
-              Edit title and description
-            </Button>
-            <Button size={'default'} variant={'ghost'} className="justify-start px-2 text-muted-foreground">
-              <Trash2/>
-              Delete deck
-            </Button>
-            
+            <EditDeckDialog/>
+            <DeleteDeckDialog deckId={deckId}/>
           </PopoverContent>
+
         </Popover>
 
         <Button className="rounded-l-none">
