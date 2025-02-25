@@ -6,7 +6,7 @@ import { FlashcardInputCard } from "../flashcard-input-card";
 import { usePost } from "@/hooks/use-request";
 import { useState, useEffect, ChangeEvent, useRef, useLayoutEffect } from "react";
 import { joiResolver } from "@hookform/resolvers/joi";
-import {useForm} from 'react-hook-form'
+import {useFieldArray, useForm} from 'react-hook-form'
 import { SubmitHandler } from "react-hook-form";
 import {toast} from 'sonner'
 import { Input } from "@/components/ui/input"
@@ -25,26 +25,30 @@ import {
 } from "@/components/ui/dialog"
 
 export type ShowGeneratedDeckDialogProps = {
-    deckFlashcardsData: DeckFlashcardsFormData,
+    generatedDeckFlashcardsData: DeckFlashcardsFormData,
     onDialogClose: ()=> void
 }
 
 // this dialog will handle generated flashcards data from the generate flashcards. basically it only holds the form and the dialog
 export default function ShowGeneratedDeckDialog({
-    deckFlashcardsData,
+    generatedDeckFlashcardsData,
     onDialogClose
 }: ShowGeneratedDeckDialogProps){   
-    const descTextareaRef = useRef<HTMLTextAreaElement>(null);
-
-    // array of flashcard numbers only. cannot pass multiple instances of form utilities
-    // converts flashcard array length n to array of 1-n
-    const [flashcardArray, setFlashcardArray] = useState<number[]>(Array(deckFlashcardsData.flashcards.length).fill(0).map((_, i)=> i+1));
-
     const {status, loading, executePostRequest , clearResponseState } = usePost('http://localhost:3001/api/decks');
     
-    const {register, unregister, setValue, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
-        resolver: joiResolver(DeckFlashcardsSchema)
+    const {register, control, unregister, setValue, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
+        resolver: joiResolver(DeckFlashcardsSchema),
+        defaultValues: {
+            title: generatedDeckFlashcardsData.title,
+            description: generatedDeckFlashcardsData.description,
+            flashcards: generatedDeckFlashcardsData.flashcards,
+        }
     });
+
+    const {fields, append, remove} = useFieldArray<DeckFlashcardsFormData>({
+        control, 
+        name: 'flashcards'
+    })
     
     const onSubmit: SubmitHandler<DeckFlashcardsFormData> = async (formData: DeckFlashcardsFormData) => {
         await new Promise((resolve) => {setTimeout(resolve, 2000)}); 
@@ -75,39 +79,17 @@ export default function ShowGeneratedDeckDialog({
             unregister('flashcards')
         }
     }, [loading])
-    
-    const removeFlashcard = (flashcardNo: number) => {
-        // do not remove card if less than 3
-        if(flashcardArray.length < 4){
-            setError('root', {message: 'need atleast 3 cards'})
-        }else{
-            const index = flashcardArray.indexOf(flashcardNo);
-    
-            //get the trailing elements
-            const trailing = flashcardArray.slice(index)
-            
-            // adjust values to left
-            trailing.forEach((flashcard)=> {
-                setValue( `flashcards.${flashcard - 1}`, getValues(`flashcards.${flashcard}`));
-            })      
-            
-            // unregister the last flashcard because it doesnt have data anymore
-            unregister(`flashcards.${flashcardArray.length-1}`)
-    
-            // remove now the last flashcard from array of numbers
-            flashcardArray.splice(flashcardArray.length-1)
 
-            // remove from the last flashcard in the fetched data array
-            deckFlashcardsData.flashcards.splice(deckFlashcardsData.flashcards.length - 1)
     
-            setFlashcardArray([...flashcardArray])
-        }
-
-    };
+    const removeFlashcard = (flashcardIndex: number) =>{
+        remove(flashcardIndex)
+    }
 
     const addFlashcard = () => {
-        // last element + 1 becomes the new last element
-        setFlashcardArray([...flashcardArray, flashcardArray[flashcardArray.length-1]+1])
+        append({
+            front: '',
+            back: ''
+        })
     }
     
     // when dialog changes, reset the form and close dialog from the parent component
@@ -141,7 +123,7 @@ export default function ShowGeneratedDeckDialog({
                             className={errors.title ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
                             id="title"
                             type="text"
-                            defaultValue={deckFlashcardsData.title}
+                            defaultValue={generatedDeckFlashcardsData.title}
                             placeholder="Enter a title (e.g., Math Quiz 101)"
                         />
                         {errors.title && (
@@ -156,7 +138,7 @@ export default function ShowGeneratedDeckDialog({
                         <Textarea
                             {...register('description')}
                             className={`max-h-64 min-h-[90px] sm:min-h-[60px] lg:min-h-1 overflow-hidden resize-none ${errors.description ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}`}
-                            defaultValue={deckFlashcardsData.description}
+                            defaultValue={generatedDeckFlashcardsData.description}
                             placeholder="Add a description"
                             id="description"
                             rows={1}                  
@@ -178,11 +160,11 @@ export default function ShowGeneratedDeckDialog({
                             </Label>)}
                     </div>
 
-                    <Label className="mb-4">{`Total: ${flashcardArray.length}`}</Label>
+                    <Label className="mb-4">{`Total: ${fields.length}`}</Label>
 
                     <div className="flex flex-col flex-grow sm:flex-none gap-4 mb-4">
-                        {flashcardArray.map((flashcardNo, index) => (
-                            <FlashcardInputCard key={index} flashcardNo={flashcardNo} formUtilities={{register, errors}} onFlashcardRemove={removeFlashcard} data={deckFlashcardsData.flashcards[index]}></FlashcardInputCard>
+                        {fields.map((field, index) => (
+                            <FlashcardInputCard key={field.id} flashcardIndex={index} formUtilities={{register, errors}} onFlashcardRemove={removeFlashcard} data={field}></FlashcardInputCard>
                         ))} 
                     </div>
 

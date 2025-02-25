@@ -12,8 +12,8 @@ export type FlashcardInputCardProps = {
         register: UseFormRegister<DeckFlashcardsFormData>
         errors: FieldErrors<DeckFlashcardsFormData>
     },
-    flashcardNo: number,
-    onFlashcardRemove: (flashcardNo: number) => void,
+    flashcardIndex: number,
+    onFlashcardRemove: (flashcardIndex: number) => void,
     data?: {
         front: string,
         back: string
@@ -25,7 +25,7 @@ export function FlashcardInputCard({
         register,
         errors,
     },
-    flashcardNo,
+    flashcardIndex,
     onFlashcardRemove,
     // data is optional, if we try to destructure, we might destructure an undefined data. 
     // that is why we have = to set a default values whenever data is undefined
@@ -45,7 +45,7 @@ export function FlashcardInputCard({
     const handleRemove = () => {      
         setIsRemoving(true)
         setTimeout(()=> {
-            onFlashcardRemove(flashcardNo)
+            onFlashcardRemove(flashcardIndex)
             setIsRemoving(false)
         }, 300)   
     }
@@ -55,7 +55,7 @@ export function FlashcardInputCard({
                     ${isRemoving ? "opacity-0" : ""}`}>
 
             <CardHeader className="flex-row justify-between items-baseline p-0">
-                <Label className="h-9 w-9 text-xl font-bold  text-center">{flashcardNo}</Label>
+                <Label className="h-9 w-9 text-xl font-bold  text-center">{flashcardIndex + 1}</Label>
                 <Button type='button' variant={'ghost'} size={'icon'} onClick={handleRemove}> 
                     <Trash2></Trash2>
                 </Button>
@@ -63,12 +63,12 @@ export function FlashcardInputCard({
 
             <CardContent className="flex flex-col gap-4 sm:flex-row p-0 mb-4">
                 <div className="flex-grow">
-                    <Label htmlFor={`flashcards.${flashcardNo-1}.front`} className="text-left sm:text-center block w-full mb-2">Question</Label>
+                    <Label htmlFor={`flashcards.${flashcardIndex}.front`} className="text-left sm:text-center block w-full mb-2">Question</Label>
 
-                    <Textarea {...register(`flashcards.${flashcardNo-1}.front`)}
+                    <Textarea {...register(`flashcards.${flashcardIndex}.front`)}
                         className={`max-h-64 min-h-1 overflow-hidden resize-none mb-4 text-muted-foreground text-justify border-x-0 border-t-0 shadow-none border-b-ring rounded-none focus-visible:border-b-4 focus-visible:ring-0
-                            ${errors?.flashcards?.[flashcardNo - 1]?.front ? 'border-b-destructive focus-visible:ring-0' : ''}`}
-                        id={`flashcards.${flashcardNo-1}.front`}
+                            ${errors?.flashcards?.[flashcardIndex]?.front ? 'border-b-destructive focus-visible:ring-0' : ''}`}
+                        id={`flashcards.${flashcardIndex}.front`}
                         defaultValue={front}
                         placeholder="Enter question here..."
                         rows={1}
@@ -84,17 +84,17 @@ export function FlashcardInputCard({
                         {questionTextLength > 0 ? questionTextLength : 0}
                     </h1>
                     
-                    { errors?.flashcards?.[flashcardNo - 1]?.front && 
-                    <Label className="text-xs text-destructive">{ errors?.flashcards?.[flashcardNo - 1]?.front?.message?.replaceAll('\"', "")}</Label>}
+                    { errors?.flashcards?.[flashcardIndex]?.front && 
+                    <Label className="text-xs text-destructive">{ errors?.flashcards?.[flashcardIndex]?.front?.message?.replaceAll('\"', "")}</Label>}
                 </div>
 
                 <div className="flex-grow">
-                    <Label htmlFor={`flashcards.${flashcardNo-1}.back`} className="text-left sm:text-center block w-full mb-2">Answer</Label>
+                    <Label htmlFor={`flashcards.${flashcardIndex}.back`} className="text-left sm:text-center block w-full mb-2">Answer</Label>
 
-                    <Textarea {...register(`flashcards.${flashcardNo-1}.back`)}
+                    <Textarea {...register(`flashcards.${flashcardIndex}.back`)}
                         className={`max-h-64 min-h-1 overflow-hidden resize-none mb-4 text-muted-foreground text-justify border-x-0 border-t-0 shadow-none border-b-ring rounded-none focus-visible:border-b-4 focus-visible:ring-0
-                            ${errors?.flashcards?.[flashcardNo - 1]?.back ? 'border-b-destructive focus-visible:ring-0' : ''}`}
-                            id={`flashcards.${flashcardNo-1}.back`}
+                            ${errors?.flashcards?.[flashcardIndex]?.back ? 'border-b-destructive focus-visible:ring-0' : ''}`}
+                            id={`flashcards.${flashcardIndex}.back`}
                             defaultValue={back}
                             placeholder="Enter answer here..."
                             rows={1}
@@ -102,16 +102,16 @@ export function FlashcardInputCard({
                                 const target = e.target as HTMLTextAreaElement;
                                 target.style.height = 'auto';
                                 target.style.height = `${target.scrollHeight}px`;
-                                setAnswerTextLength(400 - e.target.value.length)
+                                setAnswerTextLength(400 - e.target.value.length);
                             }}
-                            />
+                        />
 
                     <h1 className={`text-xs text-center sm:text-left font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ${answerTextLength < 10 ? 'text-destructive' : 'text-muted-foreground'}`}>
                         {answerTextLength > 0 ? answerTextLength : 0}
                     </h1>
                     
-                    { errors?.flashcards?.[flashcardNo - 1]?.back && 
-                    <Label className="text-xs text-destructive">{ errors?.flashcards?.[flashcardNo - 1]?.back?.message?.replaceAll('\"', "")}</Label>}
+                    { errors?.flashcards?.[flashcardIndex]?.back && 
+                    <Label className="text-xs text-destructive">{ errors?.flashcards?.[flashcardIndex]?.back?.message?.replaceAll('\"', "")}</Label>}
                 </div>
             </CardContent>
 

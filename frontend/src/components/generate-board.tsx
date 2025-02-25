@@ -127,7 +127,7 @@ export default function GenerateBoard(){
 
             {/* show the dialog after generation*/}
             { isDialogOpen && data &&           
-                <ShowGeneratedDeckDialog deckFlashcardsData={data} onDialogClose={closeDialog}/>
+                <ShowGeneratedDeckDialog generatedDeckFlashcardsData={data} onDialogClose={closeDialog}/>
             }
         </>
     )
