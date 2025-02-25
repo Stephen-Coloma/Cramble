@@ -129,6 +129,15 @@ export default function ShowGeneratedDeckDialog({
                             type="text"
                             defaultValue={generatedDeckFlashcardsData.title}
                             placeholder="Enter a title (e.g., Math Quiz 101)"
+                            onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                                const target = e.target as HTMLInputElement;
+
+                                if(target.value.length > 30){
+                                    setError('title', {type: 'max', message: 'title cannot exceed 30 characters'})
+                                }else{
+                                    clearErrors('title')
+                                }
+                            }}
                         />
                         {errors.title && (
                             <Label className="text-xs text-destructive">

@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { resolve } from "path";
 import { useEffect, useState } from "react"
 
 // T is the expected type to be returned and converted as props for rendering component (get requests).
@@ -119,7 +120,9 @@ export function useDelete(url: string, options?: AxiosRequestConfig): DeleteApiR
     // method that executes the delete request
     const executeDeleteRequest = async() => {
         setLoading(true);
-
+        // todo: remove delay
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        
         try{
             const response: AxiosResponse = await axios.delete(url, config);
             setStatus(response.status);

@@ -15,7 +15,7 @@ import { toast, Toaster } from "sonner"
 
 export type DeleteDeckDialogProps = {
     deckId: number, 
-    onDeckDelete?: (deckId: number) => void
+    onDeckDelete: (deckId: number) => void
 }
 
 export default function DeleteDeckDialog( { deckId, onDeckDelete }: DeleteDeckDialogProps ){
@@ -26,7 +26,7 @@ export default function DeleteDeckDialog( { deckId, onDeckDelete }: DeleteDeckDi
     // updates the ui based on dependency change
     useEffect(()=>{
         if(status === 200){
-            toast.success('Deck deleted successfuly', {
+            toast.success('Deck deleted successfully', {
                 description: new Date().toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
@@ -35,7 +35,7 @@ export default function DeleteDeckDialog( { deckId, onDeckDelete }: DeleteDeckDi
             })
             clearResponseState();
             setIsDialogOpen(false);
-            onDeckDelete!(deckId)
+            onDeckDelete(deckId)
         }
     }, [loading])
 

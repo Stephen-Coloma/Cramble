@@ -121,7 +121,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
             clearResponseState()
 
             // add the on deck added
-            const newlyAddedDeck: DeckProps = {
+            const newlyAddedDeck: Omit<DeckProps, 'onDeckDelete' | 'onDeckEdit'> = {
                 deckId: data.deckId,
                 title: getValues('title'),
                 description: getValues('description'),
@@ -135,7 +135,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
             }
 
             // render the newly added deck on the list using the callback function
-            onDeckAdded(newlyAddedDeck)
+            onDeckAdded(newlyAddedDeck as DeckProps)
 
             // reset all form states
             reset()
@@ -210,6 +210,15 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                             id="title"
                             type="text"
                             placeholder="Enter a title (e.g., Math Quiz 101)"
+                            onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                                const target = e.target as HTMLInputElement;
+
+                                if(target.value.length > 30){
+                                    setError('title', {type: 'max', message: 'title cannot exceed 30 characters'})
+                                }else{
+                                    clearErrors('title')
+                                }
+                            }}
                         />
                         {errors.title && (
                             <Label className="text-xs text-destructive">

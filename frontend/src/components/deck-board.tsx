@@ -50,7 +50,8 @@ export type DeckProps = Pick<DeckWithStatsDTO,
   'masteredTotal' |
   'unratedTotal'
 > & {
-  onDeckDelete?: (deckid: number) => void
+  onDeckDelete: (deckId: number) => void
+  onDeckEdit: (deckId: number,  newTitle: string, newDescription: string) => void
 }
 
 const chartConfig = {
@@ -75,6 +76,7 @@ const chartConfig = {
   }
 } satisfies ChartConfig
 
+// drilled 3 generation for onEvents
 export function Deck({
   deckId,
   title,
@@ -86,7 +88,8 @@ export function Deck({
   familiarTotal,
   masteredTotal,
   unratedTotal,
-  onDeckDelete
+  onDeckDelete,
+  onDeckEdit
 }: DeckProps) {
 
   const formattedCreationDate = new Date(createdAt)
@@ -178,7 +181,7 @@ export function Deck({
           </PopoverTrigger>
 
           <PopoverContent className="w-fit flex flex-col p-2">
-            <EditDeckDialog/>
+            <EditDeckDialog deckId={deckId} title={title} description={description} onDeckEdit={onDeckEdit}/>
             <DeleteDeckDialog deckId={deckId} onDeckDelete={onDeckDelete}/>
           </PopoverContent>
 
@@ -211,9 +214,18 @@ export default function DeckBoard(){
     setDeckArray([...deckArray, newlyAddedDeck])
   }
 
-  // deletes/filters out the card in the ui
+  // deletes/filters out the deck in the ui
   const deleteDeck = (deckId: number) => {
     setDeckArray(deckArray.filter((deck)=>deck.deckId !== deckId))
+  }
+
+  // edits the deck title and description in the ui
+  const editDeck = (deckId: number, newTitle: string, newDescription: string) => {
+    const deck = deckArray.find((deck)=>deck.deckId === deckId)
+    if(deck) {
+      deck.title = newTitle,
+      deck.description = newDescription
+    }
   }
   
   // todo: implement search and filter (filder depends on what I can filter) 
@@ -242,7 +254,7 @@ export default function DeckBoard(){
       {!loading && (deckArray.length > 0) && (
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
           {deckArray.map((deck, index) => (
-            <Deck key={index} {...deck} onDeckDelete={deleteDeck}/>
+            <Deck key={index} {...deck} onDeckDelete={deleteDeck} onDeckEdit={editDeck}/>
           ))}
           <AddDeckDialog onDeckAdded={addNewDeck} variant="deck-button" />         
         </div>
