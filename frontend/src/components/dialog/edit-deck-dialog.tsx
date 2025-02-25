@@ -10,8 +10,8 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { usePost } from "@/hooks/use-request"
-import { Pencil, X, Trash2, FolderCheck, FileCheck } from "lucide-react"
+import { usePost, usePut } from "@/hooks/use-request"
+import { Pencil, X, Trash2, FolderCheck, FileCheck, Check } from "lucide-react"
 import { useState, useEffect, ChangeEvent } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { toast } from "sonner"
@@ -56,7 +56,7 @@ export default function EditDeckDialog({
 }: EditDeckDialogProps){
     const [isDialogOpen, setIsDialogOpen]= useState<boolean>(false);
 
-    const {status, statusText, error, loading, executePostRequest, clearResponseState} = usePost(`http://localhost:3001/api/decks/${deckId}`);
+    const {status, statusText, error, loading, executePutRequest, clearResponseState} = usePut(`http://localhost:3001/api/decks/${deckId}`);
 
     const {register, unregister, handleSubmit, getValues, formState: {errors, isSubmitting}, setError, clearErrors} = useForm<DeckFormData>({
         resolver: joiResolver(DeckSchema),
@@ -69,7 +69,7 @@ export default function EditDeckDialog({
     const onSubmit: SubmitHandler<DeckFormData> = async(formData: DeckFormData) => {
         // todo: delay to be removed
         await new Promise((resolve) => {setTimeout(resolve, 1000)})
-        await executePostRequest(formData);
+        await executePutRequest(formData);
     }
 
     // updates the ui based on dependency change
@@ -90,7 +90,7 @@ export default function EditDeckDialog({
     }, [loading])
 
     return(
-        <Dialog>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
                 <Button size={'default'} variant={'ghost'} className="justify-start px-2 text-muted-foreground">
                     <Pencil/>
@@ -138,7 +138,7 @@ export default function EditDeckDialog({
                         <Label htmlFor="description">Description</Label>
                         <Textarea
                             {...register('description')}
-                            className={`max-h-40 min-h-24 overflow-hidden resize-none ${errors.description ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}`}
+                            className={`max-h-40 h-40 overflow-hidden resize-none ${errors.description ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}`}
                             placeholder="Add a description"
                             defaultValue={description}
                             id="description"
@@ -172,13 +172,13 @@ export default function EditDeckDialog({
 
                     <DialogFooter className="gap-2">
                         <DialogTrigger asChild>
-                            <Button type='button' variant={'secondary'} disabled={loading ? true : false} onClick={()=>{setIsDialogOpen(false)}}>
+                            <Button type='button' variant={'secondary'} disabled={isSubmitting ? true : false} onClick={()=>{setIsDialogOpen(false)}}>
                                 <X/>Cancel
                             </Button>
                         </DialogTrigger>
 
                         <Button type='submit' disabled={isSubmitting ? true : false}>
-                            <FileCheck/>Save Changes
+                            <Check/>Save Changes
                         </Button>
                     </DialogFooter>
                 </form>

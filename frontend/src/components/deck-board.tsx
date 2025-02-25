@@ -36,6 +36,7 @@ import DeckLoading from "./deck-loading"
 import { Label } from "./ui/label"
 import DeleteDeckDialog from "./dialog/delete-deck-dialog"
 import EditDeckDialog from "./dialog/edit-deck-dialog"
+import { title } from "process"
 
 // Deck prop is baed on DeckDTO wherein it is a shared type for backend and frontend
 export type DeckProps = Pick<DeckWithStatsDTO, 
@@ -221,11 +222,13 @@ export default function DeckBoard(){
 
   // edits the deck title and description in the ui
   const editDeck = (deckId: number, newTitle: string, newDescription: string) => {
-    const deck = deckArray.find((deck)=>deck.deckId === deckId)
-    if(deck) {
-      deck.title = newTitle,
-      deck.description = newDescription
-    }
+    setDeckArray((prevDecks) => 
+      prevDecks.map((deck)=>
+        deck.deckId === deckId 
+        ? {...deck, title: newTitle, description: newDescription}
+        : deck
+      )
+    )
   }
   
   // todo: implement search and filter (filder depends on what I can filter) 
