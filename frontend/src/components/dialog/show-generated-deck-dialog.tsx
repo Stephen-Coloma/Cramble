@@ -36,7 +36,7 @@ export default function ShowGeneratedDeckDialog({
 }: ShowGeneratedDeckDialogProps){   
     const {status, loading, executePostRequest , clearResponseState } = usePost('http://localhost:3001/api/decks');
     
-    const {register, control, unregister, setValue, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
+    const {register, control, unregister, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
         resolver: joiResolver(DeckFlashcardsSchema),
         defaultValues: {
             title: generatedDeckFlashcardsData.title,
@@ -82,6 +82,10 @@ export default function ShowGeneratedDeckDialog({
 
     
     const removeFlashcard = (flashcardIndex: number) =>{
+        if(fields.length < 4){
+            setError("root", {message: "need at least 3 cards"})
+            return;
+        }
         remove(flashcardIndex)
     }
 
