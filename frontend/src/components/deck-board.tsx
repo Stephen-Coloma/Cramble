@@ -52,7 +52,7 @@ export type DeckProps = Pick<DeckWithStatsDTO,
   'unratedTotal'
 > & {
   onDeckDelete: (deckId: number) => void
-  onDeckEdit: (deckId: number,  newTitle: string, newDescription: string) => void
+  onDeckEdit: (deckId: number,  newTitle: string, newDescription: string, newEditDate: string) => void
 }
 
 const chartConfig = {
@@ -113,6 +113,8 @@ export function Deck({
     { mastery: "unsure", tally: unsureTotal, fill: "var(--color-unsure)" },
     { mastery: "unrated", tally: unratedTotal, fill: "var(--color-unrated)" },
   ]
+
+  const [isPopOverOpen, setIsPopOverOpen] = useState<boolean>(false);
 
   return (
     <Card className="w-100 border-2 hover:border-primary shadow transition-colors duration-200">
@@ -175,15 +177,15 @@ export function Deck({
 
       {/* edit and play buttons */}
       <div>
-        <Popover>
+        <Popover open={isPopOverOpen} onOpenChange={setIsPopOverOpen}>
 
           <PopoverTrigger className="h-9 px-4 py-2 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 rounded-r-none inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0">
             <Wrench/>
           </PopoverTrigger>
 
           <PopoverContent className="w-fit flex flex-col p-2">
-            <EditDeckDialog deckId={deckId} title={title} description={description} onDeckEdit={onDeckEdit}/>
-            <DeleteDeckDialog deckId={deckId} onDeckDelete={onDeckDelete}/>
+            <EditDeckDialog deckId={deckId} title={title} description={description} onDeckEdit={onDeckEdit} onPopOverClose={()=> setIsPopOverOpen(false)}/>
+            <DeleteDeckDialog deckId={deckId} onDeckDelete={onDeckDelete} onPopOverClose={()=> setIsPopOverOpen(false)}/>
           </PopoverContent>
 
         </Popover>
@@ -221,11 +223,11 @@ export default function DeckBoard(){
   }
 
   // edits the deck title and description in the ui
-  const editDeck = (deckId: number, newTitle: string, newDescription: string) => {
+  const editDeck = (deckId: number, newTitle: string, newDescription: string, newEditDate: string) => {
     setDeckArray((prevDecks) => 
       prevDecks.map((deck)=>
         deck.deckId === deckId 
-        ? {...deck, title: newTitle, description: newDescription}
+        ? {...deck, title: newTitle, description: newDescription, editedAt: newEditDate}
         : deck
       )
     )

@@ -16,9 +16,10 @@ import { toast, Toaster } from "sonner"
 export type DeleteDeckDialogProps = {
     deckId: number, 
     onDeckDelete: (deckId: number) => void
+    onPopOverClose: () => void
 }
 
-export default function DeleteDeckDialog( { deckId, onDeckDelete }: DeleteDeckDialogProps ){
+export default function DeleteDeckDialog( { deckId, onDeckDelete, onPopOverClose }: DeleteDeckDialogProps ){
     const {status, statusText, error, loading, executeDeleteRequest, clearResponseState} = useDelete(`http://localhost:3001/api/decks/${deckId}`);
 
     const [isDialogOpen, setIsDialogOpen]= useState<boolean>(false);
@@ -35,7 +36,8 @@ export default function DeleteDeckDialog( { deckId, onDeckDelete }: DeleteDeckDi
             })
             clearResponseState();
             setIsDialogOpen(false);
-            onDeckDelete(deckId)
+            onDeckDelete(deckId);
+            onPopOverClose();
         }
     }, [loading])
 

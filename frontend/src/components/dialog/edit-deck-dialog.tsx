@@ -45,14 +45,16 @@ export type EditDeckDialogProps = {
     deckId: number,
     title: string,
     description: string,
-    onDeckEdit: (deckId: number,  newTitle: string, newDescription: string, editedAt: string) => void
+    onDeckEdit: (deckId: number,  newTitle: string, newDescription: string, editedAt: string) => void,
+    onPopOverClose: () => void
 }
 
 export default function EditDeckDialog({
     deckId,
     title,
     description,
-    onDeckEdit
+    onDeckEdit,
+    onPopOverClose
 }: EditDeckDialogProps){
     const [isDialogOpen, setIsDialogOpen]= useState<boolean>(false);
 
@@ -86,6 +88,7 @@ export default function EditDeckDialog({
             onDeckEdit(deckId, getValues('title'), getValues('description'), getValues('editedAt'))
             clearResponseState();
             setIsDialogOpen(false);
+            onPopOverClose();
         }
     }, [loading])
 
