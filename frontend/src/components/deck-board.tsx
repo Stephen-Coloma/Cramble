@@ -205,7 +205,7 @@ export default function DeckBoard(){
   const {status, statusText, data, error, loading}  = useFetch<DeckProps[]>('http://localhost:3001/api/decks')
   const [deckArray, setDeckArray] = useState<DeckProps[]>([]);
 
-  // update the deckArray when data is fetched & when it is an array only
+  // update the deckArray when data is fetched from useFetch & when it is an array only
   useEffect(()=>{
     if(Array.isArray(data)){
       setDeckArray(data)

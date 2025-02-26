@@ -51,7 +51,6 @@ export default function ShowGeneratedDeckDialog({
     })
     
     const onSubmit: SubmitHandler<DeckFlashcardsFormData> = async (formData: DeckFlashcardsFormData) => {
-        await new Promise((resolve) => {setTimeout(resolve, 2000)}); 
         await executePostRequest(formData)
     };
 

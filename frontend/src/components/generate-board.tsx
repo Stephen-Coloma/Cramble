@@ -5,7 +5,7 @@ import { Textarea } from "./ui/textarea"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import { Label } from "./ui/label"
-import { Bot, Sparkles } from "lucide-react"
+import { Bot, LoaderCircle, } from "lucide-react"
 import { ChangeEvent, useEffect, useState} from "react"
 import { useForm, SubmitHandler } from "react-hook-form"
 import {
@@ -116,9 +116,11 @@ export default function GenerateBoard(){
                             </div>
 
                             <Input {...register('count')} type="hidden" id='count' defaultValue={10}></Input>
-                            <Button type={`${isSubmitting ? 'button' : 'submit'}`} className={`${isSubmitting ? 'animate-pulse cursor-progress' : ''}`} >
+                            <Button type={`${isSubmitting ? 'button' : 'submit'}`} className={`${isSubmitting ? 'animate-pulse' : ''}`} >
                                 Generate
-                                <Sparkles className={`${isSubmitting ? 'animate-spin' : ''}`}></Sparkles>
+                                {isSubmitting 
+                                    ? <LoaderCircle className={`${isSubmitting ? 'animate-spin' : ''}`}></LoaderCircle>
+                                    : ''}
                             </Button>  
                         </div>
                     </form>

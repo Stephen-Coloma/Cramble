@@ -2,6 +2,8 @@ import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import { resolve } from "path";
 import { useEffect, useState } from "react"
 
+const requestDelay = 1000; // 1 sec
+
 // T is the expected type to be returned and converted as props for rendering component (get requests).
 // T = any makes it optional to provide a generic. Good for post requests
 export type ApiResponse<T = any> = {
@@ -42,7 +44,7 @@ export function useFetch<T>(url: string, options?: AxiosRequestConfig): ApiRespo
 
     // todo: remove the delay
     useEffect(() => {
-        setTimeout(()=>{executeGetRequest(url);}, 1000)
+        setTimeout(()=>{executeGetRequest(url);}, requestDelay)
     }, [url]); // run when url is changed
 
     return {status, statusText, data, error, loading};    
@@ -75,6 +77,9 @@ export function usePost(url: string, options?: AxiosRequestConfig ): PostApiResp
     // This method is used for firing the put request
     const executePostRequest  = async (dataToSend: any) => {
         setLoading(true);
+
+        // todo: remove delay
+        await new Promise((resolve) => setTimeout(resolve, requestDelay))
         
         try{
             const response: AxiosResponse = await axios.post(url, dataToSend, config);
@@ -124,6 +129,9 @@ export function usePut(url: string, options?: AxiosRequestConfig ): PutApiRespon
     // This method is used for firing the put request
     const executePutRequest  = async (dataToSend: any) => {
         setLoading(true);
+
+        // todo: remove delay
+        await new Promise((resolve) => setTimeout(resolve, requestDelay))
         
         try{
             const response: AxiosResponse = await axios.put(url, dataToSend, config);
@@ -168,8 +176,9 @@ export function useDelete(url: string, options?: AxiosRequestConfig): DeleteApiR
     // method that executes the delete request
     const executeDeleteRequest = async() => {
         setLoading(true);
+        
         // todo: remove delay
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, requestDelay))
         
         try{
             const response: AxiosResponse = await axios.delete(url, config);

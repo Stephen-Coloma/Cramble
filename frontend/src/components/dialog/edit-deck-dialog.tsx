@@ -69,8 +69,6 @@ export default function EditDeckDialog({
     })
 
     const onSubmit: SubmitHandler<DeckFormData> = async(formData: DeckFormData) => {
-        // todo: delay to be removed
-        await new Promise((resolve) => {setTimeout(resolve, 1000)})
         await executePutRequest(formData);
     }
 
