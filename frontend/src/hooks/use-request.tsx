@@ -1,5 +1,8 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
+import { resolve } from "path";
 import { useEffect, useState } from "react"
+
+const requestDelay = 1000; // 1 sec
 
 // T is the expected type to be returned and converted as props for rendering component (get requests).
 // T = any makes it optional to provide a generic. Good for post requests
@@ -24,7 +27,7 @@ export function useFetch<T>(url: string, options?: AxiosRequestConfig): ApiRespo
     };
 
     // This method is used for firing the get request
-    const executeGetRequest = async () => {
+    const executeGetRequest = async (url: string) => {
         setLoading(true);
 
         try{
@@ -41,7 +44,7 @@ export function useFetch<T>(url: string, options?: AxiosRequestConfig): ApiRespo
 
     // todo: remove the delay
     useEffect(() => {
-        setTimeout(()=>{executeGetRequest();}, 1000)
+        setTimeout(()=>{executeGetRequest(url);}, requestDelay)
     }, [url]); // run when url is changed
 
     return {status, statusText, data, error, loading};    
@@ -74,6 +77,9 @@ export function usePost(url: string, options?: AxiosRequestConfig ): PostApiResp
     // This method is used for firing the put request
     const executePostRequest  = async (dataToSend: any) => {
         setLoading(true);
+
+        // todo: remove delay
+        await new Promise((resolve) => setTimeout(resolve, requestDelay))
         
         try{
             const response: AxiosResponse = await axios.post(url, dataToSend, config);
@@ -97,4 +103,100 @@ export function usePost(url: string, options?: AxiosRequestConfig ): PostApiResp
     } 
 
     return {status, statusText, data, error, loading, executePostRequest , clearResponseState  };    
+}
+
+export type PutApiResponse = ApiResponse & {
+    executePutRequest : (dataToSend: any) => Promise<void>
+    clearResponseState: () => void
+}
+
+export function usePut(url: string, options?: AxiosRequestConfig ): PutApiResponse {
+    const [status, setStatus] = useState<number>(0);
+    const [statusText, setStatusText] = useState<string>('');
+    const [data, setData] = useState<any>(null);
+    const [error, setError] = useState<any>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+
+    let config = {
+        ...options,  //include other options
+        headers: {
+            ...options?.headers, //include other header 
+            'Content-Type': options?.headers?.['Content-Type'] || 'application/json' //default application/json
+        },
+        withCredentials: true //include the cookies on all request
+    };
+
+    // This method is used for firing the put request
+    const executePutRequest  = async (dataToSend: any) => {
+        setLoading(true);
+
+        // todo: remove delay
+        await new Promise((resolve) => setTimeout(resolve, requestDelay))
+        
+        try{
+            const response: AxiosResponse = await axios.put(url, dataToSend, config);
+            setStatus(response.status);
+            setStatusText(response.statusText);
+            if(response.data){
+                setData(response.data)
+            }
+        } catch(error: unknown){
+            setError(error)
+        } finally{
+            setLoading(false);
+        }
+    }
+
+    // reset states so that next request is not tied with past request's state
+    const clearResponseState  = () => {
+        setStatus(0);
+        setStatusText('');
+        setError(null)
+    } 
+
+    return {status, statusText, data, error, loading, executePutRequest , clearResponseState  };    
+}
+
+export type DeleteApiResponse = ApiResponse & {
+    executeDeleteRequest : () => Promise<void>
+    clearResponseState: () => void
+}
+
+export function useDelete(url: string, options?: AxiosRequestConfig): DeleteApiResponse{
+    const [status, setStatus] = useState<number>(0);
+    const [statusText, setStatusText] = useState<string>('')
+    const [error, setError] = useState<any>(null)
+    const [loading, setLoading] = useState<boolean>(false)
+
+    let config = {
+        ...options, //include additional configs passed if there are
+        withCredentials: true //include the cookies on all request
+    };
+
+    // method that executes the delete request
+    const executeDeleteRequest = async() => {
+        setLoading(true);
+        
+        // todo: remove delay
+        await new Promise((resolve) => setTimeout(resolve, requestDelay))
+        
+        try{
+            const response: AxiosResponse = await axios.delete(url, config);
+            setStatus(response.status);
+            setStatusText(response.statusText)
+        }catch(error: unknown){
+            setError(error);
+        }finally{
+            setLoading(false);
+        }
+    }
+
+    // reset states so that next request is not tied with past request's state
+    const clearResponseState  = () => {
+        setStatus(0);
+        setStatusText('');
+        setError(null)
+    } 
+
+    return {status, statusText, error, loading, executeDeleteRequest, clearResponseState}
 }

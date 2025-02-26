@@ -28,12 +28,15 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-import {Swords, Pencil, Info, Filter, PackagePlus } from 'lucide-react'
+import {Swords, Info, Filter, PackagePlus, Wrench, Pencil, Trash2 } from 'lucide-react'
 
 import { DeckWithStatsDTO } from "@/dtos/deck/DeckWithStats.dto"
 import { useFetch } from "@/hooks/use-request"
 import DeckLoading from "./deck-loading"
 import { Label } from "./ui/label"
+import DeleteDeckDialog from "./dialog/delete-deck-dialog"
+import EditDeckDialog from "./dialog/edit-deck-dialog"
+import { title } from "process"
 
 // Deck prop is baed on DeckDTO wherein it is a shared type for backend and frontend
 export type DeckProps = Pick<DeckWithStatsDTO, 
@@ -47,7 +50,10 @@ export type DeckProps = Pick<DeckWithStatsDTO,
   'familiarTotal' |
   'masteredTotal' |
   'unratedTotal'
->
+> & {
+  onDeckDelete: (deckId: number) => void
+  onDeckEdit: (deckId: number,  newTitle: string, newDescription: string, newEditDate: string) => void
+}
 
 const chartConfig = {
   tally: {
@@ -71,6 +77,7 @@ const chartConfig = {
   }
 } satisfies ChartConfig
 
+// drilled 3 generation for onEvents
 export function Deck({
   deckId,
   title,
@@ -81,7 +88,9 @@ export function Deck({
   unsureTotal,
   familiarTotal,
   masteredTotal,
-  unratedTotal
+  unratedTotal,
+  onDeckDelete,
+  onDeckEdit
 }: DeckProps) {
 
   const formattedCreationDate = new Date(createdAt)
@@ -105,6 +114,8 @@ export function Deck({
     { mastery: "unrated", tally: unratedTotal, fill: "var(--color-unrated)" },
   ]
 
+  const [isPopOverOpen, setIsPopOverOpen] = useState<boolean>(false);
+
   return (
     <Card className="w-100 border-2 hover:border-primary shadow transition-colors duration-200">
       <CardHeader>
@@ -125,7 +136,7 @@ export function Deck({
         </CardDescription>
         
         <Popover>
-          <PopoverTrigger className="flex gap-2 justify-center items-center h-8 rounded-md px-2 text-xs bg-primary text-primary-foreground shadow hover:bg-primary/90">
+          <PopoverTrigger className="flex gap-2 justify-center items-center h-6 rounded-sm px-2 text-xs bg-primary text-primary-foreground shadow hover:bg-primary/90">
             <Info className="h-4 w-4"/>
             Performance
           </PopoverTrigger>
@@ -163,16 +174,28 @@ export function Deck({
       </CardContent>
 
       <CardFooter className="flex justify-end">
-      <div className="">
-        <Button size={'xs'} variant={'secondary'} className="rounded-r-none">
-          <Pencil/>
-          Edit
-        </Button>
-        <Button size={'xs'} className="rounded-l-none">
+
+      {/* edit and play buttons */}
+      <div>
+        <Popover open={isPopOverOpen} onOpenChange={setIsPopOverOpen}>
+
+          <PopoverTrigger className="h-9 px-4 py-2 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 rounded-r-none inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0">
+            <Wrench/>
+          </PopoverTrigger>
+
+          <PopoverContent className="w-fit flex flex-col p-2">
+            <EditDeckDialog deckId={deckId} title={title} description={description} onDeckEdit={onDeckEdit} onPopOverClose={()=> setIsPopOverOpen(false)}/>
+            <DeleteDeckDialog deckId={deckId} onDeckDelete={onDeckDelete} onPopOverClose={()=> setIsPopOverOpen(false)}/>
+          </PopoverContent>
+
+        </Popover>
+
+        <Button className="rounded-l-none">
           <Swords/>
           Play
         </Button>
       </div>
+
       </CardFooter>
     </Card>
   )
@@ -182,7 +205,7 @@ export default function DeckBoard(){
   const {status, statusText, data, error, loading}  = useFetch<DeckProps[]>('http://localhost:3001/api/decks')
   const [deckArray, setDeckArray] = useState<DeckProps[]>([]);
 
-  // update the deckArray when data is fetched & when it is an array only
+  // update the deckArray when data is fetched from useFetch & when it is an array only
   useEffect(()=>{
     if(Array.isArray(data)){
       setDeckArray(data)
@@ -192,6 +215,22 @@ export default function DeckBoard(){
   // adds the created deck from add-deck dialoggi
   const addNewDeck = (newlyAddedDeck: DeckProps) => {
     setDeckArray([...deckArray, newlyAddedDeck])
+  }
+
+  // deletes/filters out the deck in the ui
+  const deleteDeck = (deckId: number) => {
+    setDeckArray(deckArray.filter((deck)=>deck.deckId !== deckId))
+  }
+
+  // edits the deck title and description in the ui
+  const editDeck = (deckId: number, newTitle: string, newDescription: string, newEditDate: string) => {
+    setDeckArray((prevDecks) => 
+      prevDecks.map((deck)=>
+        deck.deckId === deckId 
+        ? {...deck, title: newTitle, description: newDescription, editedAt: newEditDate}
+        : deck
+      )
+    )
   }
   
   // todo: implement search and filter (filder depends on what I can filter) 
@@ -220,7 +259,7 @@ export default function DeckBoard(){
       {!loading && (deckArray.length > 0) && (
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-3">
           {deckArray.map((deck, index) => (
-            <Deck key={index} {...deck} />
+            <Deck key={index} {...deck} onDeckDelete={deleteDeck} onDeckEdit={editDeck}/>
           ))}
           <AddDeckDialog onDeckAdded={addNewDeck} variant="deck-button" />         
         </div>

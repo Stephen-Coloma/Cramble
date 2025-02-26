@@ -6,7 +6,7 @@ import { Button } from "../ui/button"
 import { CirclePlus, Plus, Pickaxe } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile"
 import { DeckProps } from "../deck-board"
-import { SubmitHandler, useForm } from "react-hook-form"
+import { SubmitHandler, useFieldArray, useForm } from "react-hook-form"
 import { Textarea } from "../ui/textarea"
 import { FlashcardInputCard } from "../flashcard-input-card"
 import { ChangeEvent, useEffect, useState } from "react"
@@ -81,17 +81,24 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
     const isMobile = useIsMobile();
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
     
-    // array of flashcard numbers only. cannot pass multiple instances of form utilities
-    const [flashcardArray, setFlashcardArray] = useState<number[]>([1,2,3]);
-
     const {status, data, loading, executePostRequest , clearResponseState } = usePost('http://localhost:3001/api/decks');
     
-    const {register, unregister, setValue, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
-        resolver: joiResolver(DeckFlashcardsSchema)
+    const {register, unregister, control, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
+        resolver: joiResolver(DeckFlashcardsSchema),
+        defaultValues: {
+            title: undefined,
+            description: undefined,
+            // three empty cards by default
+            flashcards: new Array(3).fill({front: undefined, back: undefined})
+        }
     });
+
+    const  {fields, append, remove } = useFieldArray<DeckFlashcardsFormData>({
+        control, 
+        name: 'flashcards'
+    })
     
     const onSubmit: SubmitHandler<DeckFlashcardsFormData> = async (formData: DeckFlashcardsFormData) => {
-        await new Promise((resolve) => {setTimeout(resolve, 2000)}); 
         await executePostRequest(formData)
     };
 
@@ -113,62 +120,43 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
             clearResponseState()
 
             // add the on deck added
-            const newlyAddedDeck: DeckProps = {
+            const newlyAddedDeck: Omit<DeckProps, 'onDeckDelete' | 'onDeckEdit'> = {
                 deckId: data.deckId,
                 title: getValues('title'),
                 description: getValues('description'),
                 createdAt: getValues('createdAt'),
                 editedAt: 'null',
-                totalCards: flashcardArray.length,
+                totalCards: fields.length,
                 unsureTotal: 0,
                 familiarTotal: 0,
                 masteredTotal: 0,
-                unratedTotal: flashcardArray.length,
+                unratedTotal: fields.length,
             }
 
             // render the newly added deck on the list using the callback function
-            onDeckAdded(newlyAddedDeck)
+            onDeckAdded(newlyAddedDeck as DeckProps)
 
             // reset all form states
             reset()
             
             // unregister all flashcard input forms
             unregister('flashcards')
-
-            // set new flashcard arra
-            setFlashcardArray([1,2,3])
         }
     }, [loading])
     
-    const removeFlashcard = (flashcardNo: number) => {
-        // do not remove card if less than 3
-        if(flashcardArray.length < 4){
-            setError('root', {message: 'need atleast 3 cards'})
-        }else{
-            const index = flashcardArray.indexOf(flashcardNo);
-    
-            //get the trailing elements
-            const trailing = flashcardArray.slice(index)
-            
-            // adjust values to left
-            trailing.forEach((flashcard)=> {
-                setValue( `flashcards.${flashcard - 1}`, getValues(`flashcards.${flashcard}`));
-            })      
-            
-            // unregister the last flashcard because it doesnt have data anymore
-            unregister(`flashcards.${flashcardArray.length-1}`)
-    
-            // remove now the last flashcard 
-            flashcardArray.splice(flashcardArray.length-1)
-    
-            setFlashcardArray([...flashcardArray])    
+    const removeFlashcard = (flashcardIndex: number) => {
+        if(fields.length < 4){
+            setError("root", {message: "need at least 3 cards"})
+            return;
         }
-
+        remove(flashcardIndex)
     };
 
     const addFlashcard = () => {
-        // last element + 1 becomes the new last element
-        setFlashcardArray([...flashcardArray, flashcardArray[flashcardArray.length-1]+1])
+        append({
+            front: '',
+            back: ''
+        })
     }
     
     return (
@@ -221,6 +209,15 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                             id="title"
                             type="text"
                             placeholder="Enter a title (e.g., Math Quiz 101)"
+                            onInput={(e: ChangeEvent<HTMLInputElement>) => {
+                                const target = e.target as HTMLInputElement;
+
+                                if(target.value.length > 30){
+                                    setError('title', {type: 'max', message: 'title cannot exceed 30 characters'})
+                                }else{
+                                    clearErrors('title')
+                                }
+                            }}
                         />
                         {errors.title && (
                             <Label className="text-xs text-destructive">
@@ -255,11 +252,11 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                             </Label>)}
                     </div>
 
-                    <Label className="mb-4">{`Total: ${flashcardArray.length}`}</Label>
+                    <Label className="mb-4">{`Total: ${fields.length}`}</Label>
 
                     <div className="flex flex-col flex-grow sm:flex-none gap-4 mb-4">
-                        {flashcardArray.map((flashcardNo, index) => (
-                            <FlashcardInputCard key={index} flashcardNo={flashcardNo} formUtilities={{register, errors}} onFlashcardRemove={removeFlashcard}></FlashcardInputCard>
+                        {fields.map((field, index) => (
+                            <FlashcardInputCard key={field.id} flashcardIndex={index} formUtilities={{register, errors}} onFlashcardRemove={removeFlashcard}></FlashcardInputCard>
                         ))} 
                     </div>
 
