@@ -7,7 +7,7 @@ import config from './config/config';
 import env from 'dotenv';
 import { specs, swaggerUi } from './api-docs/swagger'
 import verifyToken from './middleware/verifyToken';
-import {loginRouter, signupRouter, logoutRouter} from './routes/auth'
+import {loginRouter, signupRouter, logoutRouter, confirmSignupRouter} from './routes/auth'
 import deckRouter from './routes/deck';
 import flashcardRouter from './routes/flashcard';
 import geminiRouter from './routes/gemini';
@@ -32,6 +32,7 @@ app.use(helmet());
 // routers
 app.use('/auth', loginRouter)
 app.use('/auth', signupRouter)
+app.use('/auth', confirmSignupRouter)
 app.use('/auth', logoutRouter)
 app.use('/api', verifyToken, deckRouter)
 app.use('/api', verifyToken, flashcardRouter)

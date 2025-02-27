@@ -6,9 +6,14 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto'
 import { CognitoIdentityProviderClient, SignUpCommand, SignUpCommandInput } from "@aws-sdk/client-cognito-identity-provider"
 
+
 const cognito = new CognitoIdentityProviderClient({
     region: process.env.AWS_REGION    
 })
+
+const CLIENT_ID = process.env.AWS_COGNITO_CRAMBLE_CLIENT_ID || 'noId'
+const CLIENT_SECRET = process.env.AWS_COGNITO_CRAMBLE_CLIENT_SECRET || 'noSecret'
+
 
 const signUpController = async(req: Request<{}, {}, UserSignUp>, res: Response) => {
     const user: UserSignUp = {
@@ -21,11 +26,11 @@ const signUpController = async(req: Request<{}, {}, UserSignUp>, res: Response) 
 
     try{
         // cognito sign up
-        await cognito_signup(user.username, user.email, user.firstName, user.lastName, user.password);
+        await cognitoSignup(user.username, user.email, user.firstName, user.lastName, user.password);
     
         // save a copy to app databse
         user.password = hashPassword(user.password);
-        await saveToDatabase(user, res);
+        await saveUserToDatabase(user, res);
     }catch(error: unknown){
         sendErrorToClient(error, res)
     }
@@ -33,22 +38,18 @@ const signUpController = async(req: Request<{}, {}, UserSignUp>, res: Response) 
 }
 
 /**
- * Method called to create a user in aws cognit o
+ * Method called to create a user in aws cognito
  * @param username 
  * @param email 
  * @param firstName 
  * @param lastName 
  * @param password 
  */
-async function cognito_signup(username:string, email: string, firstName: string, lastName: string, password: string) {
-
-    const clientId = process.env.AWS_COGNITO_CRAMBLE_CLIENT_ID as string | 'noID';
-    const clientSecret = process.env.AWS_COGNITO_CRAMBLE_CLIENT_SECRET as string | 'noSecret';
-
-    const secretHashGenerated = generateSecretHash(username, clientId, clientSecret);
+async function cognitoSignup(username:string, email: string, firstName: string, lastName: string, password: string) {
+    const secretHashGenerated = generateSecretHash(username, CLIENT_ID, CLIENT_SECRET);
 
     const input: SignUpCommandInput = {
-        ClientId: clientId,
+        ClientId: CLIENT_ID,
         SecretHash: secretHashGenerated,
         Username: username,
         Password: password,
@@ -74,22 +75,21 @@ async function cognito_signup(username:string, email: string, firstName: string,
 
     try{
         const command = new SignUpCommand(input);
-        const response = await cognito.send(command);
-        console.log(response);
+        await cognito.send(command);
+        return;
     }catch(error: unknown){
-        console.log(error);
-        
         throw(error)
     }
 }
 
 /**
  * a function that saves user signup data to the database
+ * assigns unverified status to user because they need to confirm first their identity through email for aws cognito
  *  */ 
-async function saveToDatabase(user:UserSignUp, res: Response) {
+async function saveUserToDatabase(user:UserSignUp, res: Response) {
     const queryString = `
-            INSERT INTO users (first_name, last_name, username, password, email)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO users (first_name, last_name, username, password, email, status)
+            VALUES (?, ?, ?, ?, ?, ?)
         `;
 
     const values = [
@@ -97,14 +97,15 @@ async function saveToDatabase(user:UserSignUp, res: Response) {
         user.lastName,
         user.username,
         user.password,
-        user.email
+        user.email,
+        'unverified'
     ];
 
     try{
         const connection = await Database.connect();
         const results = await Database.processQuery(connection, queryString, values);
         if(results.affectedRows > 0){
-            res.status(201).json({message: "User created successfully"}).end()
+            res.status(201).json({message: "User created successfully. Please verify account"}).end()
         }
     }catch(error: unknown){
         throw(error)

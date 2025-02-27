@@ -5,7 +5,7 @@ import sendErrorToClient from "../utilities/errorHandler";
 /** isUsernameExists middleware checks whether an inputed username is already existing in the database or not.
  * 
  * responds "{message: username already taken}" when username already exist
- * proceed to signUpController when valid
+ * proceed to isEmailExists middleware when valid
  */
 const isUsernameExists = async (req: Request, res: Response, next: NextFunction) =>{
     const username = req.body.username as string;

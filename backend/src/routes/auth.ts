@@ -5,9 +5,12 @@ import isUsernameExists from '../middleware/isUsernameExists ';
 import isSignupDataValid from '../middleware/validation/isSignupDataValid';
 import logoutController from "../controller/auth/logout";
 import verifyToken from "../middleware/verifyToken";
+import isEmailExists from "../middleware/isEmailExists";
+import confirmSignupController from "../controller/auth/confirmSignup";
 
 const loginRouter = Router();
 const signupRouter = Router();
+const confirmSignupRouter = Router();
 const logoutRouter = Router();
 
 /**
@@ -155,7 +158,9 @@ loginRouter.post('/login', loginController)
  *                     type: string
  *                     example: Internal Server Error
  */
-signupRouter.post('/signup', isSignupDataValid, isUsernameExists, signUpController)
+signupRouter.post('/signup', isSignupDataValid, isUsernameExists, isEmailExists, signUpController)
+
+confirmSignupRouter.post('/confirm', confirmSignupController)
 
 /**
  * @swagger
@@ -200,4 +205,4 @@ signupRouter.post('/signup', isSignupDataValid, isUsernameExists, signUpControll
  */
 logoutRouter.post('/logout', verifyToken, logoutController)
 
-export {loginRouter, signupRouter, logoutRouter};
+export {loginRouter, signupRouter, confirmSignupRouter, logoutRouter};
