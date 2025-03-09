@@ -1,0 +1,122 @@
+import { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { JWTTokenContent } from "../dtos/JWTTokenContent";
+import { CognitoIdentityProviderClient, InitiateAuthCommand, InitiateAuthCommandInput } from "@aws-sdk/client-cognito-identity-provider";
+import { CognitoJwtVerifier } from 'aws-jwt-verify';
+
+const cognito = new CognitoIdentityProviderClient({
+    region: process.env.AWS_REGION,
+});
+
+const verifier = CognitoJwtVerifier.create({
+    userPoolId: process.env.AWS_COGNITO_USER_POOL_ID || "no user pool id",
+    tokenUse: "access",
+    clientId: process.env.AWS_COGNITO_CRAMBLE_CLIENT_ID || "no client id",
+});
+
+const CLIENT_ID = process.env.AWS_COGNITO_CRAMBLE_CLIENT_ID || 'noId';
+
+/* a middleware that manages and verifies access token on each request */
+const verifyCognitoToken = async (req: Request, res: Response, next: NextFunction) => {
+    const token = req.signedCookies.token;
+    const accessToken = req.signedCookies.accessToken;
+    const refreshToken = req.signedCookies.refreshToken;    
+
+    if (!token || !accessToken || !refreshToken) { 
+        resetCookies(res);
+        return;
+    } else { // all tokens are present
+        try {
+            await verifier.verify(accessToken); // Use async verify, if true, access token is still valid
+
+            try {
+                const key = process.env.JWT_SECRET_KEY || "";
+                const decoded = jwt.verify(token, key, { complete: true });
+                req.userId = (decoded.payload as JWTTokenContent).userId;
+                next();
+            } catch (jwtError: unknown) {
+                console.error("JWT verification error:", jwtError);
+                resetCookies(res);
+                return;
+            }
+        } catch (cognitoError: unknown) { //access token invalid
+            try {
+                const newTokens = await refreshAccessToken(refreshToken);
+
+                if (newTokens) {
+                    res.cookie("accessToken", newTokens.AccessToken, {
+                        httpOnly: true,
+                        secure: process.env.NODE_ENV === 'production',
+                        maxAge: newTokens.ExpiresIn! * 1000,
+                    });
+
+                    res.cookie("refreshToken", newTokens.RefreshToken, {
+                        httpOnly: true,
+                        secure: process.env.NODE_ENV === 'production',
+                    });
+
+                    try {
+                        const key = process.env.JWT_SECRET_KEY || "";
+                        const decoded = jwt.verify(token, key, { complete: true });
+                        req.userId = (decoded.payload as JWTTokenContent).userId;
+                        next();
+                    } catch (jwtError: unknown) {
+                        console.error("JWT verification error:", jwtError);
+                        resetCookies(res);
+                        return;
+                    }
+                } else { // refresh token is invalid too
+                    resetCookies(res);
+                    return;
+                }
+            } catch (refreshError: unknown) {
+                console.error("Refresh token error:", refreshError);
+                resetCookies(res);
+                return;
+            }
+        }
+    }
+};
+
+/**A function that resets cookies if tokens are all invalid. */
+function resetCookies(res: Response) {
+    res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        signed: true,
+    }).clearCookie('accessToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+    }).clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+    })
+    .status(401).send({ message: 'Access Denied - Invalid or Expired Tokens' }); // Improved message
+}
+
+/**Function to call when access token is invalid, and tries to refresh a token */
+async function refreshAccessToken(refreshToken: string) {
+    const input: InitiateAuthCommandInput = {
+        AuthFlow: 'REFRESH_TOKEN_AUTH',
+        AuthParameters: {
+            REFRESH_TOKEN: refreshToken,
+        },
+        ClientId: CLIENT_ID,
+    };
+
+    try {
+        const command = new InitiateAuthCommand(input);
+        const response = await cognito.send(command);
+
+        if (response.AuthenticationResult) {
+            return response.AuthenticationResult;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error("Cognito refresh error:", error);
+        return null;
+    }
+}
+
+export default verifyCognitoToken;
