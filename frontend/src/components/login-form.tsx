@@ -66,14 +66,10 @@ export function LoginForm({
 
     if(error){
       if ((error as AxiosError).response?.status === 401) { // 401 username not found
-        reset({password: ''})
-        setError("username", (error.response.data as ErrorOption));
+        reset({password: '', username: ''})
+        setError("root", (error.response.data as ErrorOption));
         document.getElementById("username")?.focus();
-      } else if ((error as AxiosError).response?.status === 404) { //404 incorrect password
-        reset({password: ''})
-        setError("password", (error.response.data as ErrorOption));
-        document.getElementById("password")?.focus();
-      }      
+      } 
     }
 
     clearResponseState(); // next request is not tied
@@ -158,6 +154,10 @@ export function LoginForm({
                   <span className="sr-only">Login with Facebook</span>
                 </Button>
               </div>
+
+              {errors.root && 
+                  <Label className="text-xs text-destructive text-center">{errors.root.message?.replaceAll('\"', "")}</Label>}
+
               <div className="text-center text-sm">
                 Don't have an account?{" "}
                 <Link href='/signup' className="underline underline-offset-4">
