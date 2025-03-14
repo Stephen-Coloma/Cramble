@@ -4,9 +4,9 @@ import signUpController from '../controller/auth/signup'
 import isUsernameExists from '../middleware/isUsernameExists ';
 import isSignupDataValid from '../middleware/validation/isSignupDataValid';
 import logoutController from "../controller/auth/logout";
-import verifyToken from "../middleware/verifyToken";
 import isEmailExists from "../middleware/isEmailExists";
 import confirmSignupController from "../controller/auth/confirmSignup";
+import verifyCognitoToken from "../middleware/verifyCognitoToken";
 
 const loginRouter = Router();
 const signupRouter = Router();
@@ -203,6 +203,6 @@ confirmSignupRouter.post('/confirm', confirmSignupController)
  *                     type: string
  *                     example: Internal Server Error
  */
-logoutRouter.post('/logout', verifyToken, logoutController)
+logoutRouter.post('/logout', verifyCognitoToken, logoutController)
 
 export {loginRouter, signupRouter, confirmSignupRouter, logoutRouter};

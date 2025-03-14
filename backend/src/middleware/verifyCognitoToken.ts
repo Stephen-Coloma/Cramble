@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import { JWTTokenContent } from "../dtos/JWTTokenContent";
 import { CognitoIdentityProviderClient, InitiateAuthCommand, InitiateAuthCommandInput} from "@aws-sdk/client-cognito-identity-provider";
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
+import { resetCookies } from "../utilities/resetCookies";
 
 const cognito = new CognitoIdentityProviderClient({
     region: process.env.AWS_REGION,
@@ -24,6 +25,7 @@ const verifyCognitoToken = async (req: Request, res: Response, next: NextFunctio
 
     if (!token || !accessToken || !refreshToken) { 
         resetCookies(res);
+        res.status(401).send({ message: 'Access Denied - Invalid or Expired Tokens' });
         return;
     } else { // all tokens are present
         try{
@@ -58,26 +60,11 @@ const verifyCognitoToken = async (req: Request, res: Response, next: NextFunctio
         }catch(error: unknown){
             console.error("Error: ", error);
             resetCookies(res);
+            res.status(401).send({ message: 'Access Denied - Invalid or Expired Tokens' });
             return;
         }
     }
 };
-
-/**A function that resets cookies if tokens are all invalid. */
-function resetCookies(res: Response) {
-    res.clearCookie('token', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        signed: true,
-    }).clearCookie('accessToken', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-    }).clearCookie('refreshToken', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-    })
-    .status(401).send({ message: 'Access Denied - Invalid or Expired Tokens' }); // Improved message
-}
 
 /**Function to call when access token is invalid, and tries to refresh a token */
 async function refreshAccessToken(refreshToken: string) {
