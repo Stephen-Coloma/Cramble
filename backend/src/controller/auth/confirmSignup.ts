@@ -14,7 +14,11 @@ const confirmSignupController = async(req: Request, res: Response) => {
         await cognitoConfirmSignup(username, confirmationCode);
 
         //if the account is confirmed, changed the status of user from unverified to active
-        await setUserAsActiveToDatabase(username, res);
+        const results = await setUserAsActiveToDatabase(username, res);
+
+        if(results.affectedRows > 0){
+            res.status(200).json({message: "Account Verified"}).end()
+        }
     }catch(error: unknown){
         if(error instanceof CodeMismatchException){
             res.status(400).json({message: error.message})
@@ -60,10 +64,7 @@ async function setUserAsActiveToDatabase(username: string, res: Response){
 
     try{
         const connection = await Database.connect();
-        const results = await Database.processQuery(connection, queryString, [username]);
-        if(results.affectedRows > 0){
-            res.status(200).json({message: "Account Verified"}).end()
-        }
+        return await Database.processQuery(connection, queryString, [username]);
     }catch(error: unknown){
         throw(error)
     }

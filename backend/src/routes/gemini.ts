@@ -57,7 +57,7 @@ const geminiRouter = Router();
  *         content:
  *           application/json:
  *             example:
- *               message: "Access Denied"
+ *               message: "Access Denied - Invalid or Expired Tokens"
  *       500:
  *         description: Server error or Gemini API failure
  *         content:

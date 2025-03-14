@@ -34,7 +34,7 @@ app.use(helmet());
 app.use('/auth', loginRouter)
 app.use('/auth', signupRouter)
 app.use('/auth', confirmSignupRouter)
-app.use('/auth', logoutRouter)
+app.use('/auth', verifyCognitoToken, logoutRouter)
 app.use('/api', verifyCognitoToken, deckRouter)
 app.use('/api', verifyCognitoToken, flashcardRouter)
 app.use('/api', verifyCognitoToken, geminiRouter)
