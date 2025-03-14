@@ -1,5 +1,4 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import { resolve } from "path";
 import { useEffect, useState } from "react"
 
 const requestDelay = 1000; // 1 sec

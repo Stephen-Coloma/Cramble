@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Facebook, EyeClosed, Eye } from "lucide-react"
-import { useEffect, useState } from "react"
+import { Facebook, EyeClosed, Eye, LoaderCircle } from "lucide-react"
+import { ChangeEvent, useEffect, useState } from "react"
 import { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
 import { Toggle } from "./ui/toggle"
@@ -14,6 +14,7 @@ import {SubmitHandler, useForm, ErrorOption} from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
 import { PostApiResponse, usePost } from "@/hooks/use-request"
+import Link from "next/link"
 
 const loginSchema = Joi.object({
   username: Joi.string()
@@ -41,11 +42,15 @@ export function LoginForm({
 
   const router = useRouter();
 
-  const {register, setError, handleSubmit, formState: {errors, isSubmitting }, reset} = useForm<LoginFormData>({
+  useEffect(()=>{
+    router.prefetch('/signup')
+  }, [])
+
+  const {register, setError, handleSubmit, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<LoginFormData>({
     resolver: joiResolver(loginSchema)
   })
 
-  const { status, error, loading, executePostRequest }: PostApiResponse = usePost('http://localhost:3001/auth/login');
+  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost('http://localhost:3001/auth/login');
 
   //handle form validation and submission
   const onSubmit: SubmitHandler<LoginFormData> = async (formData: LoginFormData) => {
@@ -56,19 +61,22 @@ export function LoginForm({
   useEffect(()=>{
     if(status === 200){
       router.replace('/dashboard/mydecks')
+      return;
     }
 
     if(error){
-      if ((error as AxiosError).response?.status === 401) {
-        // Handle username not found error
+      if ((error as AxiosError).response?.status === 401) { // 401 username not found
         reset({password: ''})
         setError("username", (error.response.data as ErrorOption));
-      } else if ((error as AxiosError).response?.status === 404) {
-        // Handle incorrect password error
+        document.getElementById("username")?.focus();
+      } else if ((error as AxiosError).response?.status === 404) { //404 incorrect password
         reset({password: ''})
         setError("password", (error.response.data as ErrorOption));
+        document.getElementById("password")?.focus();
       }      
     }
+
+    clearResponseState(); // next request is not tied
   }, [loading])  
 
   return (
@@ -92,7 +100,8 @@ export function LoginForm({
                   placeholder="johndoe123"
                   required
                 />
-                {errors.username && <Label className="text-xs text-destructive">{errors.username.message?.replaceAll('\"', "")}</Label>}
+                {errors.username && 
+                  <Label className="text-xs text-destructive">{errors.username.message?.replaceAll('\"', "")}</Label>}
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
@@ -120,11 +129,14 @@ export function LoginForm({
                   className={errors.password ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
                   id="password" 
                   type={`${isVisible ? 'text' : 'password'}`}
-                  required />
-                {errors.password && <Label className="text-xs text-destructive">{errors.password.message?.replaceAll('\"', "")}</Label>}
+                  required/>
+                {errors.password && 
+                  <Label className="text-xs text-destructive">{errors.password.message?.replaceAll('\"', "")}</Label>}
               </div>
               <Button type="submit" disabled={isSubmitting ? true : false} className="w-full">
-                {isSubmitting ? 'Loading...': 'Login'}
+                {isSubmitting 
+                ? <LoaderCircle className="animate-spin"></LoaderCircle>
+                : 'Login'}
               </Button>
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                 <span className="relative z-10 bg-background px-2 text-muted-foreground">
@@ -148,9 +160,9 @@ export function LoginForm({
               </div>
               <div className="text-center text-sm">
                 Don't have an account?{" "}
-                <a href="/signup" className="underline underline-offset-4">
+                <Link href='/signup' className="underline underline-offset-4">
                   Sign up
-                </a>
+                </Link>
               </div>
             </div>
           </form>

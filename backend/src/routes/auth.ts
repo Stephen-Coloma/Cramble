@@ -4,70 +4,92 @@ import signUpController from '../controller/auth/signup'
 import isUsernameExists from '../middleware/isUsernameExists ';
 import isSignupDataValid from '../middleware/validation/isSignupDataValid';
 import logoutController from "../controller/auth/logout";
-import verifyToken from "../middleware/verifyToken";
+import isEmailExists from "../middleware/isEmailExists";
+import confirmSignupController from "../controller/auth/confirmSignup";
 
 const loginRouter = Router();
 const signupRouter = Router();
+const confirmSignupRouter = Router();
 const logoutRouter = Router();
 
 /**
- * @swagger
- * /auth/login:
- *     post:
- *       summary: User login
- *       description: Authenticates a user and returns a JWT token if login is successful.
- *       tags:
- *         - authentication
- *       requestBody:
- *         required: true
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 username:
- *                   type: string
- *                   description: User's username
- *                   example: johndoe123
- *                 password:
- *                   type: string
- *                   description: User's password
- *                   example: P@ssw0rd123
- *               required:
- *                 - username
- *                 - password
- *       responses:
- *         '200':
- *           description: Login successful
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: Login successful
- *         '401':
- *           description: Unauthorized
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: Incorrect password or Username not found
- *         '500':
- *           description: Internal server error
- *           content:
- *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: Internal Server Error
- */
+* @swagger
+*   /auth/login:
+*     post:
+*       summary: User login
+*       description: Authenticates a user and returns JWT tokens if login is successful.
+*       tags:
+*         - authentication
+*       requestBody:
+*         required: true
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 username:
+*                   type: string
+*                   description: User's username
+*                   example: johndoe123
+*                 password:
+*                   type: string
+*                   description: User's password
+*                   example: P@ssw0rd123
+*               required:
+*                 - username
+*                 - password
+*       responses:
+*         '200':
+*           description: Login successful
+*           content:
+*             application/json:
+*               schema:
+*                 type: object
+*                 properties:
+*                   accessToken:
+*                     type: string
+*                     description: Cognito Access Token
+*                   refreshToken:
+*                     type: string
+*                     description: Cognito Refresh Token
+*                   expiresIn:
+*                     type: integer
+*                     description: Expiry time in seconds
+*                   jwtToken:
+*                     type: string
+*                     description: Custom JWT Token
+*         '401':
+*           description: Unauthorized - Incorrect password or username not found
+*           content:
+*             application/json:
+*               schema:
+*                 type: object
+*                 properties:
+*                   message:
+*                     type: string
+*                     example: Incorrect username or password.
+*         '412':
+*           description: Precondition Failed - User not confirmed
+*           content:
+*             application/json:
+*               schema:
+*                 type: object
+*                 properties:
+*                   message:
+*                     type: string
+*                     example: User is not confirmed.
+*         '500':
+*           description: Internal server error
+*           content:
+*             application/json:
+*               schema:
+*                 type: object
+*                 properties:
+*                   message:
+*                     type: string
+*                     example: Internal Server Error
+*
+*/
 loginRouter.post('/login', loginController)
 
 /**
@@ -113,7 +135,7 @@ loginRouter.post('/login', loginController)
  *                 - email
  *       responses:
  *         '201':
- *           description: User created successfully
+ *           description: User created successfully. Verify account so that it can be used.
  *           content:
  *             application/json:
  *               schema:
@@ -121,7 +143,7 @@ loginRouter.post('/login', loginController)
  *                 properties:
  *                   message:
  *                     type: string
- *                     example: User created successfully
+ *                     example: User created successfully. Please verify account
  *         '400':
  *           description: Invalid input data
  *           content:
@@ -138,12 +160,15 @@ loginRouter.post('/login', loginController)
  *           description: Username already taken
  *           content:
  *             application/json:
- *               schema:
- *                 type: object
- *                 properties:
- *                   message:
- *                     type: string
- *                     example: Username already taken
+ *               examples:
+ *                  username exists:
+ *                    summary: Username is already taken in the application
+ *                    value:
+ *                      message: "Username already taken"
+ *                  email exists:
+ *                    summary: Email is already taken in the application
+ *                    value:
+ *                      message: "Email already taken'"
  *         '500':
  *           description: Internal server error
  *           content:
@@ -155,7 +180,78 @@ loginRouter.post('/login', loginController)
  *                     type: string
  *                     example: Internal Server Error
  */
-signupRouter.post('/signup', isSignupDataValid, isUsernameExists, signUpController)
+signupRouter.post('/signup', isSignupDataValid, isUsernameExists, isEmailExists, signUpController)
+
+/**
+ * @swagger
+* /auth/confirm:
+*     post:
+*       summary: Confirm user signup
+*       description: Confirms a user's signup by verifying the confirmation code.
+*       tags:
+*         - authentication
+*       requestBody:
+*         required: true
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 username:
+*                   type: string
+*                   description: User's username
+*                   example: johndoe123
+*                 confirmationCode:
+*                   type: string
+*                   description: Confirmation code received via email
+*                   example: "123456"
+*               required:
+*                 - username
+*                 - confirmationCode
+*       responses:
+*         '200':
+*           description: Account verified successfully
+*           content:
+*             application/json:
+*               schema:
+*                 type: object
+*                 properties:
+*                   message:
+*                     type: string
+*                     example: Account Verified
+*         '400':
+*           description: Bad Request - Incorrect confirmation code
+*           content:
+*             application/json:
+*               schema:
+*                 type: object
+*                 properties:
+*                   message:
+*                     type: string
+*                     example: Confirmation code is incorrect
+*         '406':
+*           description: Not Acceptable - Confirmation code expired
+*           content:
+*             application/json:
+*               schema:
+*                 type: object
+*                 properties:
+*                   message:
+*                     type: string
+*                     example: Confirmation code expired
+*         '500':
+*           description: Internal server error
+*           content:
+*             application/json:
+*               schema:
+*                 type: object
+*                 properties:
+*                   message:
+*                     type: string
+*                     example: Internal Server Error
+*
+*/
+confirmSignupRouter.post('/confirm', confirmSignupController)
 
 /**
  * @swagger
@@ -186,7 +282,7 @@ signupRouter.post('/signup', isSignupDataValid, isUsernameExists, signUpControll
  *                 properties:
  *                   message:
  *                     type: "string"
- *                     example: "Logout successful"       
+ *                     example: "Access Denied - Invalid or Expired Tokens"       
  *       '500':
  *           description: Internal server error
  *           content:
@@ -198,6 +294,6 @@ signupRouter.post('/signup', isSignupDataValid, isUsernameExists, signUpControll
  *                     type: string
  *                     example: Internal Server Error
  */
-logoutRouter.post('/logout', verifyToken, logoutController)
+logoutRouter.post('/logout', logoutController)
 
-export {loginRouter, signupRouter, logoutRouter};
+export {loginRouter, signupRouter, confirmSignupRouter, logoutRouter};

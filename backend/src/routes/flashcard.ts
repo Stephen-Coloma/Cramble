@@ -60,7 +60,7 @@ const flashcardRouter = Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Access Denied"
+ *                   example: "Access Denied - Invalid or Expired Tokens"
  *       500:
  *         description: Internal server error.
  *         content:
@@ -136,7 +136,7 @@ flashcardRouter.get('/flashcards/:deckId', isOwnerOfDeck, getFlashcardsControlle
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Access Denied"
+ *                   example: "Access Denied - Invalid or Expired Tokens"
  *       500:
  *         description: Internal server error.
  *         content:
@@ -211,7 +211,7 @@ flashcardRouter.post('/flashcards/:deckId', isOwnerOfDeck, isFlashCardDataValid,
  *               unauthorized:
  *                 summary: User is not authenticated
  *                 value:
- *                   message: "Access Denied."
+ *                   message: "Access Denied - Invalid or Expired Tokens"
  *               notOwner:
  *                 summary: User does not own the deck
  *                 value:
@@ -262,7 +262,7 @@ flashcardRouter.put('/flashcards/:deckId/:flashcardId', isOwnerOfDeck, isFlashCa
  *               unauthorized:
  *                 summary: User is not authenticated
  *                 value:
- *                   message: "Access Denied."
+ *                   message: "Access Denied - Invalid or Expired Tokens"
  *               notOwner:
  *                 summary: User does not own the deck
  *                 value:

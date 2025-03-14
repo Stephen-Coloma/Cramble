@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import sendErrorToClient from "../../utilities/errorHandler";
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'null');
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+const model = genAI.getGenerativeModel({ model: process.env.GEMINI_MODEL || '' });
 
 
 const generateFlashcardController = async(req: Request, res: Response) =>{

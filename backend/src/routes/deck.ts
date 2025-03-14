@@ -80,7 +80,7 @@ const deckRouter = Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Access Denied"
+ *                   example: "Access Denied - Invalid or Expired Tokens"
  *       500:
  *         description: Internal server error.
  *         content:
@@ -167,7 +167,7 @@ deckRouter.get('/decks', getDecksController);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Access Denied"
+ *                   example: "Access Denied - Invalid or Expired Tokens"
  *       500:
  *         description: Internal server error.
  *         content:
@@ -243,7 +243,7 @@ deckRouter.post('/decks', isDeckFlashcardsDataValid, createDeckController);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Access Denied"
+ *                   example: "Access Denied - Invalid or Expired Tokens"
  *       500:
  *         description: Internal server error.
  *         content:
@@ -298,7 +298,7 @@ deckRouter.put('/decks/:deckId', isOwnerOfDeck, isDeckDataValid, updateDeckDetai
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Access Denied"
+ *                   example: "Access Denied - Invalid or Expired Tokens"
  *       500:
  *         description: Internal server error.
  *         content:
