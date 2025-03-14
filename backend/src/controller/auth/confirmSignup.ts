@@ -2,15 +2,8 @@ import { Request, Response } from "express";
 import { databaseInstance as Database } from "../../database/mysql";
 import sendErrorToClient  from "../../utilities/errorHandler";
 import crypto from 'crypto'
-import { CognitoIdentityProviderClient, ConfirmSignUpCommand, ConfirmSignUpCommandInput } from "@aws-sdk/client-cognito-identity-provider"
-
-const cognito = new CognitoIdentityProviderClient({
-    region: process.env.AWS_REGION    
-})
-
-const CLIENT_ID = process.env.AWS_COGNITO_CRAMBLE_CLIENT_ID || 'noId'
-const CLIENT_SECRET = process.env.AWS_COGNITO_CRAMBLE_CLIENT_SECRET || 'noSecret'
-
+import { CodeMismatchException, ConfirmSignUpCommand, ConfirmSignUpCommandInput, ExpiredCodeException } from "@aws-sdk/client-cognito-identity-provider"
+import {cognito, CLIENT_ID, CLIENT_SECRET} from '../../services/cognitoService'
 
 const confirmSignupController = async(req: Request, res: Response) => {
     const username = req.body.username as string;
@@ -23,7 +16,13 @@ const confirmSignupController = async(req: Request, res: Response) => {
         //if the account is confirmed, changed the status of user from unverified to active
         await setUserAsActiveToDatabase(username, res);
     }catch(error: unknown){
-        sendErrorToClient(error, res)
+        if(error instanceof CodeMismatchException){
+            res.status(400).json({message: error.message})
+        }else if(error instanceof ExpiredCodeException){
+            res.status(406).json({message: error.message})
+        }else{
+            sendErrorToClient(error, res)
+        }
     }
 }
 

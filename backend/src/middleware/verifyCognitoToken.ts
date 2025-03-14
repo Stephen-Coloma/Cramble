@@ -1,21 +1,9 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { JWTTokenContent } from "../dtos/JWTTokenContent";
-import { CognitoIdentityProviderClient, InitiateAuthCommand, InitiateAuthCommandInput} from "@aws-sdk/client-cognito-identity-provider";
-import { CognitoJwtVerifier } from 'aws-jwt-verify';
+import {  InitiateAuthCommand, InitiateAuthCommandInput} from "@aws-sdk/client-cognito-identity-provider";
 import { resetCookies } from "../utilities/resetCookies";
-
-const cognito = new CognitoIdentityProviderClient({
-    region: process.env.AWS_REGION,
-});
-
-const verifier = CognitoJwtVerifier.create({
-    userPoolId: process.env.AWS_COGNITO_USER_POOL_ID || "no user pool id",
-    tokenUse: "access",
-    clientId: process.env.AWS_COGNITO_CRAMBLE_CLIENT_ID || "no client id",
-});
-
-const CLIENT_ID = process.env.AWS_COGNITO_CRAMBLE_CLIENT_ID || 'noId';
+import {cognito, verifier, CLIENT_ID } from '../services/cognitoService'
 
 /* a middleware that manages and verifies access token on each request */
 const verifyCognitoToken = async (req: Request, res: Response, next: NextFunction) => {
@@ -31,7 +19,7 @@ const verifyCognitoToken = async (req: Request, res: Response, next: NextFunctio
         try{
             req.userId = await decodeUserId(token);
             
-            const accessTokenPayload = verifier.verifySync(accessToken); 
+            const accessTokenPayload = await verifier.verify(accessToken); 
 
             if(accessTokenPayload){ //access token is valid
                 req.userId = await decodeUserId(token);

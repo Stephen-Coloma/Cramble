@@ -4,15 +4,8 @@ import { UserSignUp } from "../../dtos/user/UserSignUp.dto";
 import sendErrorToClient from "../../utilities/errorHandler";
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto'
-import { CognitoIdentityProviderClient, SignUpCommand, SignUpCommandInput } from "@aws-sdk/client-cognito-identity-provider"
-
-
-const cognito = new CognitoIdentityProviderClient({
-    region: process.env.AWS_REGION    
-})
-
-const CLIENT_ID = process.env.AWS_COGNITO_CRAMBLE_CLIENT_ID || 'noId'
-const CLIENT_SECRET = process.env.AWS_COGNITO_CRAMBLE_CLIENT_SECRET || 'noSecret'
+import { SignUpCommand, SignUpCommandInput } from "@aws-sdk/client-cognito-identity-provider"
+import { cognito, CLIENT_ID, CLIENT_SECRET } from '../../services/cognitoService'
 
 
 const signUpController = async(req: Request<{}, {}, UserSignUp>, res: Response) => {

@@ -1,43 +1,39 @@
 import { Request, Response } from "express";
 import { UserLogin } from "../../dtos/user/UserLogin.dto";
-import sendErrorToClient from "../../utilities/errorHandler";
+import sendErrorToClient  from "../../utilities/errorHandler";
 import crypto from 'crypto';
-import { CognitoIdentityProviderClient, InitiateAuthCommand, InitiateAuthCommandInput, InitiateAuthCommandOutput } from "@aws-sdk/client-cognito-identity-provider";
+import { InitiateAuthCommand, InitiateAuthCommandInput, InitiateAuthCommandOutput, NotAuthorizedException, UserNotConfirmedException } from "@aws-sdk/client-cognito-identity-provider";
 import jwt from 'jsonwebtoken';
 import { databaseInstance as Database } from "../../database/mysql";
-
-const cognito = new CognitoIdentityProviderClient({
-    region: process.env.AWS_REGION
-});
-
-const CLIENT_ID = process.env.AWS_COGNITO_CRAMBLE_CLIENT_ID || 'noId';
-const CLIENT_SECRET = process.env.AWS_COGNITO_CRAMBLE_CLIENT_SECRET || 'noSecret';
+import {cognito, CLIENT_ID, CLIENT_SECRET} from '../../services/cognitoService'
 
 const loginController = async (req: Request<{}, {}, UserLogin>, res: Response) => {
     try {
         const { username, password } = req.body;
 
-        // login to aws
+        // login to aws, throws an error for incorrect credentials. 
         const cognitoResponse = await cognitoLogin(username, password);
 
-        if (!cognitoResponse.AuthenticationResult) {
-            res.status(401).send({ message: "Incorrect password or Username not found" });
-            return;
+        if (cognitoResponse.AuthenticationResult) {
+            const { AccessToken, RefreshToken, ExpiresIn } = cognitoResponse.AuthenticationResult;
+    
+            // get the userId from database
+            const userId = await getUserIdFromDatabase(username);
+    
+            const payload = { userId: userId };
+            const key = process.env.JWT_SECRET_KEY || "";
+            const token = jwt.sign(payload, key, { algorithm: 'HS256' });
+    
+            loginSuccessful(res, AccessToken!, RefreshToken!, ExpiresIn!, token);
         }
-
-        const { AccessToken, RefreshToken, ExpiresIn } = cognitoResponse.AuthenticationResult;
-
-        // get the userId from database
-        const userId = await getUserIdFromDatabase(username);
-
-        const payload = { userId: userId };
-        const key = process.env.JWT_SECRET_KEY || "";
-        const token = jwt.sign(payload, key, { algorithm: 'HS256' });
-
-        loginSuccessful(res, AccessToken!, RefreshToken!, ExpiresIn!, token);
-
     } catch (error: unknown) {
-        sendErrorToClient(error, res);
+        if(error instanceof NotAuthorizedException){
+            res.status(401).json({message: error.message});
+        }else if(error instanceof UserNotConfirmedException){
+            res.status(412).json({message: error.message});
+        }else{
+            sendErrorToClient(error, res);
+        }
     }
 };
 
@@ -99,7 +95,10 @@ function generateSecretHash(username: string, clientId: string, clientSecret: st
         .digest("base64");
 }
 
-function loginSuccessful(res: Response, AccessToken: string, RefreshToken: string, ExpiresIn: number, token: string){
+/**Function that is called when the user has correct credentials.
+ * It sets up cookie based sessions.
+ */
+function loginSuccessful(res: Response, AccessToken: string, RefreshToken: string, ExpiresIn: number, token: string){   
     res.cookie("accessToken", AccessToken, {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
