@@ -34,31 +34,7 @@ const loginController = async (req: Request<{}, {}, UserLogin>, res: Response) =
         const key = process.env.JWT_SECRET_KEY || "";
         const token = jwt.sign(payload, key, { algorithm: 'HS256' });
 
-        // Convert expiresIn to milliseconds for cookie maxAge
-        const expiresInMilliseconds = ExpiresIn! * 1000;
-
-        res.cookie("accessToken", AccessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            maxAge: expiresInMilliseconds, // Set maxAge to token's expiration
-            signed: true
-        });
-
-        res.cookie("refreshToken", RefreshToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            signed: true
-        });
-
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            signed: true,
-        });
-
-        res.status(200).json({
-            message: "Login successful",
-        }).end();
+        loginSuccessful(res, AccessToken!, RefreshToken!, ExpiresIn!, token);
 
     } catch (error: unknown) {
         sendErrorToClient(error, res);
@@ -89,6 +65,7 @@ async function cognitoLogin(username: string, password: string): Promise<Initiat
     }
 }
 
+/**A function that gets the user id in the database */
 async function getUserIdFromDatabase(username: string): Promise<number | null> {
     const queryString = `
         SELECT user_id
@@ -113,10 +90,38 @@ async function getUserIdFromDatabase(username: string): Promise<number | null> {
     }
 }
 
+/**Helper function that generatess hash of username, aws clientId and aws clientSecret.
+ * This is a required params when requesting to aws.
+ */
 function generateSecretHash(username: string, clientId: string, clientSecret: string): string {
     return crypto.createHmac("sha256", clientSecret)
         .update(username + clientId)
         .digest("base64");
+}
+
+function loginSuccessful(res: Response, AccessToken: string, RefreshToken: string, ExpiresIn: number, token: string){
+    res.cookie("accessToken", AccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: ExpiresIn! * 1000, // Set maxAge to token's expiration in milliseconds
+        signed: true
+    });
+
+    res.cookie("refreshToken", RefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        signed: true
+    });
+
+    res.cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        signed: true,
+    });
+
+    res.status(200).json({
+        message: "Login successful",
+    }).end();
 }
 
 export default loginController;

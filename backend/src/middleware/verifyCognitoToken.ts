@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { JWTTokenContent } from "../dtos/JWTTokenContent";
-import { CognitoIdentityProviderClient, InitiateAuthCommand, InitiateAuthCommandInput } from "@aws-sdk/client-cognito-identity-provider";
+import { CognitoIdentityProviderClient, InitiateAuthCommand, InitiateAuthCommandInput} from "@aws-sdk/client-cognito-identity-provider";
 import { CognitoJwtVerifier } from 'aws-jwt-verify';
 
 const cognito = new CognitoIdentityProviderClient({
@@ -26,24 +26,19 @@ const verifyCognitoToken = async (req: Request, res: Response, next: NextFunctio
         resetCookies(res);
         return;
     } else { // all tokens are present
-        try {
-            await verifier.verify(accessToken); // Use async verify, if true, access token is still valid
+        try{
+            req.userId = await decodeUserId(token);
+            
+            const accessTokenPayload = verifier.verifySync(accessToken); 
 
-            try {
-                const key = process.env.JWT_SECRET_KEY || "";
-                const decoded = jwt.verify(token, key, { complete: true });
-                req.userId = (decoded.payload as JWTTokenContent).userId;
+            if(accessTokenPayload){ //access token is valid
+                req.userId = await decodeUserId(token);
                 next();
-            } catch (jwtError: unknown) {
-                console.error("JWT verification error:", jwtError);
-                resetCookies(res);
-                return;
-            }
-        } catch (cognitoError: unknown) { //access token invalid
-            try {
+            }else{
+                //refresh the acess token
                 const newTokens = await refreshAccessToken(refreshToken);
 
-                if (newTokens) {
+                if(newTokens){
                     res.cookie("accessToken", newTokens.AccessToken, {
                         httpOnly: true,
                         secure: process.env.NODE_ENV === 'production',
@@ -55,25 +50,15 @@ const verifyCognitoToken = async (req: Request, res: Response, next: NextFunctio
                         secure: process.env.NODE_ENV === 'production',
                     });
 
-                    try {
-                        const key = process.env.JWT_SECRET_KEY || "";
-                        const decoded = jwt.verify(token, key, { complete: true });
-                        req.userId = (decoded.payload as JWTTokenContent).userId;
-                        next();
-                    } catch (jwtError: unknown) {
-                        console.error("JWT verification error:", jwtError);
-                        resetCookies(res);
-                        return;
-                    }
-                } else { // refresh token is invalid too
-                    resetCookies(res);
-                    return;
+                    next()
+                }else{
+                    throw new Error('Refreshing Token Not Successful')
                 }
-            } catch (refreshError: unknown) {
-                console.error("Refresh token error:", refreshError);
-                resetCookies(res);
-                return;
             }
+        }catch(error: unknown){
+            console.error("Error: ", error);
+            resetCookies(res);
+            return;
         }
     }
 };
@@ -108,15 +93,18 @@ async function refreshAccessToken(refreshToken: string) {
         const command = new InitiateAuthCommand(input);
         const response = await cognito.send(command);
 
-        if (response.AuthenticationResult) {
-            return response.AuthenticationResult;
-        } else {
-            return null;
-        }
+        return (response.AuthenticationResult) ? response.AuthenticationResult : null;
     } catch (error) {
         console.error("Cognito refresh error:", error);
         return null;
     }
+}
+
+/**Function that decodes userid from token */
+async function  decodeUserId(token: any): Promise<string> {
+    const key = process.env.JWT_SECRET_KEY || "";
+    const decoded = jwt.verify(token, key, { complete: true });
+    return (decoded.payload as JWTTokenContent).userId;
 }
 
 export default verifyCognitoToken;
