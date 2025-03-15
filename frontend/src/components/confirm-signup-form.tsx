@@ -14,21 +14,24 @@ import { Button } from "./ui/button"
 import { useEffect, useState } from "react"
 import { usePost } from "@/hooks/use-request"
 import { AxiosError } from "axios"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 
-export type OTPProps= {
-	email: string,
-	username: string
-}
-
-export function InputOTPForm({email, username}:OTPProps) {
+export function InputOTPForm() {
 	const router = useRouter();
+	const searchParams = useSearchParams();
+  const username = searchParams.get('username');
+  const email = searchParams.get('email');
+
+	if(!username || !email){
+		router.back()
+	}
+
 	const [otp, setOtp] = useState<string>("");
 	const [errorStatus, setErrorStatus] = useState<number>(0);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
+	
 	const {status, statusText, data, error, loading, executePostRequest , clearResponseState  } = usePost('http://localhost:3001/auth/confirm');
-
+	
 	// handle otp change
 	const handleChange = (value: string)=>{
 		setErrorStatus(0); //reset error status

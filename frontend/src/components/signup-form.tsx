@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Toggle } from "./ui/toggle"
-import { Facebook, Eye, EyeClosed } from "lucide-react"
+import { Facebook, Eye, EyeClosed, LoaderCircle } from "lucide-react"
 import Link from "next/link"
 import { usePost, PostApiResponse } from "@/hooks/use-request"
 import { UserSignUp } from "@/dtos/user/UserSignUp.dto"
@@ -15,6 +15,7 @@ import { joiResolver } from "@hookform/resolvers/joi"
 import { useState, useEffect } from "react"
 import { AxiosError } from "axios"
 import {SubmitHandler, useForm, ErrorOption} from 'react-hook-form' 
+import { useRouter } from "next/navigation"
 
 const signupSchema = Joi.object({
   firstName: Joi.string()
@@ -72,8 +73,9 @@ export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter();
   const [isVisible, setVisible] = useState<boolean>(false);
-  const {register, setError, handleSubmit, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<SignFormData>({
+  const {register, setError, handleSubmit, getValues, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<SignFormData>({
       resolver: joiResolver(signupSchema)
   })
 
@@ -85,9 +87,11 @@ export function SignupForm({
 
   // update the ui based on loading change
   useEffect(()=>{
-    // todo: 201 - user created successfully
+    // 201 - user created successfully
     if(status === 201){
-      // handle OTP
+      const username = getValues('username');
+      const email = getValues('email');
+      router.replace(`/signup/confirm?username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}`)
       return;
     }
 
@@ -200,8 +204,11 @@ export function SignupForm({
                     ))}  
                   </Label>}
               </div>
-              <Button type="submit" className="w-full">
-                Signup
+
+              <Button type="submit" disabled={isSubmitting ? true : false} className="w-full">
+                {isSubmitting 
+                ? <LoaderCircle className="animate-spin"></LoaderCircle>
+                : 'Signup'}
               </Button>
 
               {errors.root && 
