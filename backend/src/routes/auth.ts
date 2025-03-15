@@ -6,10 +6,12 @@ import isSignupDataValid from '../middleware/validation/isSignupDataValid';
 import logoutController from "../controller/auth/logout";
 import isEmailExists from "../middleware/isEmailExists";
 import confirmSignupController from "../controller/auth/confirmSignup";
+import resendOTPController from "../controller/auth/resendOTP";
 
 const loginRouter = Router();
 const signupRouter = Router();
 const confirmSignupRouter = Router();
+const resendOTPRouter = Router();
 const logoutRouter = Router();
 
 /**
@@ -184,7 +186,7 @@ signupRouter.post('/signup', isSignupDataValid, isUsernameExists, isEmailExists,
 
 /**
  * @swagger
-* /auth/confirm:
+* /auth/signup/confirm:
 *     post:
 *       summary: Confirm user signup
 *       description: Confirms a user's signup by verifying the confirmation code.
@@ -251,7 +253,58 @@ signupRouter.post('/signup', isSignupDataValid, isUsernameExists, isEmailExists,
 *                     example: Internal Server Error
 *
 */
-confirmSignupRouter.post('/confirm', confirmSignupController)
+confirmSignupRouter.post('/signup/confirm', confirmSignupController)
+
+
+/**
+ * @swagger
+* /auth/otp/resend:
+*     post:
+*       summary: Confirm user signup
+*       description: Confirms a user's signup by verifying the confirmation code.
+*       tags:
+*         - authentication
+*       requestBody:
+*         required: true
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 username:
+*                   type: string
+*                   description: User's username
+*                   example: johndoe123
+*                 confirmationCode:
+*                   type: string
+*                   description: Confirmation code received via email
+*                   example: "123456"
+*               required:
+*                 - username
+*                 - confirmationCode
+*       responses:
+*         '200':
+*           description: A new code has been delivered successfuly.
+*           content:
+*             application/json:
+*               schema:
+*                 type: object
+*                 properties:
+*                   message:
+*                     type: string
+*                     example: New code sent
+*         '500':
+*           description: Might be code delivery failure, too much request etc. Refer to the docs of class ResendConfirmationCodeCommand in AWS SDK javascript v3
+*           content:
+*             application/json:
+*               schema:
+*                 type: object
+*                 properties:
+*                   message:
+*                     type: string
+*                     example: Internal Server Error
+*/
+resendOTPRouter.post('/otp/resend', resendOTPController)
 
 /**
  * @swagger
@@ -296,4 +349,4 @@ confirmSignupRouter.post('/confirm', confirmSignupController)
  */
 logoutRouter.post('/logout', logoutController)
 
-export {loginRouter, signupRouter, confirmSignupRouter, logoutRouter};
+export {loginRouter, signupRouter, confirmSignupRouter, resendOTPRouter, logoutRouter};

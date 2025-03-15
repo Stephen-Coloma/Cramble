@@ -15,22 +15,27 @@ import { useEffect, useState } from "react"
 import { usePost } from "@/hooks/use-request"
 import { AxiosError } from "axios"
 import { useRouter, useSearchParams } from "next/navigation"
+import { toast } from "sonner"
 
 export function InputOTPForm() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
-  const username = searchParams.get('username');
-  const email = searchParams.get('email');
+	const username = searchParams.get('username');
+	const email = searchParams.get('email');
 
-	if(!username || !email){
-		router.back()
-	}
+  // Use useEffect to check first username and email. 
+	useEffect(() => {
+		if (!username || !email) {
+			router.back();
+		}
+	}, [username, email, router]);
 
 	const [otp, setOtp] = useState<string>("");
-	const [errorStatus, setErrorStatus] = useState<number>(0);
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+	const [errorStatus, setErrorStatus] = useState<number>(0); //used for the error messages in the ui
+	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 	
-	const {status, statusText, data, error, loading, executePostRequest , clearResponseState  } = usePost('http://localhost:3001/auth/confirm');
+	const {status, statusText, data, error, loading, executePostRequest , clearResponseState  } = usePost('http://localhost:3001/auth/signup/confirm');
+  const resendOtpRequest = usePost("http://localhost:3001/auth/otp/resend");
 	
 	// handle otp change
 	const handleChange = (value: string)=>{
@@ -38,10 +43,25 @@ export function InputOTPForm() {
 		setOtp(value);
 	}
 
-	//action for resend
-	const requestNewCode = () => {
-		//call endpoint for the new code request
-	}
+	// Action for resend OTP
+	const requestNewCode = async () => {
+    await resendOtpRequest.executePostRequest({username: username});
+	};
+
+  //use effect that listens to request new otp
+  useEffect(()=>{
+    if (resendOtpRequest?.status === 200) {
+      toast.success("A new OTP has been sent to your email.");
+      resendOtpRequest.clearResponseState();
+      return;
+    } 
+
+    if(resendOtpRequest.error){
+      toast.error("Unable to resend OTP right now. Please try again later.");
+      resendOtpRequest.clearResponseState();
+      return;
+    }
+  }, [resendOtpRequest.loading])
 
 	// Trigger API request when OTP reaches 6 digits
   useEffect(() => {
@@ -97,7 +117,7 @@ export function InputOTPForm() {
 		<Card>
 			<form action="" className="flex flex-col justify-center items-center">
 				<CardHeader>
-						<ShieldCheck className={`h-16 w-16 md:h-24 md:w-24`}></ShieldCheck>
+						<ShieldCheck className={`h-12 w-12 md:h-20 md:w-20`}></ShieldCheck>
 				</CardHeader>
 				<CardContent className="flex flex-col items-center gap-6">
 						<Label className="text-xl md:text-2xl font-bold">OTP Verification</Label>
