@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Facebook, EyeClosed, Eye, LoaderCircle } from "lucide-react"
-import { ChangeEvent, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
 import { Toggle } from "./ui/toggle"
@@ -38,13 +38,9 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [isVisible, setVisible] = useState<boolean>(false);
-
   const router = useRouter();
 
-  useEffect(()=>{
-    router.prefetch('/signup')
-  }, [])
+  const [isVisible, setVisible] = useState<boolean>(false);
 
   const {register, setError, handleSubmit, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<LoginFormData>({
     resolver: joiResolver(loginSchema)

@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "../ui/button"
 import { CirclePlus, Plus, Pickaxe } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile"
-import { DeckProps } from "../deck-board"
+import { DeckProps } from "../deck";
 import { SubmitHandler, useFieldArray, useForm } from "react-hook-form"
 import { Textarea } from "../ui/textarea"
 import { FlashcardInputCard } from "../flashcard-input-card"
@@ -80,9 +80,7 @@ export type DeckFlashcardsFormData = {
 export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDialogProps){
     const isMobile = useIsMobile();
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-    
     const {status, data, loading, executePostRequest , clearResponseState } = usePost('http://localhost:3001/api/decks');
-    
     const {register, unregister, control, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
         resolver: joiResolver(DeckFlashcardsSchema),
         defaultValues: {
@@ -93,7 +91,7 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
         }
     });
 
-    const  {fields, append, remove } = useFieldArray<DeckFlashcardsFormData>({
+    const {fields, append, remove } = useFieldArray<DeckFlashcardsFormData>({
         control, 
         name: 'flashcards'
     })
@@ -112,13 +110,8 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                     day: 'numeric',
                 })
             })
-
-            // Close the dialog
             setIsDialogOpen(false);
-
-            // reset state so that next request is not tied with past requests
             clearResponseState()
-
             // add the on deck added
             const newlyAddedDeck: Omit<DeckProps, 'onDeckDelete' | 'onDeckEdit'> = {
                 deckId: data.deckId,
@@ -132,14 +125,8 @@ export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDial
                 masteredTotal: 0,
                 unratedTotal: fields.length,
             }
-
-            // render the newly added deck on the list using the callback function
             onDeckAdded(newlyAddedDeck as DeckProps)
-
-            // reset all form states
-            reset()
-            
-            // unregister all flashcard input forms
+            reset()            
             unregister('flashcards')
         }
     }, [loading])
