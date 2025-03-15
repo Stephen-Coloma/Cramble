@@ -17,7 +17,7 @@ const isEmailExists = async (req: Request, res: Response, next: NextFunction) =>
         const connection = await Database.connect();
         const results = await Database.processQuery(connection, queryString, values);
         const count = results[0].count;
-        count > 0 ? res.status(406).send({messsage: 'Email already taken'}) : next();
+        count > 0 ? res.status(406).json({message: 'Email already taken'}) : next();
     }catch(error: unknown){
         sendErrorToClient(error, res);
     }

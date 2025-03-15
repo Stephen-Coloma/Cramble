@@ -88,22 +88,25 @@ export function SignupForm({
     // todo: 201 - user created successfully
     if(status === 201){
       // handle OTP
+      return;
     }
 
-    // todo: 406 - username or email already taken
     if(error){
-      if ((error as AxiosError).response?.status === 401) { // 401 username not found
-        reset({password: '', username: ''})
-        setError("root", (error.response.data as ErrorOption));
+      // 406 - username or email already taken
+      // 500 - internal server error  
+      const status = (error as AxiosError).response?.status;
+      if (status === 406) { 
+        reset({username: '', email: ''})
+        setError("root", {message: error.response.data.message});
         document.getElementById("username")?.focus();
-      } 
+      } else if(status === 500){
+        reset();
+        setError("root", {message: 'Something went wrong. Try again later.'});
+      }
     }
-
-    // todo: 500 - internal server error  
 
     clearResponseState(); // next request is not tied
   }, [loading])  
-
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -200,6 +203,10 @@ export function SignupForm({
               <Button type="submit" className="w-full">
                 Signup
               </Button>
+
+              {errors.root && 
+                  <Label className="text-xs text-destructive text-center">{errors.root.message}</Label>}
+
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                 <span className="relative z-10 bg-background px-2 text-muted-foreground">
                   Or continue with
