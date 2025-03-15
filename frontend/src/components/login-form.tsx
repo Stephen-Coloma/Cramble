@@ -15,6 +15,7 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
 import { PostApiResponse, usePost } from "@/hooks/use-request"
 import Link from "next/link"
+import { UserLogin } from "@/dtos/user/UserLogin.dto"
 
 const loginSchema = Joi.object({
   username: Joi.string()
@@ -29,19 +30,14 @@ const loginSchema = Joi.object({
       .required(),
 });
 
-type LoginFormData = {
-  username: string,
-  password: string
-}
+type LoginFormData = UserLogin;
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter();
-
   const [isVisible, setVisible] = useState<boolean>(false);
-
   const {register, setError, handleSubmit, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<LoginFormData>({
     resolver: joiResolver(loginSchema)
   })
@@ -55,18 +51,23 @@ export function LoginForm({
 
   // update the ui based on loading change
   useEffect(()=>{
+    // 200 - login successful
     if(status === 200){
       router.replace('/dashboard/mydecks')
       return;
     }
 
+    // 401 - incorrect credentials
     if(error){
-      if ((error as AxiosError).response?.status === 401) { // 401 username not found
+      if ((error as AxiosError).response?.status === 401) { 
         reset({password: '', username: ''})
         setError("root", (error.response.data as ErrorOption));
         document.getElementById("username")?.focus();
       } 
     }
+
+    // todo: 412 - user not confirmed
+    // todo: 500 - internal server error
 
     clearResponseState(); // next request is not tied
   }, [loading])  
