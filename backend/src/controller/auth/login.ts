@@ -8,29 +8,35 @@ import { databaseInstance as Database } from "../../database/mysql";
 import {cognito, CLIENT_ID, CLIENT_SECRET} from '../../services/cognitoService'
 
 const loginController = async (req: Request<{}, {}, UserLogin>, res: Response) => {
+    let tempUsername= '';
     try {
         const { username, password } = req.body;
-
+        tempUsername = username;
         // login to aws, throws an error for incorrect credentials. 
         const cognitoResponse = await cognitoLogin(username, password);
-
+        
         if (cognitoResponse.AuthenticationResult) {
             const { AccessToken, RefreshToken, ExpiresIn } = cognitoResponse.AuthenticationResult;
-    
+            
             // get the userId from database
             const userId = await getUserIdFromDatabase(username);
-    
+            
             const payload = { userId: userId };
             const key = process.env.JWT_SECRET_KEY || "";
             const token = jwt.sign(payload, key, { algorithm: 'HS256' });
-    
+            
             loginSuccessful(res, AccessToken!, RefreshToken!, ExpiresIn!, token);
         }
     } catch (error: unknown) {
         if(error instanceof NotAuthorizedException){
             res.status(401).json({message: error.message});
         }else if(error instanceof UserNotConfirmedException){
-            res.status(412).json({message: error.message});
+            //get email on database
+            const email = await getEmailFromDatabase(tempUsername)
+            res.status(412).json({
+                username: tempUsername, 
+                email: email
+            });
         }else{
             sendErrorToClient(error, res);
         }
@@ -82,6 +88,31 @@ async function getUserIdFromDatabase(username: string): Promise<number | null> {
         }
     } catch (error) {
         console.error("Error retrieving user ID from database:", error);
+        return null;
+    }
+}
+
+/**A function that gets the email in the database */
+async function getEmailFromDatabase(username: string): Promise<string | null> {
+    const queryString = `
+        SELECT email
+        FROM users
+        WHERE username = ? and status = 'unconfirmed';
+    `;
+
+    const values = [username];
+
+    try {
+        const connection = await Database.connect();
+        const results = await Database.processQuery(connection, queryString, values);
+
+        if (results.length > 0) {
+            return results[0].email;
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error("Error retrieving user email from database:", error);
         return null;
     }
 }

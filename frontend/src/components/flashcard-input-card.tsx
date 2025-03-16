@@ -5,8 +5,9 @@ import {Trash2} from 'lucide-react'
 import { Textarea } from "./ui/textarea";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { DeckFlashcardsFormData } from "./dialog/add-deck-dialog";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useState } from "react";
 
+// Data is optional because it can be used for displaying generated flashcards or from adding a flashcard
 export type FlashcardInputCardProps = {
     formUtilities: {
         register: UseFormRegister<DeckFlashcardsFormData>

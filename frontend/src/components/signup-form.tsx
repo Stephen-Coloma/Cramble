@@ -1,15 +1,115 @@
+'use client'
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Facebook } from "lucide-react"
+import { Toggle } from "./ui/toggle"
+import { Facebook, Eye, EyeClosed, LoaderCircle } from "lucide-react"
 import Link from "next/link"
+import { usePost, PostApiResponse } from "@/hooks/use-request"
+import { UserSignUp } from "@/dtos/user/UserSignUp.dto"
+import Joi from "joi"
+import { joiResolver } from "@hookform/resolvers/joi"
+import { useState, useEffect } from "react"
+import { AxiosError } from "axios"
+import {SubmitHandler, useForm, ErrorOption} from 'react-hook-form' 
+import { useRouter } from "next/navigation"
+
+const signupSchema = Joi.object({
+  firstName: Joi.string()
+      .min(1)
+      .max(50)
+      .required()
+      .messages({
+        'string.empty': 'firstname is required',
+        'string.max' : 'max 50 characters'
+      }),
+
+  lastName: Joi.string()
+      .min(1)
+      .max(50)
+      .required()
+      .messages({
+        'string.empty': 'lastname is required',
+        'string.max' : 'max 50 characters'
+      }),
+
+  username: Joi.string()
+      .alphanum()
+      .min(3)
+      .max(30)
+      .required()
+      .messages({
+        'string.empty': 'username is required',
+        'string.min': 'minimum 3 characters',
+        'string.max' : 'max 30 characters'
+      }),
+
+  password: Joi.string()
+      .min(8)
+      .max(100)
+      .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!"#$%&\'()*+,-./:;<=>?@^_`{|}~])(?=.{8,})'))
+      .required()
+      .messages({
+        'string.pattern.base': "Atleast: | 1 uppercase letter | 1 lowercase letter | 1 number | 1 special character",
+        'string.empty': 'password is required',
+        'string.min': 'password must be at least 8 characters long',
+        'string.max': 'max 100 characters'
+      }), 
+
+  email: Joi.string()
+      .email({tlds: false})
+      .required()
+      .messages({
+        'string.empty': 'email is required',
+      })
+});
+
+type SignFormData = UserSignUp;
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter();
+  const [isVisible, setVisible] = useState<boolean>(false);
+  const {register, setError, handleSubmit, getValues, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<SignFormData>({
+      resolver: joiResolver(signupSchema)
+  })
+
+  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost('http://localhost:3001/auth/signup');
+
+  const onSubmit: SubmitHandler<SignFormData> = async (formData: SignFormData) => {
+    await executePostRequest(formData);
+  }
+
+  // update the ui based on loading change
+  useEffect(()=>{
+    // 201 - user created successfully, redirect to confirming an account
+    if(status === 201){
+      const username = getValues('username');
+      const email = getValues('email');
+      router.replace(`/signup/confirm?username=${encodeURIComponent(username)}&email=${encodeURIComponent(email)}`)
+      return;
+    }
+
+    if(error){
+      // 406 - username or email already taken
+      // 500 - internal server error  
+      const errorStatus = (error as AxiosError).response?.status;
+      if (errorStatus === 406) { 
+        reset({username: '', email: ''})
+        setError("root", {message: error.response.data.message});
+        document.getElementById("username")?.focus();
+      } else if(errorStatus === 500){
+        reset();
+        setError("root", {message: 'Something went wrong. Try again later.'});
+      }
+      clearResponseState(); // next request is not tied
+    }
+  }, [loading])  
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -22,7 +122,7 @@ export function SignupForm({
               className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
             />
           </div>
-          <form className="p-6 md:p-8">
+          <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-8">
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Get Started</h1>
@@ -32,49 +132,87 @@ export function SignupForm({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="firstname">Firstname</Label>
-                <Input
+                <Input {...register('firstName')}
                   id="firstname"
                   type="text"
                   placeholder="John"
-                  required
+                  className={errors.firstName ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
                 />
+                {errors.firstName && 
+                  <Label className="text-xs text-destructive">{errors.firstName.message}</Label>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="lastname">Lastname</Label>
-                <Input
+                <Input {...register('lastName')}
                   id="lastname"
                   type="text"
                   placeholder="Doe"
-                  required
+                  className={errors.lastName ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
                 />
+              {errors.lastName && 
+                  <Label className="text-xs text-destructive">{errors.lastName.message}</Label>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="username">Username</Label>
-                <Input
+                <Input {...register('username')}
                   id="username"
                   type="text"
                   placeholder="johndoe123"
-                  required
+                  className={errors.username ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
                 />
+                {errors.username && 
+                  <Label className="text-xs text-destructive">{errors.username.message}</Label>}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input
+                <Input {...register('email')}
                   id="email"
-                  type="email"
+                  type="text"
                   placeholder="m@example.com"
-                  required
+                  className={errors.email ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
                 />
+                {errors.email && 
+                  <Label className="text-xs text-destructive">{errors.email.message?.replaceAll("\"", "")}</Label>}
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+                <div className="flex w-full justify-between items-center">
+                    <Label htmlFor="password">Password</Label>
+                    <Toggle size={'sm'}  onClick={() => setVisible((prev) => !prev)}>
+                      {isVisible ? (
+                        <Eye className="h-6 w-6 " />
+                      ) : (
+                        <EyeClosed className="h-6 w-6 " />
+                      )}
+                      <span className="sr-only">Toggle theme</span>
+                    </Toggle>
+                  </div>
                 </div>
-                <Input id="password" type="password" required />
+                <Input {...register('password')} 
+                  id="password"
+                  type={`${isVisible ? 'text' : 'password'}`}
+                  className={errors.password ? 'border-destructive focus-visible:border-destructive focus-visible:ring-0' : ''}
+                />
+                {errors.password && 
+                  <Label className="text-xs text-destructive">
+                    {errors.password.message?.replaceAll('\"', "").split(" | ").map((rule, index) => (
+                      <span key={index}>
+                        {rule}
+                        <br />
+                      </span>
+                    ))}  
+                  </Label>}
               </div>
-              <Button type="submit" className="w-full">
-                Signup
+
+              <Button type="submit" disabled={isSubmitting ? true : false} className="w-full">
+                {isSubmitting 
+                ? <LoaderCircle className="animate-spin"></LoaderCircle>
+                : 'Signup'}
               </Button>
+
+              {errors.root && 
+                  <Label className="text-xs text-destructive text-center">{errors.root.message}</Label>}
+
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                 <span className="relative z-10 bg-background px-2 text-muted-foreground">
                   Or continue with

@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Facebook, EyeClosed, Eye, LoaderCircle } from "lucide-react"
-import { ChangeEvent, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
 import { Toggle } from "./ui/toggle"
@@ -15,6 +15,7 @@ import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
 import { PostApiResponse, usePost } from "@/hooks/use-request"
 import Link from "next/link"
+import { UserLogin } from "@/dtos/user/UserLogin.dto"
 
 const loginSchema = Joi.object({
   username: Joi.string()
@@ -29,23 +30,19 @@ const loginSchema = Joi.object({
       .required(),
 });
 
-type LoginFormData = {
+type LoginFormData = UserLogin;
+type UnverifiedAccountCred = {
   username: string,
-  password: string
+  email: string
 }
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [isVisible, setVisible] = useState<boolean>(false);
-
   const router = useRouter();
-
-  useEffect(()=>{
-    router.prefetch('/signup')
-  }, [])
-
+  const [isVisible, setVisible] = useState<boolean>(false);
+  const [verifyAccountData, setVerifyAccountData] = useState<UnverifiedAccountCred>();
   const {register, setError, handleSubmit, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<LoginFormData>({
     resolver: joiResolver(loginSchema)
   })
@@ -59,24 +56,31 @@ export function LoginForm({
 
   // update the ui based on loading change
   useEffect(()=>{
+    // 200 - login successful
     if(status === 200){
       router.replace('/dashboard/mydecks')
       return;
     }
 
     if(error){
-      if ((error as AxiosError).response?.status === 401) { // 401 username not found
-        reset({password: ''})
-        setError("username", (error.response.data as ErrorOption));
+      // 401 - incorrect credentials
+      // 500 - internal server error  
+      // 412 - user not confirmed
+      const errorStatus = (error as AxiosError).response?.status;
+      if (errorStatus === 401) { 
+        reset({password: '', username: ''})
+        setError("root", {message: error.response.data.message});
         document.getElementById("username")?.focus();
-      } else if ((error as AxiosError).response?.status === 404) { //404 incorrect password
-        reset({password: ''})
-        setError("password", (error.response.data as ErrorOption));
-        document.getElementById("password")?.focus();
-      }      
+      } else if(errorStatus === 412){
+        const unverifiedUsernameEmail = (error as AxiosError).response?.data!;
+        setVerifyAccountData(unverifiedUsernameEmail as UnverifiedAccountCred);
+      } else if(errorStatus === 500){
+        reset();
+        setError("root", {message: 'Something went wrong. Try again later.'});
+      }
+      clearResponseState(); // next request is not tied
     }
 
-    clearResponseState(); // next request is not tied
   }, [loading])  
 
   return (
@@ -138,6 +142,22 @@ export function LoginForm({
                 ? <LoaderCircle className="animate-spin"></LoaderCircle>
                 : 'Login'}
               </Button>
+
+              {errors.root && 
+                  <Label className="text-xs text-destructive text-center">{errors.root.message?.replaceAll('\"', "")}</Label>}
+
+              {/* redirect to singup/confirm page */}
+              {verifyAccountData && 
+                  <Label className="text-xs text-destructive md:text-sm text-center">
+                    Your account is unverfied.
+                    <Link 
+                      href={`/signup/confirm?username=${encodeURIComponent(verifyAccountData.username)}&email=${encodeURIComponent(verifyAccountData.email)}`}
+                      className="text-primary text-xs md:text-sm border-b-2"
+                      >
+                      Verify?
+                    </Link>
+                  </Label>}
+
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                 <span className="relative z-10 bg-background px-2 text-muted-foreground">
                   Or continue with

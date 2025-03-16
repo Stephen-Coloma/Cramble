@@ -2,6 +2,7 @@ import {Header} from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import {ArrowUpRight} from 'lucide-react'
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -17,12 +18,12 @@ export default function Home() {
           <p className="text-center text-sm text-muted-foreground sm:text-base md:text-lg">
               Master your quizzes with personalized <br></br>flashcards — organized, trackable and <br></br>seamless.
           </p>
-          <a href="/signup">
+          <Link href="/signup">
             <Button variant={"default"} className="text-white">
               Get Started
               <ArrowUpRight color="white"></ArrowUpRight>
             </Button>
-          </a>
+          </Link>
       </div> 
       <Footer></Footer>
     </div>
