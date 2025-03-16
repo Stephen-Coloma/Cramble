@@ -60,18 +60,21 @@ export function LoginForm({
     if(error){
       // 401 - incorrect credentials
       // 500 - internal server error  
-      const status = (error as AxiosError).response?.status;
-      if (status === 401) { 
+      // todo: 412 - user not confirmed
+      const errorStatus = (error as AxiosError).response?.status;
+      if (errorStatus === 401) { 
         reset({password: '', username: ''})
         setError("root", {message: error.response.data.message});
         document.getElementById("username")?.focus();
-      } else if(status === 500){
+      } else if(errorStatus === 412){
+        const errorData = (error as AxiosError).response?.data;
+        console.log(errorData);
+      } else if(errorStatus === 500){
         reset();
         setError("root", {message: 'Something went wrong. Try again later.'});
       }
     }
 
-    // todo: 412 - user not confirmed
 
     clearResponseState(); // next request is not tied
   }, [loading])  

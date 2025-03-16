@@ -98,12 +98,12 @@ export function SignupForm({
     if(error){
       // 406 - username or email already taken
       // 500 - internal server error  
-      const status = (error as AxiosError).response?.status;
-      if (status === 406) { 
+      const errorStatus = (error as AxiosError).response?.status;
+      if (errorStatus === 406) { 
         reset({username: '', email: ''})
         setError("root", {message: error.response.data.message});
         document.getElementById("username")?.focus();
-      } else if(status === 500){
+      } else if(errorStatus === 500){
         reset();
         setError("root", {message: 'Something went wrong. Try again later.'});
       }

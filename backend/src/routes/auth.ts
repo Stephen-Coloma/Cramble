@@ -77,9 +77,17 @@ const logoutRouter = Router();
 *               schema:
 *                 type: object
 *                 properties:
-*                   message:
+*                   username:
 *                     type: string
-*                     example: User is not confirmed.
+*                     description: User's username
+*                     example: johndoe123
+*                   email:
+*                     type: string
+*                     description: User's email that is unconfirmed in the database
+*                     example: johndoe@123
+*                 required:
+*                   - username
+*                   - email
 *         '500':
 *           description: Internal server error
 *           content:
@@ -275,13 +283,8 @@ confirmSignupRouter.post('/signup/confirm', confirmSignupController)
 *                   type: string
 *                   description: User's username
 *                   example: johndoe123
-*                 confirmationCode:
-*                   type: string
-*                   description: Confirmation code received via email
-*                   example: "123456"
 *               required:
 *                 - username
-*                 - confirmationCode
 *       responses:
 *         '200':
 *           description: A new code has been delivered successfuly.

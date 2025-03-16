@@ -91,7 +91,7 @@ async function saveUserToDatabase(user:UserSignUp, res: Response) {
         user.username,
         user.password,
         user.email,
-        'unverified'
+        'unconfirmed'
     ];
 
     try{
