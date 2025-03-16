@@ -79,37 +79,27 @@ export function InputOTPForm() {
 		if(status === 200){
 			setTimeout(()=> {
 				router.replace('/login')
-			}, 2000);
+			}, 1000);
+      return;
 		}
 
 		if(error){
 			const errorStatus = (error as AxiosError).response?.status;
-			//incorrect confirmation code
+			// 400 - incorrect confirmation code
+      // 406 - confirmation expired 
+      // 500 - internal server error
 			if(errorStatus === 400){
 				setOtp('')
 				setErrorStatus(errorStatus);
-				setIsSubmitting(false);
-				clearResponseState();
-				return;
-			}
-			
-			//confirmation expired 
-			if(errorStatus === 406){
+			} else if(errorStatus === 406){
 				setOtp('')
 				setErrorStatus(errorStatus);
-				setIsSubmitting(false);
-				clearResponseState();
-				return;
-			}
-			
-			// internal server error
-			if(errorStatus === 500){
+			} else if(errorStatus === 500){
 				setOtp('')
 				setErrorStatus(errorStatus);
-				setIsSubmitting(false);
-				clearResponseState();
-				return;
 			}
+      setIsSubmitting(false);
+      clearResponseState();
 		}		
 	}, [loading])
   

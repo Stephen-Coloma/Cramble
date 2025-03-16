@@ -87,7 +87,7 @@ export function SignupForm({
 
   // update the ui based on loading change
   useEffect(()=>{
-    // 201 - user created successfully
+    // 201 - user created successfully, redirect to confirming an account
     if(status === 201){
       const username = getValues('username');
       const email = getValues('email');
@@ -107,9 +107,8 @@ export function SignupForm({
         reset();
         setError("root", {message: 'Something went wrong. Try again later.'});
       }
+      clearResponseState(); // next request is not tied
     }
-
-    clearResponseState(); // next request is not tied
   }, [loading])  
 
   return (
