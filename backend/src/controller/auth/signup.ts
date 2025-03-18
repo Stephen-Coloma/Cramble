@@ -2,7 +2,6 @@ import { Request, Response,  } from "express";
 import { databaseInstance as Database } from "../../database/mysql";
 import { UserSignUp } from "../../dtos/user/UserSignUp.dto";
 import sendErrorToClient from "../../utilities/errorHandler";
-import bcrypt from 'bcryptjs';
 import crypto from 'crypto'
 import { SignUpCommand, SignUpCommandInput } from "@aws-sdk/client-cognito-identity-provider"
 import { cognito, CLIENT_ID, CLIENT_SECRET } from '../../services/cognitoService'
@@ -21,8 +20,6 @@ const signUpController = async(req: Request<{}, {}, UserSignUp>, res: Response) 
         // cognito sign up
         await cognitoSignup(user.username, user.email, user.firstName, user.lastName, user.password);
     
-        // save a copy to app databse
-        user.password = hashPassword(user.password);
         await saveUserToDatabase(user, res);
     }catch(error: unknown){
         sendErrorToClient(error, res)
@@ -81,15 +78,14 @@ async function cognitoSignup(username:string, email: string, firstName: string, 
  *  */ 
 async function saveUserToDatabase(user:UserSignUp, res: Response) {
     const queryString = `
-            INSERT INTO users (first_name, last_name, username, password, email, status)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO users (first_name, last_name, username, email, status)
+            VALUES (?, ?, ?, ?, ?)
         `;
 
     const values = [
         user.firstName,
         user.lastName,
         user.username,
-        user.password,
         user.email,
         'unconfirmed'
     ];
@@ -103,14 +99,6 @@ async function saveUserToDatabase(user:UserSignUp, res: Response) {
     }catch(error: unknown){
         throw(error)
     }
-}
-
-/**
- * a function that hashes a password string before saving to the database
- *  */ 
-function hashPassword(password: string): string {
-    const hash =  bcrypt.hashSync(password, 5);
-    return hash;
 }
 
 /***

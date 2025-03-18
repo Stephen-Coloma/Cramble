@@ -106,7 +106,7 @@ export function InputOTPForm() {
 		if(confirmSignupRequest.status === 200){
 			setTimeout(()=> {
 				router.replace('/login')
-			}, 2000);
+			}, 1500);
       return;
 		}
 
@@ -176,7 +176,14 @@ export function InputOTPForm() {
 						<Button 
 							variant={'ghost'} 
 							className="text-xs md:text-sm font-bold text-primary hover:bg-transparent hover:text-primary hover:text-md"
-							onClick={requestNewCode}
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                const btn = e.currentTarget as HTMLButtonElement;
+                btn.style.transform = "scale(0.95)";
+                setTimeout(() => {
+                  btn.style.transform = "scale(1)";
+                }, 150);
+                requestNewCode(); // Call function
+              }}
               disabled={isCooldown}
 							>
 								{isCooldown ? `Resend OTP in ${cooldownTime}s` : "Resend OTP"}
