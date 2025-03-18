@@ -30,8 +30,7 @@ async function cognitoResendConfirmationCode(username:string) {
     
     try{
         const command = new ResendConfirmationCodeCommand(input);
-        const response = await cognito.send(command);
-        console.log(response);
+        await cognito.send(command);
         return
     }catch(error: unknown){        
         throw(error)

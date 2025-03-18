@@ -33,19 +33,46 @@ export function InputOTPForm() {
 	const [otp, setOtp] = useState<string>("");
 	const [errorStatus, setErrorStatus] = useState<number>(0); //used for the error messages in the ui
 	const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isCooldown, setIsCooldown] = useState<boolean>(false);
+  const [cooldownTime, setCooldownTime] = useState<number>(30); // Cooldown in seconds
+
+  const errorMessages: Record<number, string> = {
+    400: "Incorrect code",
+    406: "Expired code",
+    500: "Something went wrong. Try again.",
+  };
 	
-	const {status, statusText, data, error, loading, executePostRequest , clearResponseState  } = usePost('http://localhost:3001/auth/signup/confirm');
+	const confirmSignupRequest= usePost('http://localhost:3001/auth/signup/confirm');
   const resendOtpRequest = usePost("http://localhost:3001/auth/otp/resend");
 	
 	// handle otp change
-	const handleChange = (value: string)=>{
+	const handleOTPChange = (value: string)=>{
 		setErrorStatus(0); //reset error status
 		setOtp(value);
 	}
 
 	// Action for resend OTP
 	const requestNewCode = async () => {
+    if (isCooldown) return;
+
     await resendOtpRequest.executePostRequest({username: username});
+
+    // Start cooldown
+    setIsCooldown(true);
+    setCooldownTime(30); // Reset cooldown time
+
+    //countdown for resending request
+    const interval = setInterval(()=>{
+      setCooldownTime((prev) => {
+        if(prev === 1){
+          clearInterval(interval);
+          setIsCooldown(false);
+          return 0;
+        }
+
+        return prev - 1;
+      })
+    }, 1000)
 	};
 
   //use effect that listens to request new otp
@@ -63,45 +90,39 @@ export function InputOTPForm() {
     }
   }, [resendOtpRequest.loading])
 
-	// Trigger API request when OTP reaches 6 digits
+	// use effect that Triggers API request when OTP reaches 6 digits
   useEffect(() => {
     if (otp.length === 6) {
       setIsSubmitting(true);
-			executePostRequest({
+			confirmSignupRequest.executePostRequest({
 				username: username,
 				confirmationCode: otp
 			})
     }
   }, [otp]);
 
-	// listens to on loading change.
+	// listens to on confirm signup loading change.
 	useEffect(() => {
-		if(status === 200){
+		if(confirmSignupRequest.status === 200){
 			setTimeout(()=> {
 				router.replace('/login')
-			}, 1000);
+			}, 1500);
       return;
 		}
 
-		if(error){
-			const errorStatus = (error as AxiosError).response?.status;
+		if(confirmSignupRequest.error){
+			const errorStatus = (confirmSignupRequest.error as AxiosError).response?.status;
 			// 400 - incorrect confirmation code
       // 406 - confirmation expired 
       // 500 - internal server error
-			if(errorStatus === 400){
-				setOtp('')
-				setErrorStatus(errorStatus);
-			} else if(errorStatus === 406){
-				setOtp('')
-				setErrorStatus(errorStatus);
-			} else if(errorStatus === 500){
-				setOtp('')
-				setErrorStatus(errorStatus);
-			}
+      if ([400, 406, 500].includes(errorStatus ?? 0)) {
+        setErrorStatus(errorStatus!);
+      }
+      setOtp('')
       setIsSubmitting(false);
-      clearResponseState();
+      confirmSignupRequest.clearResponseState();
 		}		
-	}, [loading])
+	}, [confirmSignupRequest.loading])
   
   return (
 		<Card>
@@ -115,7 +136,7 @@ export function InputOTPForm() {
 							maxLength={6} 
 							pattern={REGEXP_ONLY_DIGITS}
 							value={otp}
-							onChange={handleChange}
+							onChange={handleOTPChange}
 							disabled={isSubmitting}
 						>
 							<InputOTPGroup>
@@ -131,48 +152,50 @@ export function InputOTPForm() {
 							</InputOTPGroup>
 						</InputOTP>
 
-						{status === 200 && 
+						{confirmSignupRequest.status === 200 && 
 							<Label className="flex items-center text-xs md:text-sm text-green-500 gap-2">
 								account confirmed <CircleCheck />
 							</Label>
 						}
 
-						{errorStatus === 400 && 
-								<Label className="flex items-center text-xs md:text-sm text-destructive gap-2">
-									incorrect code <CircleX />
-								</Label>
-						}
-
-						{errorStatus === 406 && 
-								<Label className="flex items-center text-xs md:text-sm text-destructive gap-2">
-									expired code <CircleX />
-								</Label>
-						}
-
-						{errorStatus === 500 && 
-								<Label className="flex items-center text-xs md:text-sm text-destructive gap-2">
-									Something went wrong. Try again.
-								</Label>
-						}
+            { errorMessages[errorStatus] && 
+              <Label className="flex items-center text-xs md:text-sm text-destructive gap-2">
+                {errorMessages[errorStatus]} {errorStatus !== 500 && <CircleX />}
+              </Label>  
+            }
 
 						<div className="flex flex-col items-center gap-2">
-							<Label className="text-sm md:text-base text-center">Hello, {username}</Label>
-							<Label className="max-w-[500px] text-xs md:text-sm font-light text-center text-muted-foreground">Thankyou for registering. To confirm your account, please type the OTP sent to your {email}.</Label>
+							<Label className="text-sm text-primary font-bold md:text-base text-center">Hello, {username}</Label>
+							<Label className="max-w-[500px] text-xs md:text-sm font-light text-center text-muted-foreground">Thankyou for registering. To confirm your account, please type the OTP sent to your {maskEmail(email!)}.</Label>
 						</div>
 				</CardContent>
 			</form>
 			<CardFooter className="w-full justify-center sm:justify-end">
-					<Label className="text-sm">
+					<Label className="text-xs md:text-sm">
 						OTP not received? 
 						<Button 
 							variant={'ghost'} 
-							className="font-bold text-primary hover:bg-transparent hover:text-primary hover:text-md"
-							onClick={requestNewCode}
+							className="text-xs md:text-sm font-bold text-primary hover:bg-transparent hover:text-primary hover:text-md"
+              onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                const btn = e.currentTarget as HTMLButtonElement;
+                btn.style.transform = "scale(0.95)";
+                setTimeout(() => {
+                  btn.style.transform = "scale(1)";
+                }, 150);
+                requestNewCode(); // Call function
+              }}
+              disabled={isCooldown}
 							>
-								Resend
+								{isCooldown ? `Resend OTP in ${cooldownTime}s` : "Resend OTP"}
 						</Button>
 					</Label>
 			</CardFooter>
 		</Card>
   )
 }
+
+/**Helper function that masks email */
+const maskEmail = (email: string) => {
+  const [local, domain] = email.split("@");
+  return `${local[0]}****${local.slice(-1)}@${domain}`;
+};
