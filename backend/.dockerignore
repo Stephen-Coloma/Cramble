@@ -1,0 +1,14 @@
+# dependencies
+node_modules
+
+# distribution files
+dist
+
+# vs code
+.vscode
+
+# database
+.sql
+
+# environment variable
+.env
