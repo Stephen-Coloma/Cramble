@@ -86,9 +86,9 @@ async function getUserIdFromDatabase(username: string): Promise<number | null> {
         } else {
             return null;
         }
-    } catch (error) {
+    } catch (error: unknown) {
         console.error("Error retrieving user ID from database:", error);
-        return null;
+        throw (error);
     }
 }
 
