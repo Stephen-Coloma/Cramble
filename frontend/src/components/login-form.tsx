@@ -50,7 +50,7 @@ export function LoginForm({
     resolver: joiResolver(loginSchema)
   })
 
-  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`http://${SERVER_HOST}/auth/login`);
+  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`https://${SERVER_HOST}/auth/login`);
 
   //handle form validation and submission
   const onSubmit: SubmitHandler<LoginFormData> = async (formData: LoginFormData) => {
