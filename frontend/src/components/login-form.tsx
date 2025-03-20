@@ -17,6 +17,8 @@ import { PostApiResponse, usePost } from "@/hooks/use-request"
 import Link from "next/link"
 import { UserLogin } from "@/dtos/user/UserLogin.dto"
 
+
+
 const loginSchema = Joi.object({
   username: Joi.string()
       .alphanum()
@@ -40,6 +42,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const SERVER_HOST=process.env.NEXT_PUBLIC_SERVER_HOST
   const router = useRouter();
   const [isVisible, setVisible] = useState<boolean>(false);
   const [verifyAccountData, setVerifyAccountData] = useState<UnverifiedAccountCred>();
@@ -47,7 +50,7 @@ export function LoginForm({
     resolver: joiResolver(loginSchema)
   })
 
-  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost('http://localhost:3001/auth/login');
+  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`http://${SERVER_HOST}/auth/login`);
 
   //handle form validation and submission
   const onSubmit: SubmitHandler<LoginFormData> = async (formData: LoginFormData) => {

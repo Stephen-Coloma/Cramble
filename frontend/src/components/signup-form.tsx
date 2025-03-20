@@ -73,13 +73,16 @@ export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const SERVER_HOST=process.env.NEXT_PUBLIC_SERVER_HOST
+  console.log(SERVER_HOST);
+  
   const router = useRouter();
   const [isVisible, setVisible] = useState<boolean>(false);
   const {register, setError, handleSubmit, getValues, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<SignFormData>({
       resolver: joiResolver(signupSchema)
   })
 
-  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost('http://localhost:3001/auth/signup');
+  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`http://${SERVER_HOST}/auth/signup`);
 
   const onSubmit: SubmitHandler<SignFormData> = async (formData: SignFormData) => {
     await executePostRequest(formData);

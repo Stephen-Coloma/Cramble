@@ -36,12 +36,14 @@ type GenerateCardsFormData = {
 }
 
 export default function GenerateBoard(){
+    const SERVER_HOST=process.env.NEXT_PUBLIC_SERVER_HOST
+
     const [remanining, setRemaining] = useState<number>(1500);
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false)
 
     const {register, setValue, clearErrors, handleSubmit, formState: {errors, isSubmitting}} = useForm<GenerateCardsFormData>({resolver: joiResolver(generateSchema)})
 
-    const {status, statusText, data, error, loading, executePostRequest, clearResponseState} = usePost('http://localhost:3001/api/gemini/generate')
+    const {status, statusText, data, error, loading, executePostRequest, clearResponseState} = usePost(`http://${SERVER_HOST}/api/gemini/generate`)
 
     const onSubmit: SubmitHandler<GenerateCardsFormData> = async (formData: GenerateCardsFormData) => {
         // todo: delay to be removed

@@ -12,13 +12,12 @@ import flashcardRouter from './routes/flashcard';
 import geminiRouter from './routes/gemini';
 import verifyCognitoToken from './middleware/verifyCognitoToken';
 
-
 // env config
 env.config();
 
 //cors configuration
 const corsOption = {
-    origin: `http://${process.env.CLIENT_HOST}:${process.env.CLIENT_PORT}`,
+    origin: `${process.env.VERCEL_FRONTEND_DEPLOYMENT_DOMAIN}`,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true
 }
