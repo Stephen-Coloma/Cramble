@@ -18,6 +18,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 
 export function InputOTPForm() {
+  const SERVER_HOST=process.env.NEXT_PUBLIC_SERVER_HOST
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const username = searchParams.get('username');
@@ -42,8 +43,8 @@ export function InputOTPForm() {
     500: "Something went wrong. Try again.",
   };
 	
-	const confirmSignupRequest= usePost('http://localhost:3001/auth/signup/confirm');
-  const resendOtpRequest = usePost("http://localhost:3001/auth/otp/resend");
+	const confirmSignupRequest= usePost(`http://${SERVER_HOST}/auth/signup/confirm`);
+  const resendOtpRequest = usePost(`http://${SERVER_HOST}/auth/otp/resend`);
 	
 	// handle otp change
 	const handleOTPChange = (value: string)=>{

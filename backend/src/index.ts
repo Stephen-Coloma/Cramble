@@ -6,20 +6,18 @@ import cors from 'cors'
 import config from './config/config';
 import env from 'dotenv';
 import { specs, swaggerUi } from './api-docs/swagger'
-// import verifyToken from './middleware/verifyToken';
 import {loginRouter, signupRouter, logoutRouter, confirmSignupRouter, resendOTPRouter} from './routes/auth'
 import deckRouter from './routes/deck';
 import flashcardRouter from './routes/flashcard';
 import geminiRouter from './routes/gemini';
 import verifyCognitoToken from './middleware/verifyCognitoToken';
 
-
 // env config
 env.config();
 
 //cors configuration
 const corsOption = {
-    origin: `http://${process.env.CLIENT_HOST}:${process.env.CLIENT_PORT}`,
+    origin: `${process.env.VERCEL_FRONTEND_DEPLOYMENT_DOMAIN}`,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true
 }
