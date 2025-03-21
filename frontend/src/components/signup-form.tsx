@@ -82,7 +82,7 @@ export function SignupForm({
       resolver: joiResolver(signupSchema)
   })
 
-  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`https://${SERVER_HOST}/auth/signup`);
+  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`http://${SERVER_HOST}/auth/signup`);
 
   const onSubmit: SubmitHandler<SignFormData> = async (formData: SignFormData) => {
     await executePostRequest(formData);

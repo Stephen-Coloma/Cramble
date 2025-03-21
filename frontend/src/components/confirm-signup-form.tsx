@@ -43,8 +43,8 @@ export function InputOTPForm() {
     500: "Something went wrong. Try again.",
   };
 	
-	const confirmSignupRequest= usePost(`https://${SERVER_HOST}/auth/signup/confirm`);
-  const resendOtpRequest = usePost(`https://${SERVER_HOST}/auth/otp/resend`);
+	const confirmSignupRequest= usePost(`http://${SERVER_HOST}/auth/signup/confirm`);
+  const resendOtpRequest = usePost(`http://${SERVER_HOST}/auth/otp/resend`);
 	
 	// handle otp change
 	const handleOTPChange = (value: string)=>{

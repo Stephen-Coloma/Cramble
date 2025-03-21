@@ -17,7 +17,7 @@ env.config();
 
 //cors configuration
 const corsOption = {
-    origin: `${process.env.VERCEL_FRONTEND_DEPLOYMENT_DOMAIN}`,
+    origin: `${process.env.CLIENT_HOST}:${process.env.CLIENT_PORT}`,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true
 }

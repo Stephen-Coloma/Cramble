@@ -43,7 +43,7 @@ export default function GenerateBoard(){
 
     const {register, setValue, clearErrors, handleSubmit, formState: {errors, isSubmitting}} = useForm<GenerateCardsFormData>({resolver: joiResolver(generateSchema)})
 
-    const {status, statusText, data, error, loading, executePostRequest, clearResponseState} = usePost(`https://${SERVER_HOST}/api/gemini/generate`)
+    const {status, statusText, data, error, loading, executePostRequest, clearResponseState} = usePost(`http://${SERVER_HOST}/api/gemini/generate`)
 
     const onSubmit: SubmitHandler<GenerateCardsFormData> = async (formData: GenerateCardsFormData) => {
         // todo: delay to be removed
