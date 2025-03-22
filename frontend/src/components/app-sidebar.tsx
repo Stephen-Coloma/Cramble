@@ -18,15 +18,10 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar"
 import { SidebarMenuButton } from "@/components/ui/sidebar"
+import { User } from "@/dtos/user/User"
 
 // Data for the side bar
-const data = {
-  user: {
-    firstname: "Stephen",
-    lastname: "Coloma",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
+const dataRender = {
   navItems: [
     {
       name: "My Decks",
@@ -78,10 +73,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarContent>
         {/* <NavMain items={data.navMain} /> has dropdown*/} 
-        <NavMenu navItems={data.navItems} />
+        <NavMenu navItems={dataRender.navItems} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
   )

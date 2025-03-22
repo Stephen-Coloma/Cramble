@@ -11,13 +11,14 @@ import deckRouter from './routes/deck';
 import flashcardRouter from './routes/flashcard';
 import geminiRouter from './routes/gemini';
 import verifyCognitoToken from './middleware/verifyCognitoToken';
+import extrasRouter from './routes/extras';
 
 // env config
 env.config();
 
 //cors configuration
 const corsOption = {
-    origin: `${process.env.CLIENT_HOST}:${process.env.CLIENT_PORT}`,
+    origin:`http://${process.env.CLIENT_HOST}:${process.env.CLIENT_PORT}`,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true
 }
@@ -37,6 +38,7 @@ app.use('/auth', verifyCognitoToken, logoutRouter)
 app.use('/api', verifyCognitoToken, deckRouter)
 app.use('/api', verifyCognitoToken, flashcardRouter)
 app.use('/api', verifyCognitoToken, geminiRouter)
+app.use('/api', verifyCognitoToken, extrasRouter)
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 //custom 404
@@ -45,5 +47,5 @@ app.use((req, res, next) => {
 })
 
 app.listen(config.server.port, config.server.host, () => {
-    console.log(`Server listening on port ${config.server.port}`);
+    console.log(`Server listening on port ${config.server.port} and host ${config.server.host}`);
 })
