@@ -7,7 +7,7 @@ export type UserDetails =  Pick<User, 'firstName' | 'lastName' | 'username' | 'e
 
 type UserStore = {
     user: UserDetails | null;
-    getUserDetailsAsync: () => Promise<void>,
+    getUserDetailsAsync: () => Promise<boolean>,
     setUser: (user: UserDetails) => void;
 }
 
@@ -21,8 +21,9 @@ export const useUserStore = create<UserStore>((set, )=> ({
         if(response.status === 200){
           set({user: response.data})
         }
+        return true;
       } catch (err: unknown) {
-        set({user: null})
+        return false;
       }
     },
     setUser: (user: UserDetails) => set({user: user}),

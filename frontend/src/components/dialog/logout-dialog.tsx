@@ -9,7 +9,6 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { usePost } from "@/hooks/use-request"
-import { useUserStore } from "@/store/userStore"
 import { Handshake, LogOut, LogOutIcon, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -25,7 +24,6 @@ export default function LogoutDialog(){
     const router = useRouter();
     const {status, statusText, error, loading, executePostRequest, clearResponseState} = usePost(`http://localhost:3001/auth/logout`);
     
-
     useEffect(()=>{
         if(status === 200){
             toast.success('Account logged out', {
@@ -37,7 +35,7 @@ export default function LogoutDialog(){
             })
             clearResponseState();
             setIsDialogOpen(false);
-            router.push('/');
+            router.push('/')
         }
     }, [loading])
 

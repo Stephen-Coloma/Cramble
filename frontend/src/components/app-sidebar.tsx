@@ -18,9 +18,11 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar"
 import { SidebarMenuButton } from "@/components/ui/sidebar"
-import { useUserStore } from "@/store/userStore"
+import { useUserStore } from "@/store/userStore";
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
-// Data for the side bar
+
 const dataRender = {
   navItems: [
     {
@@ -52,9 +54,16 @@ const dataRender = {
 }
 
 //initialize user detials
-await useUserStore.getState().getUserDetailsAsync();
+const isLoggedIn = await useUserStore.getState().getUserDetailsAsync();
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const router = useRouter();
+  useEffect(()=>{
+    if(isLoggedIn === false){
+      router.replace('/') // redirect to dashboard page when user is logged out already
+    }
+  }, [])
+  
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
