@@ -20,7 +20,7 @@ import {
 import { SidebarMenuButton } from "@/components/ui/sidebar"
 import { useUserStore } from "@/store/userStore";
 import { useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { permanentRedirect, useRouter } from "next/navigation"
 
 
 const dataRender = {
@@ -53,11 +53,13 @@ const dataRender = {
   ]
 }
 
-//initialize user detials
+//initialize user detials from the backend
 const isLoggedIn = await useUserStore.getState().getUserDetailsAsync();
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const router = useRouter();
+  const user = useUserStore((state)=> state.user)
+  
   useEffect(()=>{
     if(isLoggedIn === false){
       router.replace('/') // redirect to dashboard page when user is logged out already
@@ -88,7 +90,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMenu navItems={dataRender.navItems} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser />
+        <NavUser user={user!}/>
       </SidebarFooter>
     </Sidebar>
   )
