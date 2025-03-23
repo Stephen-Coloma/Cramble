@@ -29,7 +29,7 @@ const getUserDetailsController = async (req: Request, res: Response) =>{
             email: result.email,
             createdAt: result.created_at,
             lastLogin: result.last_login,
-            status: result.status, // Fixed typo (was "stasus")
+            status: result.status, // Fixed typo
         })
     }catch(error: unknown){
         console.log(error);

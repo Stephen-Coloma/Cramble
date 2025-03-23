@@ -17,8 +17,6 @@ import { PostApiResponse, usePost } from "@/hooks/use-request"
 import Link from "next/link"
 import { UserLogin } from "@/dtos/user/UserLogin.dto"
 
-
-
 const loginSchema = Joi.object({
   username: Joi.string()
       .alphanum()
