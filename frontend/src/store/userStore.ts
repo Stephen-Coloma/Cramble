@@ -11,8 +11,8 @@ type UserStore = {
     setUser: (user: UserDetails) => void;
 }
 
-export const useUserStore = create<UserStore>((set, get)=> ({
-    user: null,
+export const useUserStore = create<UserStore>((set, )=> ({
+    user:  null,
     getUserDetailsAsync: async () => {
       const SERVER_HOST = process.env.NEXT_PUBLIC_SERVER_HOST;
       const url = `http://${SERVER_HOST}/api/extras/user/details`;

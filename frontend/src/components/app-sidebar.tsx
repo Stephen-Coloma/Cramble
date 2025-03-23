@@ -18,6 +18,7 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar"
 import { SidebarMenuButton } from "@/components/ui/sidebar"
+import { useUserStore } from "@/store/userStore"
 
 // Data for the side bar
 const dataRender = {
@@ -50,8 +51,7 @@ const dataRender = {
   ]
 }
 
-//initialize useUserStore
-import { useUserStore } from "@/store/userStore"
+//initialize user detials
 await useUserStore.getState().getUserDetailsAsync();
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {

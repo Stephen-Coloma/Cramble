@@ -119,10 +119,13 @@ export default function GenerateBoard(){
 
                             <Input {...register('count')} type="hidden" id='count' defaultValue={10}></Input>
                             <Button type={`${isSubmitting ? 'button' : 'submit'}`} className={`${isSubmitting ? 'animate-pulse' : ''}`} >
-                                Generate
-                                {isSubmitting 
-                                    ? <LoaderCircle className={`${isSubmitting ? 'animate-spin' : ''}`}></LoaderCircle>
-                                    : ''}
+                                {isSubmitting ? (
+                                    <>
+                                    Generating <LoaderCircle className="animate-spin" />
+                                    </>
+                                ) : (
+                                    'Generate'
+                                )}
                             </Button>  
                         </div>
                     </form>

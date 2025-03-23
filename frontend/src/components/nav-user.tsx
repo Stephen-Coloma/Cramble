@@ -18,12 +18,12 @@ import { Separator } from "./ui/separator"
 import { Button } from "./ui/button"
 import { useRouter } from "next/navigation"
 import { useUserStore } from "@/store/userStore"
+import LogoutDialog from "./dialog/logout-dialog"
 
 export function NavUser() {
   const user = useUserStore((state) => state.user)!
   const router = useRouter();
   const handleSettings = () => router.push('/dashboard/settings')
-  const handleLogout = () => router.push('/dashboard/settings')
 
   return (
     <SidebarMenu>
@@ -34,12 +34,12 @@ export function NavUser() {
         >
           <Avatar className="h-8 w-8 rounded-lg">
             {/* //todo: impelement src of the avatar image */}
-            <AvatarImage alt={user.firstName} />
-            <AvatarFallback className="rounded-lg border-2">{user.firstName[0].toUpperCase() + user.lastName[0].toUpperCase()}</AvatarFallback>
+            <AvatarImage alt={user?.firstName ?? "User"}/>
+            <AvatarFallback className="rounded-lg border-2"> {user ? (user.firstName[0]?.toUpperCase() + user.lastName[0]?.toUpperCase()) : "?"}</AvatarFallback>
           </Avatar>
             <div className="grid flex-1 text-left leading-tight">
-              <span className="truncate text-sm font-semibold">{user.firstName + " " + user.lastName}</span>
-              <span className="truncate text-xs">{user.email}</span>
+              <span className="truncate text-sm font-semibold"> {user ? (user.firstName + " " + user.lastName) :  '?'}</span>
+              <span className="truncate text-xs">{user ? user.email : '?'}</span>
             </div>
         </SidebarMenuButton>
       </SidebarMenuItem>
@@ -54,14 +54,7 @@ export function NavUser() {
             <UserCog></UserCog>
             <h1 className="text-xs">Settings</h1>
           </Button>
-          <Button 
-            variant={"secondary"} 
-            className="px-2 py-1 flex-grow bg-transparent hover:bg-secondary"
-            onClick={handleLogout}
-          >
-            <LogOut></LogOut>
-            <h1 className="text-xs">Log out</h1>
-          </Button>
+          <LogoutDialog></LogoutDialog>
         </div>
       </SidebarMenuItem>
     </SidebarMenu>
