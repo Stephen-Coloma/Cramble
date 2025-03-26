@@ -10,12 +10,13 @@ import { useEffect, useState } from "react"
 import { AxiosError } from "axios"
 import { useRouter } from "next/navigation"
 import { Toggle } from "./ui/toggle"
-import {SubmitHandler, useForm, ErrorOption} from 'react-hook-form' 
+import {SubmitHandler, useForm } from 'react-hook-form' 
 import { joiResolver } from '@hookform/resolvers/joi'
 import Joi from 'joi'
 import { PostApiResponse, usePost } from "@/hooks/use-request"
 import Link from "next/link"
 import { UserLogin } from "@/dtos/user/UserLogin.dto"
+import { useUserStore } from "@/store/userStore"
 
 const loginSchema = Joi.object({
   username: Joi.string()
@@ -44,6 +45,7 @@ export function LoginForm({
   const router = useRouter();
   const [isVisible, setVisible] = useState<boolean>(false);
   const [verifyAccountData, setVerifyAccountData] = useState<UnverifiedAccountCred>();
+  const initializeUserDetails = useUserStore((state) => state.initializeUserDetails);
   const {register, setError, handleSubmit, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<LoginFormData>({
     resolver: joiResolver(loginSchema)
   })
@@ -59,8 +61,15 @@ export function LoginForm({
   useEffect(()=>{
     // 200 - login successful
     if(status === 200){
-      router.replace('/dashboard/mydecks')
-      return;
+      initializeUserDetails()
+      .then(() => {
+        // Fetch successful, redirect to dashboard
+        router.replace('/dashboard/mydecks');
+      })
+      .catch(() => {
+        // Error occurred, redirect to home
+        router.replace('/');
+      });
     }
 
     if(error){

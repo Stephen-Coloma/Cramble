@@ -2,7 +2,6 @@
 
 import {
   UserCog,
-  LogOut,
 } from "lucide-react"
 import {
   Avatar,
@@ -18,12 +17,13 @@ import { Separator } from "./ui/separator"
 import { Button } from "./ui/button"
 import { useRouter } from "next/navigation"
 import LogoutDialog from "./dialog/logout-dialog"
-import { UserDetails } from "@/store/userStore"
+import { useUserStore } from "@/store/userStore"
 
-export function NavUser({user} : {user: UserDetails}) {
+export function NavUser() {
+  const user = useUserStore((state)=> state.user)!;
   const router = useRouter();
-  const handleSettings = () => router.push('/dashboard/settings')
-
+  const handleSettings = () => router.push('/dashboard/settings');
+  
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -33,7 +33,7 @@ export function NavUser({user} : {user: UserDetails}) {
         >
           <Avatar className="h-8 w-8 rounded-lg">
             {/* //todo: impelement src of the avatar image */}
-            <AvatarImage alt={user.firstName}/>
+            <AvatarImage alt={user ? user.firstName : '?'}/>
             <AvatarFallback className="rounded-lg border-2"> {user.firstName[0]?.toUpperCase() + user.lastName[0]?.toUpperCase()}</AvatarFallback>
           </Avatar>
             <div className="grid flex-1 text-left leading-tight">
