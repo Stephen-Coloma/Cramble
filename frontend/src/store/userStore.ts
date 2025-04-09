@@ -7,7 +7,7 @@ import { AxiosResponse } from "axios";
 export type UserDetails =  Pick<User, 'firstName' | 'lastName' | 'username' | 'email'> 
 
 type UserStoreState = {
-  user: UserDetails | null;
+  user: UserDetails;
 }
   
 type UserStoreAction = {
@@ -19,7 +19,12 @@ type UserStore = UserStoreState & UserStoreAction;
 
 export const useUserStore = create<UserStore>()(
   persist((set)=>({ // zustand persist stores data to localstorage
-      user: null,
+      user: {
+        firstName: '',
+        lastName: '',
+        username: '',
+        email: '',
+      },
 
       initializeUserDetails: async () => {
         const SERVER_HOST = process.env.NEXT_PUBLIC_SERVER_HOST;

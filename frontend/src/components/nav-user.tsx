@@ -20,7 +20,7 @@ import LogoutDialog from "./dialog/logout-dialog"
 import { useUserStore } from "@/store/userStore"
 
 export function NavUser() {
-  const user = useUserStore((state)=> state.user)!;
+  const user = useUserStore((state)=> state.user);
   const router = useRouter();
   const handleSettings = () => router.push('/dashboard/settings');
   
@@ -33,7 +33,7 @@ export function NavUser() {
         >
           <Avatar className="h-8 w-8 rounded-lg">
             {/* //todo: impelement src of the avatar image */}
-            <AvatarImage alt={user ? user.firstName : '?'}/>
+            <AvatarImage alt={user.firstName}/>
             <AvatarFallback className="rounded-lg border-2"> {user.firstName[0]?.toUpperCase() + user.lastName[0]?.toUpperCase()}</AvatarFallback>
           </Avatar>
             <div className="grid flex-1 text-left leading-tight">
