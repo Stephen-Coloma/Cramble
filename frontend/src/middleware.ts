@@ -7,10 +7,8 @@ export function middleware(req: NextRequest) {
   const token = req.cookies.get("token"); 
   const accessToken = req.cookies.get("accessToken"); 
   const refreshToken = req.cookies.get("refreshToken"); 
-
+  
   if (protectedRoutes.includes(req.nextUrl.pathname)) {
-    console.log('protected');
-    
     if (!token || !accessToken || !refreshToken) {
       return NextResponse.redirect(new URL("/login", req.url));
     }

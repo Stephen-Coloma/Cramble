@@ -17,13 +17,14 @@ import { Separator } from "./ui/separator"
 import { Button } from "./ui/button"
 import { useRouter } from "next/navigation"
 import LogoutDialog from "./dialog/logout-dialog"
-import { useUserStore } from "@/store/userStore"
+import { userDetails } from "@/lib/getUserDetails"
 
 export function NavUser() {
-  const user = useUserStore((state)=> state.user);
+  // const user = useUserStore((state)=> state.user!);
   const router = useRouter();
   const handleSettings = () => router.push('/dashboard/settings');
-  
+  const user = userDetails;
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>

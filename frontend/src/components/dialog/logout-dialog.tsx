@@ -9,7 +9,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { usePost } from "@/hooks/use-request"
-import { useUserStore } from "@/store/userStore"
+// import { useUserStore } from "@/store/userStore"
 import { Handshake, LogOut, LogOutIcon, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -23,7 +23,7 @@ export type DeleteDeckDialogProps = {
 
 export default function LogoutDialog(){
     const router = useRouter();
-    const userStore = useUserStore;
+    // const userStore = useUserStore;
     const {status, statusText, error, loading, executePostRequest, clearResponseState} = usePost(`http://localhost:3001/auth/logout`);
     
     useEffect(()=>{
@@ -37,7 +37,7 @@ export default function LogoutDialog(){
             })
             clearResponseState();
             setIsDialogOpen(false);
-            userStore.persist.clearStorage()// clear the local storage
+            // userStore.persist.clearStorage()// clear the local storage
             router.replace('/')
         }
     }, [loading])
