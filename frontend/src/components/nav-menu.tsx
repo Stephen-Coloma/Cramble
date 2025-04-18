@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Separator } from "./ui/separator"
 import { usePathname } from "next/navigation"
+import Link from "next/link"
 
 export function NavMenu({
   navItems,
@@ -30,12 +31,12 @@ export function NavMenu({
       <SidebarMenu>
         {navItems.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <a href={item.url}>
+            <Link href={item.url}>
               <SidebarMenuButton className="flex h-12 px-4" variant={`${path.includes(item.url) ? 'selected' : 'default'}`}>
                 <item.icon className="w-5 h-5" />
                 <span className="font-light text-base">{item.name}</span>
               </SidebarMenuButton>
-            </a>
+            </Link>
           </SidebarMenuItem>
         ))}
       </SidebarMenu>
