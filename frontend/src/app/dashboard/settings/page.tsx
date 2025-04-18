@@ -1,5 +1,5 @@
-import DeckBoard from "@/components/deck-board"
 import {PageTitle, PageTitleProps} from "@/components/page-title"
+import ProfileSettings from "@/components/profile-settings"
 import { UserCog } from 'lucide-react'
 
 
@@ -15,6 +15,8 @@ export default function MyDecks() {
   return (
     <div className=" w-full">
       <PageTitle {...pageDetails}/>
+      <ProfileSettings></ProfileSettings>
+      <></>
     </div>
   )
 } 

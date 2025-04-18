@@ -205,16 +205,9 @@ export default function GenerateBoard() {
                   disabled={isSubmitting || remaining > 0}
                   className="w-full sm:w-auto transition-all"
                 >
-                  {isSubmitting ? (
-                    <span className="flex items-center gap-2">
-                      Generating{" "}
-                      <LoaderCircle className="h-4 w-4 animate-spin" />
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-2">
-                      Generate <Sparkles className="h-4 w-4" />
-                    </span>
-                  )}
+                  <span className="flex items-center gap-2">
+                    Generate <Sparkles className="h-4 w-4" />
+                  </span>
                 </Button>
               </div>
             </form>

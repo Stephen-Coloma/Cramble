@@ -3,7 +3,7 @@ import { User } from "@/dtos/user/User";
 
 export type UserDetails = Pick<User, "firstName" | "lastName" | "username" | "email">;
 
-async function getUserDetails(): Promise<UserDetails> {
+async function getUserDetailss(): Promise<UserDetails> {
   const SERVER_HOST = process.env.NEXT_PUBLIC_SERVER_HOST;
   const url = `http://${SERVER_HOST}/api/extras/user/details`;
 
@@ -20,4 +20,4 @@ async function getUserDetails(): Promise<UserDetails> {
   }
 }
 
-export const userDetails: UserDetails = await getUserDetails();
+export const userDetails: UserDetails = await getUserDetailss();
