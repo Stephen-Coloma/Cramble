@@ -26,11 +26,7 @@ import { usePost } from "@/hooks/use-request";
 import ShowGeneratedDeckDialog from "./dialog/show-generated-deck-dialog";
 import { Progress } from "@/components/ui/progress";
 import { generateFlashcardsSchema } from "@/schema/generate-flashcards-schema";
-
-type GenerateFlashcardsFormData = {
-  text: string;
-  count: number;
-};
+import { GenerateFlashcardsFormData } from "@/form-types/GenerateFlashcardsFormData";
 
 export default function GenerateBoard() {
   const SERVER_HOST = process.env.NEXT_PUBLIC_SERVER_HOST;

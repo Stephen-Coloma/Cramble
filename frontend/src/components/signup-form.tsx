@@ -9,16 +9,13 @@ import { Toggle } from "./ui/toggle"
 import { Facebook, Eye, EyeClosed, LoaderCircle } from "lucide-react"
 import Link from "next/link"
 import { usePost, PostApiResponse } from "@/hooks/use-request"
-import { UserSignUp } from "@/dtos/user/UserSignUp.dto"
 import { joiResolver } from "@hookform/resolvers/joi"
 import { useState, useEffect } from "react"
 import { AxiosError } from "axios"
 import {SubmitHandler, useForm, ErrorOption} from 'react-hook-form' 
 import { useRouter } from "next/navigation"
 import { signupSchema } from "@/schema/signup-schema"
-
-
-type SignFormData = UserSignUp;
+import { SignUpFormData } from "@/form-types/SignupFormData"
 
 export function SignupForm({
   className,
@@ -29,13 +26,13 @@ export function SignupForm({
   
   const router = useRouter();
   const [isVisible, setVisible] = useState<boolean>(false);
-  const {register, setError, handleSubmit, getValues, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<SignFormData>({
+  const {register, setError, handleSubmit, getValues, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<SignUpFormData>({
       resolver: joiResolver(signupSchema)
   })
 
   const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`http://${SERVER_HOST}/auth/signup`);
 
-  const onSubmit: SubmitHandler<SignFormData> = async (formData: SignFormData) => {
+  const onSubmit: SubmitHandler<SignUpFormData> = async (formData: SignUpFormData) => {
     await executePostRequest(formData);
   }
 

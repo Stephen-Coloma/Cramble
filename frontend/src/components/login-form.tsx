@@ -14,10 +14,10 @@ import {SubmitHandler, useForm } from 'react-hook-form'
 import { joiResolver } from '@hookform/resolvers/joi'
 import { PostApiResponse, usePost } from "@/hooks/use-request"
 import Link from "next/link"
-import { UserLogin } from "@/dtos/user/UserLogin.dto"
+import { LoginFormData } from "@/form-types/LoginFormData"
 import { loginSchema } from "@/schema/login-shema"
 
-type LoginFormData = UserLogin;
+
 type UnverifiedAccountCred = {
   username: string,
   email: string
