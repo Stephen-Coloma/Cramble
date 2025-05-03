@@ -19,8 +19,7 @@ import {
 } from "@/components/ui/sidebar"
 import { SidebarMenuButton } from "@/components/ui/sidebar"
 
-const dataRender = {
-  navItems: [
+const navItems = [
     {
       name: "My Decks",
       url: "/dashboard/mydecks",
@@ -47,7 +46,6 @@ const dataRender = {
       icon: MessageSquareText,
     }
   ]
-}
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -69,9 +67,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenuButton>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent >
         {/* <NavMain items={data.navMain} /> has dropdown*/} 
-        <NavMenu navItems={dataRender.navItems} />
+        <NavMenu navItems={navItems} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />
