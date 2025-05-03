@@ -24,15 +24,12 @@ type UnverifiedAccountCred = {
   email: string
 }
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
+export function LoginForm({className,...props}: React.ComponentProps<"div">) {
   const router = useRouter();
   const [isVisible, setVisible] = useState<boolean>(false);
   const [verifyAccountData, setVerifyAccountData] = useState<UnverifiedAccountCred>();
-  // const initializeUserDetails = useUserStore((state) => state.initializeUserDetails);
-  const {register, setError, handleSubmit, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<LoginFormData>({
+  const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
+  const {register, setError, handleSubmit, formState: {errors}, reset, clearErrors} = useForm<LoginFormData>({
     resolver: joiResolver(loginSchema)
   })
 
@@ -40,6 +37,7 @@ export function LoginForm({
 
   //handle form validation and submission
   const onSubmit: SubmitHandler<LoginFormData> = async (formData: LoginFormData) => {
+    setIsLoggingIn(true);
     await executePostRequest(formData);
   }
 
@@ -67,6 +65,7 @@ export function LoginForm({
         setError("root", {message: 'Something went wrong. Try again later.'});
       }
       clearResponseState(); // next request is not tied
+      setIsLoggingIn(false);
     }
 
   }, [loading])  
@@ -79,7 +78,7 @@ export function LoginForm({
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
-                <p className="text-balance text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Login to your Cramble account
                 </p>
               </div>
@@ -125,8 +124,8 @@ export function LoginForm({
                 {errors.password && 
                   <Label className="text-xs text-destructive">{errors.password.message?.replaceAll('\"', "")}</Label>}
               </div>
-              <Button type="submit" disabled={isSubmitting ? true : false} className="w-full">
-                {isSubmitting 
+              <Button type="submit" disabled={isLoggingIn ? true : false} className="w-full">
+                {isLoggingIn 
                 ? <LoaderCircle className="animate-spin"></LoaderCircle>
                 : 'Login'}
               </Button>
@@ -136,15 +135,15 @@ export function LoginForm({
 
               {/* redirect to singup/confirm page */}
               {verifyAccountData && 
-                  <Label className="text-xs text-destructive md:text-sm text-center">
-                    Your account is unverfied.
-                    <Link 
-                      href={`/signup/confirm?username=${encodeURIComponent(verifyAccountData.username)}&email=${encodeURIComponent(verifyAccountData.email)}`}
-                      className="text-primary text-xs md:text-sm border-b-2"
-                      >
-                      Verify?
-                    </Link>
-                  </Label>}
+                <Label className="text-xs text-destructive md:text-sm text-center">
+                  Your account is unverified.
+                  <Link 
+                    href={`/signup/confirm?username=${encodeURIComponent(verifyAccountData.username)}&email=${encodeURIComponent(verifyAccountData.email)}`}
+                    className="text-primary text-xs md:text-sm border-b-2"
+                    >
+                    Verify?
+                  </Link>
+                </Label>}
 
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                 <span className="relative z-10 bg-background px-2 text-muted-foreground">

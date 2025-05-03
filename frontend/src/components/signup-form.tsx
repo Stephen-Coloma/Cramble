@@ -12,7 +12,7 @@ import { usePost, PostApiResponse } from "@/hooks/use-request"
 import { joiResolver } from "@hookform/resolvers/joi"
 import { useState, useEffect } from "react"
 import { AxiosError } from "axios"
-import {SubmitHandler, useForm, ErrorOption} from 'react-hook-form' 
+import {SubmitHandler, useForm} from 'react-hook-form' 
 import { useRouter } from "next/navigation"
 import { signupSchema } from "@/schema/signup-schema"
 import { SignUpFormData } from "@/form-types/SignupFormData"
@@ -26,13 +26,15 @@ export function SignupForm({
   
   const router = useRouter();
   const [isVisible, setVisible] = useState<boolean>(false);
-  const {register, setError, handleSubmit, getValues, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<SignUpFormData>({
+  const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
+  const {register, setError, handleSubmit, getValues, formState: {errors }, reset} = useForm<SignUpFormData>({
       resolver: joiResolver(signupSchema)
   })
 
-  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`${API_BASE_URL}/auth/signup`);
+  const {status, error, loading, executePostRequest, clearResponseState}: PostApiResponse = usePost(`${API_BASE_URL}/auth/signup`);
 
   const onSubmit: SubmitHandler<SignUpFormData> = async (formData: SignUpFormData) => {
+    setIsSigningUp(true);
     await executePostRequest(formData);
   }
 
@@ -59,6 +61,7 @@ export function SignupForm({
         setError("root", {message: 'Something went wrong. Try again later.'});
       }
       clearResponseState(); // next request is not tied
+      setIsSigningUp(false)
     }
   }, [loading])  
 
@@ -155,8 +158,8 @@ export function SignupForm({
                   </Label>}
               </div>
 
-              <Button type="submit" disabled={isSubmitting ? true : false} className="w-full">
-                {isSubmitting 
+              <Button type="submit" disabled={isSigningUp ? true : false} className="w-full">
+                {isSigningUp 
                 ? <LoaderCircle className="animate-spin"></LoaderCircle>
                 : 'Signup'}
               </Button>
