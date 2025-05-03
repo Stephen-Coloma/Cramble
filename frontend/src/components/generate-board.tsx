@@ -27,9 +27,8 @@ import ShowGeneratedDeckDialog from "./dialog/show-generated-deck-dialog";
 import { Progress } from "@/components/ui/progress";
 import { generateFlashcardsSchema } from "@/schema/generate-flashcards-schema";
 import { GenerateFlashcardsFormData } from "@/form-types/GenerateFlashcardsFormData";
-
+import { API_BASE_URL } from "@/constants"
 export default function GenerateBoard() {
-  const SERVER_HOST = process.env.NEXT_PUBLIC_SERVER_HOST;
 
   const [remaining, setRemaining] = useState<number>(1500);
   const [charCount, setCharCount] = useState<number>(0);
@@ -51,7 +50,7 @@ export default function GenerateBoard() {
     loading,
     executePostRequest,
     clearResponseState,
-  } = usePost(`http://${SERVER_HOST}/api/gemini/generate`);
+  } = usePost(`${API_BASE_URL}/api/gemini/generate`);
 
   const onSubmit: SubmitHandler<GenerateFlashcardsFormData> = async (
     formData: GenerateFlashcardsFormData

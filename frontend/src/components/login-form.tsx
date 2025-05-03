@@ -17,6 +17,7 @@ import Link from "next/link"
 import { LoginFormData } from "@/form-types/LoginFormData"
 import { loginSchema } from "@/schema/login-shema"
 
+import { API_BASE_URL } from "@/constants"
 
 type UnverifiedAccountCred = {
   username: string,
@@ -27,7 +28,6 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const SERVER_HOST=process.env.NEXT_PUBLIC_SERVER_HOST
   const router = useRouter();
   const [isVisible, setVisible] = useState<boolean>(false);
   const [verifyAccountData, setVerifyAccountData] = useState<UnverifiedAccountCred>();
@@ -36,7 +36,7 @@ export function LoginForm({
     resolver: joiResolver(loginSchema)
   })
 
-  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`http://${SERVER_HOST}/auth/login`);
+  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`${API_BASE_URL}/auth/login`);
 
   //handle form validation and submission
   const onSubmit: SubmitHandler<LoginFormData> = async (formData: LoginFormData) => {

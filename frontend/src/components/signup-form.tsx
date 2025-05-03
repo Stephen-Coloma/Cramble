@@ -17,12 +17,12 @@ import { useRouter } from "next/navigation"
 import { signupSchema } from "@/schema/signup-schema"
 import { SignUpFormData } from "@/form-types/SignupFormData"
 
+import { API_BASE_URL } from "@/constants"
+
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const SERVER_HOST=process.env.NEXT_PUBLIC_SERVER_HOST
-  console.log(SERVER_HOST);
   
   const router = useRouter();
   const [isVisible, setVisible] = useState<boolean>(false);
@@ -30,7 +30,7 @@ export function SignupForm({
       resolver: joiResolver(signupSchema)
   })
 
-  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`http://${SERVER_HOST}/auth/signup`);
+  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`${API_BASE_URL}/auth/signup`);
 
   const onSubmit: SubmitHandler<SignUpFormData> = async (formData: SignUpFormData) => {
     await executePostRequest(formData);

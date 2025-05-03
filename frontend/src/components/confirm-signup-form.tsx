@@ -17,8 +17,9 @@ import { AxiosError } from "axios"
 import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "sonner"
 
+import { API_BASE_URL } from "@/constants"
+
 export function InputOTPForm() {
-  const SERVER_HOST=process.env.NEXT_PUBLIC_SERVER_HOST
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const username = searchParams.get('username');
@@ -43,8 +44,8 @@ export function InputOTPForm() {
     500: "Something went wrong. Try again.",
   };
 	
-	const confirmSignupRequest= usePost(`http://${SERVER_HOST}/auth/signup/confirm`);
-  const resendOtpRequest = usePost(`http://${SERVER_HOST}/auth/otp/resend`);
+	const confirmSignupRequest= usePost(`${API_BASE_URL}/auth/signup/confirm`);
+  const resendOtpRequest = usePost(`${API_BASE_URL}/auth/otp/resend`);
 	
 	// handle otp change
 	const handleOTPChange = (value: string)=>{

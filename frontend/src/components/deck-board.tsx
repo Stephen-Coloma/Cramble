@@ -12,10 +12,10 @@ import { useFetch } from "@/hooks/use-request"
 import DeckLoading from "./deck-loading"
 import { DeckProps } from "./deck"
 import { Deck } from "./deck"
+import { API_BASE_URL } from "@/constants"
 
 export default function DeckBoard(){
-  const SERVER_HOST=process.env.NEXT_PUBLIC_SERVER_HOST
-  const {status, statusText, data, error, loading}  = useFetch<DeckProps[]>(`http://${SERVER_HOST}/api/decks`)
+  const {status, statusText, data, error, loading}  = useFetch<DeckProps[]>(`${API_BASE_URL}/api/decks`)
   const [deckArray, setDeckArray] = useState<DeckProps[]>([]);
 
   // update the deckArray when data is fetched from useFetch & when it is an array only
