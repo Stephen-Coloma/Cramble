@@ -85,7 +85,7 @@ export default function EditDeckDialog({
                     <DialogHeader>
                         <DialogTitle>Edit Deck</DialogTitle>
                         <DialogDescription>
-                            Edit your deck here. Click save when you're done.
+                        <span>Edit your deck here. Click save when you&#39;re done.</span>
                         </DialogDescription>
                     </DialogHeader>
 

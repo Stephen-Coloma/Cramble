@@ -18,6 +18,7 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar"
 import { SidebarMenuButton } from "@/components/ui/sidebar"
+import Image from "next/image"
 
 const navItems = [
     {
@@ -56,7 +57,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-default"
         >
           <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-seconary text-sidebar-primary-foreground">
-            <img src="/assets/Black-Cramble-Logo.svg" className="h-6 w-6" />
+            <Image src="/assets/Black-Cramble-Logo.svg" className="h-6 w-6" alt='cramble-logo' width={1} height={1} />
           </div>
           <div className="grid flex-1 text-left text-base leading-tight">
             <span className="truncate font-semibold">

@@ -37,14 +37,12 @@ export default function GenerateBoard() {
   const {
     register,
     setValue,
-    clearErrors,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<GenerateFlashcardsFormData>({ resolver: joiResolver(generateFlashcardsSchema) });
 
   const {
     status,
-    statusText,
     data,
     error,
     loading,
@@ -86,7 +84,7 @@ export default function GenerateBoard() {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-xl md:text-2xl font-bold">
               <Bot className="text-primary" />
-              AI Creates, You Learn!
+              <span className="text-lg">AI Creates, You Learn!</span>
             </CardTitle>
             <CardDescription>
               Enter your notes below and our AI will generate flashcards to help

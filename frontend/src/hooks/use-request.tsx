@@ -20,7 +20,7 @@ export function useFetch<T>(url: string, options?: AxiosRequestConfig): ApiRespo
     const [error, setError] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
-    let config = {
+    const config = {
         ...options, //include additional configs passed if there are
         withCredentials: true //include the cookies on all request
     };
@@ -64,7 +64,7 @@ export function usePost(url: string, options?: AxiosRequestConfig ): PostApiResp
     const [error, setError] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
-    let config = {
+    const config = {
         ...options,  //include other options
         headers: {
             ...options?.headers, //include other header 
@@ -116,7 +116,7 @@ export function usePut(url: string, options?: AxiosRequestConfig ): PutApiRespon
     const [error, setError] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(false);
 
-    let config = {
+    const config = {
         ...options,  //include other options
         headers: {
             ...options?.headers, //include other header 
@@ -167,7 +167,7 @@ export function useDelete(url: string, options?: AxiosRequestConfig): DeleteApiR
     const [error, setError] = useState<any>(null)
     const [loading, setLoading] = useState<boolean>(false)
 
-    let config = {
+    const config = {
         ...options, //include additional configs passed if there are
         withCredentials: true //include the cookies on all request
     };

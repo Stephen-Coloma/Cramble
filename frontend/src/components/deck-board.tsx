@@ -15,7 +15,7 @@ import { Deck } from "./deck"
 import { API_BASE_URL } from "@/constants"
 
 export default function DeckBoard(){
-  const {status, statusText, data, error, loading}  = useFetch<DeckProps[]>(`${API_BASE_URL}/api/decks`)
+  const {data, loading}  = useFetch<DeckProps[]>(`${API_BASE_URL}/api/decks`)
   const [deckArray, setDeckArray] = useState<DeckProps[]>([]);
 
   // update the deckArray when data is fetched from useFetch & when it is an array only

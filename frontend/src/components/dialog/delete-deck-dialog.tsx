@@ -21,7 +21,7 @@ export type DeleteDeckDialogProps = {
 }
 
 export default function DeleteDeckDialog( { deckId, onDeckDelete, onPopOverClose }: DeleteDeckDialogProps ){
-    const {status, statusText, error, loading, executeDeleteRequest, clearResponseState} = useDelete(`${API_BASE_URL}/api/decks/${deckId}`);
+    const {status, error, loading, executeDeleteRequest, clearResponseState} = useDelete(`${API_BASE_URL}/api/decks/${deckId}`);
 
     const [isDialogOpen, setIsDialogOpen]= useState<boolean>(false);
 

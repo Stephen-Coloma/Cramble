@@ -4,8 +4,7 @@ import { API_BASE_URL } from "@/constants";
 
 export type UserDetails = Pick<User, "firstName" | "lastName" | "username" | "email">;
 
-async function getUserDetailss(): Promise<UserDetails> {
-  const SERVER_HOST = process.env.NEXT_PUBLIC_SERVER_HOST;
+async function getUserDetails(): Promise<UserDetails> {
   const url = `${API_BASE_URL}/api/extras/user/details`;
 
   try {
@@ -21,4 +20,4 @@ async function getUserDetailss(): Promise<UserDetails> {
   }
 }
 
-export const userDetails: UserDetails = await getUserDetailss();
+export const userDetails: UserDetails = await getUserDetails();

@@ -23,7 +23,7 @@ export type DeleteDeckDialogProps = {
 
 export default function LogoutDialog(){
     const router = useRouter();
-    const {status, statusText, error, loading, executePostRequest, clearResponseState} = usePost(`${API_BASE_URL}/auth/logout`);
+    const {status, error, loading, executePostRequest, clearResponseState} = usePost(`${API_BASE_URL}/auth/logout`);
     
     useEffect(()=>{
         if(status === 200){

@@ -29,7 +29,7 @@ export function LoginForm({className,...props}: React.ComponentProps<"div">) {
   const [isVisible, setVisible] = useState<boolean>(false);
   const [verifyAccountData, setVerifyAccountData] = useState<UnverifiedAccountCred>();
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
-  const {register, setError, handleSubmit, formState: {errors}, reset, clearErrors} = useForm<LoginFormData>({
+  const {register, setError, handleSubmit, formState: {errors}, reset } = useForm<LoginFormData>({
     resolver: joiResolver(loginSchema)
   })
 
@@ -58,7 +58,7 @@ export function LoginForm({className,...props}: React.ComponentProps<"div">) {
         setError("root", {message: error.response.data.message});
         document.getElementById("username")?.focus();
       } else if(errorStatus === 412){
-        const unverifiedUsernameEmail = (error as AxiosError).response?.data!;
+        const unverifiedUsernameEmail = (error as AxiosError).response?.data;
         setVerifyAccountData(unverifiedUsernameEmail as UnverifiedAccountCred);
       } else if(errorStatus === 500){
         reset();
@@ -166,7 +166,7 @@ export function LoginForm({className,...props}: React.ComponentProps<"div">) {
                 </Button>
               </div>
               <div className="text-center text-sm">
-                Don't have an account?{" "}
+                Don&#39;t have an account?{" "}
                 <Link href='/signup' className="underline underline-offset-4">
                   Sign up
                 </Link>

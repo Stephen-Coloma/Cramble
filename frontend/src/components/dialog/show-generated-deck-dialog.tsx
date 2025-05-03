@@ -1,7 +1,7 @@
 'use client'
 import { FlashcardInputCard } from "../flashcard-input-card";
 import { usePost } from "@/hooks/use-request";
-import { useState, useEffect, ChangeEvent, useRef, useLayoutEffect } from "react";
+import { useEffect, ChangeEvent, } from "react";
 import { joiResolver } from "@hookform/resolvers/joi";
 import {useFieldArray, useForm} from 'react-hook-form'
 import { SubmitHandler } from "react-hook-form";
