@@ -12,24 +12,10 @@ import { useRouter } from "next/navigation"
 import { Toggle } from "./ui/toggle"
 import {SubmitHandler, useForm } from 'react-hook-form' 
 import { joiResolver } from '@hookform/resolvers/joi'
-import Joi from 'joi'
 import { PostApiResponse, usePost } from "@/hooks/use-request"
 import Link from "next/link"
 import { UserLogin } from "@/dtos/user/UserLogin.dto"
-// import { useUserStore } from "@/store/userStore"
-
-const loginSchema = Joi.object({
-  username: Joi.string()
-      .alphanum()
-      .min(3)
-      .max(30)
-      .required(),
-
-  password: Joi.string()
-      .min(8)
-      .max(100)
-      .required(),
-});
+import { loginSchema } from "@/schema/login-shema"
 
 type LoginFormData = UserLogin;
 type UnverifiedAccountCred = {

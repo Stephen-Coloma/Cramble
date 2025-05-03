@@ -22,18 +22,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { joiResolver } from "@hookform/resolvers/joi";
-import Joi from "joi";
 import { usePost } from "@/hooks/use-request";
 import ShowGeneratedDeckDialog from "./dialog/show-generated-deck-dialog";
 import { Progress } from "@/components/ui/progress";
+import { generateFlashcardsSchema } from "@/schema/generate-flashcards-schema";
 
-const generateSchema = Joi.object({
-  text: Joi.string().required().min(1500),
-
-  count: Joi.number().required().min(10),
-});
-
-type GenerateCardsFormData = {
+type GenerateFlashcardsFormData = {
   text: string;
   count: number;
 };
@@ -51,7 +45,7 @@ export default function GenerateBoard() {
     clearErrors,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<GenerateCardsFormData>({ resolver: joiResolver(generateSchema) });
+  } = useForm<GenerateFlashcardsFormData>({ resolver: joiResolver(generateFlashcardsSchema) });
 
   const {
     status,
@@ -63,8 +57,8 @@ export default function GenerateBoard() {
     clearResponseState,
   } = usePost(`http://${SERVER_HOST}/api/gemini/generate`);
 
-  const onSubmit: SubmitHandler<GenerateCardsFormData> = async (
-    formData: GenerateCardsFormData
+  const onSubmit: SubmitHandler<GenerateFlashcardsFormData> = async (
+    formData: GenerateFlashcardsFormData
   ) => {
     // todo: delay to be removed
     await new Promise((resolve) => {
