@@ -1,10 +1,7 @@
 'use client'
-
-import { DeckFlashcardsSchema } from "./add-deck-dialog";
-import { DeckFlashcardsFormData } from "./add-deck-dialog";
 import { FlashcardInputCard } from "../flashcard-input-card";
 import { usePost } from "@/hooks/use-request";
-import { useState, useEffect, ChangeEvent, useRef, useLayoutEffect } from "react";
+import { useEffect, ChangeEvent, } from "react";
 import { joiResolver } from "@hookform/resolvers/joi";
 import {useFieldArray, useForm} from 'react-hook-form'
 import { SubmitHandler } from "react-hook-form";
@@ -14,6 +11,9 @@ import { Label } from "@/components/ui/label"
 import { Button } from "../ui/button"
 import { Pickaxe } from "lucide-react";
 import { Textarea } from "../ui/textarea";
+import { DeckFlashcardsSchema } from "@/schema/deck-flashcards-schema";
+import { DeckFlashcardsFormData } from "@/form-types/DeckFlashcardsFormData";
+import { API_BASE_URL } from "@/constants";
 
 import {
     Dialog,
@@ -34,7 +34,7 @@ export default function ShowGeneratedDeckDialog({
     generatedDeckFlashcardsData,
     onDialogClose
 }: ShowGeneratedDeckDialogProps){   
-    const {status, loading, executePostRequest , clearResponseState } = usePost('http://localhost:3001/api/decks');
+    const {status, loading, executePostRequest , clearResponseState } = usePost(`${API_BASE_URL}/api/decks`);
     
     const {register, control, unregister, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
         resolver: joiResolver(DeckFlashcardsSchema),

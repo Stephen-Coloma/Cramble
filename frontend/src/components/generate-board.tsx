@@ -22,24 +22,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { joiResolver } from "@hookform/resolvers/joi";
-import Joi from "joi";
 import { usePost } from "@/hooks/use-request";
 import ShowGeneratedDeckDialog from "./dialog/show-generated-deck-dialog";
 import { Progress } from "@/components/ui/progress";
-
-const generateSchema = Joi.object({
-  text: Joi.string().required().min(1500),
-
-  count: Joi.number().required().min(10),
-});
-
-type GenerateCardsFormData = {
-  text: string;
-  count: number;
-};
-
+import { generateFlashcardsSchema } from "@/schema/generate-flashcards-schema";
+import { GenerateFlashcardsFormData } from "@/form-types/GenerateFlashcardsFormData";
+import { API_BASE_URL } from "@/constants"
 export default function GenerateBoard() {
-  const SERVER_HOST = process.env.NEXT_PUBLIC_SERVER_HOST;
 
   const [remaining, setRemaining] = useState<number>(1500);
   const [charCount, setCharCount] = useState<number>(0);
@@ -48,23 +37,21 @@ export default function GenerateBoard() {
   const {
     register,
     setValue,
-    clearErrors,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<GenerateCardsFormData>({ resolver: joiResolver(generateSchema) });
+  } = useForm<GenerateFlashcardsFormData>({ resolver: joiResolver(generateFlashcardsSchema) });
 
   const {
     status,
-    statusText,
     data,
     error,
     loading,
     executePostRequest,
     clearResponseState,
-  } = usePost(`http://${SERVER_HOST}/api/gemini/generate`);
+  } = usePost(`${API_BASE_URL}/api/gemini/generate`);
 
-  const onSubmit: SubmitHandler<GenerateCardsFormData> = async (
-    formData: GenerateCardsFormData
+  const onSubmit: SubmitHandler<GenerateFlashcardsFormData> = async (
+    formData: GenerateFlashcardsFormData
   ) => {
     // todo: delay to be removed
     await new Promise((resolve) => {
@@ -97,7 +84,7 @@ export default function GenerateBoard() {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-xl md:text-2xl font-bold">
               <Bot className="text-primary" />
-              AI Creates, You Learn!
+              <span className="text-lg">AI Creates, You Learn!</span>
             </CardTitle>
             <CardDescription>
               Enter your notes below and our AI will generate flashcards to help

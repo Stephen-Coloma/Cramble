@@ -9,82 +9,32 @@ import { Toggle } from "./ui/toggle"
 import { Facebook, Eye, EyeClosed, LoaderCircle } from "lucide-react"
 import Link from "next/link"
 import { usePost, PostApiResponse } from "@/hooks/use-request"
-import { UserSignUp } from "@/dtos/user/UserSignUp.dto"
-import Joi from "joi"
 import { joiResolver } from "@hookform/resolvers/joi"
 import { useState, useEffect } from "react"
 import { AxiosError } from "axios"
-import {SubmitHandler, useForm, ErrorOption} from 'react-hook-form' 
+import {SubmitHandler, useForm} from 'react-hook-form' 
 import { useRouter } from "next/navigation"
+import { signupSchema } from "@/schema/signup-schema"
+import { SignUpFormData } from "@/form-types/SignupFormData"
 
-const signupSchema = Joi.object({
-  firstName: Joi.string()
-      .min(1)
-      .max(50)
-      .required()
-      .messages({
-        'string.empty': 'firstname is required',
-        'string.max' : 'max 50 characters'
-      }),
-
-  lastName: Joi.string()
-      .min(1)
-      .max(50)
-      .required()
-      .messages({
-        'string.empty': 'lastname is required',
-        'string.max' : 'max 50 characters'
-      }),
-
-  username: Joi.string()
-      .alphanum()
-      .min(3)
-      .max(30)
-      .required()
-      .messages({
-        'string.empty': 'username is required',
-        'string.min': 'minimum 3 characters',
-        'string.max' : 'max 30 characters'
-      }),
-
-  password: Joi.string()
-      .min(8)
-      .max(100)
-      .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!"#$%&\'()*+,-./:;<=>?@^_`{|}~])(?=.{8,})'))
-      .required()
-      .messages({
-        'string.pattern.base': "Atleast: | 1 uppercase letter | 1 lowercase letter | 1 number | 1 special character",
-        'string.empty': 'password is required',
-        'string.min': 'password must be at least 8 characters long',
-        'string.max': 'max 100 characters'
-      }), 
-
-  email: Joi.string()
-      .email({tlds: false})
-      .required()
-      .messages({
-        'string.empty': 'email is required',
-      })
-});
-
-type SignFormData = UserSignUp;
+import { API_BASE_URL } from "@/constants"
 
 export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const SERVER_HOST=process.env.NEXT_PUBLIC_SERVER_HOST
-  console.log(SERVER_HOST);
   
   const router = useRouter();
   const [isVisible, setVisible] = useState<boolean>(false);
-  const {register, setError, handleSubmit, getValues, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<SignFormData>({
+  const [isSigningUp, setIsSigningUp] = useState<boolean>(false);
+  const {register, setError, handleSubmit, getValues, formState: {errors }, reset} = useForm<SignUpFormData>({
       resolver: joiResolver(signupSchema)
   })
 
-  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`http://${SERVER_HOST}/auth/signup`);
+  const {status, error, loading, executePostRequest, clearResponseState}: PostApiResponse = usePost(`${API_BASE_URL}/auth/signup`);
 
-  const onSubmit: SubmitHandler<SignFormData> = async (formData: SignFormData) => {
+  const onSubmit: SubmitHandler<SignUpFormData> = async (formData: SignUpFormData) => {
+    setIsSigningUp(true);
     await executePostRequest(formData);
   }
 
@@ -111,6 +61,7 @@ export function SignupForm({
         setError("root", {message: 'Something went wrong. Try again later.'});
       }
       clearResponseState(); // next request is not tied
+      setIsSigningUp(false)
     }
   }, [loading])  
 
@@ -130,7 +81,7 @@ export function SignupForm({
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Get Started</h1>
                 <p className="text-balance text-muted-foreground">
-                  Let's create your account!
+                  Let&#39;s create your account!
                 </p>
               </div>
               <div className="grid gap-2">
@@ -207,8 +158,8 @@ export function SignupForm({
                   </Label>}
               </div>
 
-              <Button type="submit" disabled={isSubmitting ? true : false} className="w-full">
-                {isSubmitting 
+              <Button type="submit" disabled={isSigningUp ? true : false} className="w-full">
+                {isSigningUp 
                 ? <LoaderCircle className="animate-spin"></LoaderCircle>
                 : 'Signup'}
               </Button>

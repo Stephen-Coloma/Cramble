@@ -12,48 +12,32 @@ import { useRouter } from "next/navigation"
 import { Toggle } from "./ui/toggle"
 import {SubmitHandler, useForm } from 'react-hook-form' 
 import { joiResolver } from '@hookform/resolvers/joi'
-import Joi from 'joi'
 import { PostApiResponse, usePost } from "@/hooks/use-request"
 import Link from "next/link"
-import { UserLogin } from "@/dtos/user/UserLogin.dto"
-// import { useUserStore } from "@/store/userStore"
+import { LoginFormData } from "@/form-types/LoginFormData"
+import { loginSchema } from "@/schema/login-shema"
 
-const loginSchema = Joi.object({
-  username: Joi.string()
-      .alphanum()
-      .min(3)
-      .max(30)
-      .required(),
+import { API_BASE_URL } from "@/constants"
 
-  password: Joi.string()
-      .min(8)
-      .max(100)
-      .required(),
-});
-
-type LoginFormData = UserLogin;
 type UnverifiedAccountCred = {
   username: string,
   email: string
 }
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"div">) {
-  const SERVER_HOST=process.env.NEXT_PUBLIC_SERVER_HOST
+export function LoginForm({className,...props}: React.ComponentProps<"div">) {
   const router = useRouter();
   const [isVisible, setVisible] = useState<boolean>(false);
   const [verifyAccountData, setVerifyAccountData] = useState<UnverifiedAccountCred>();
-  // const initializeUserDetails = useUserStore((state) => state.initializeUserDetails);
-  const {register, setError, handleSubmit, formState: {errors, isSubmitting, isSubmitted }, reset, clearErrors} = useForm<LoginFormData>({
+  const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
+  const {register, setError, handleSubmit, formState: {errors}, reset } = useForm<LoginFormData>({
     resolver: joiResolver(loginSchema)
   })
 
-  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`http://${SERVER_HOST}/auth/login`);
+  const { status, error, loading, executePostRequest, clearResponseState }: PostApiResponse = usePost(`${API_BASE_URL}/auth/login`);
 
   //handle form validation and submission
   const onSubmit: SubmitHandler<LoginFormData> = async (formData: LoginFormData) => {
+    setIsLoggingIn(true);
     await executePostRequest(formData);
   }
 
@@ -74,13 +58,14 @@ export function LoginForm({
         setError("root", {message: error.response.data.message});
         document.getElementById("username")?.focus();
       } else if(errorStatus === 412){
-        const unverifiedUsernameEmail = (error as AxiosError).response?.data!;
+        const unverifiedUsernameEmail = (error as AxiosError).response?.data;
         setVerifyAccountData(unverifiedUsernameEmail as UnverifiedAccountCred);
       } else if(errorStatus === 500){
         reset();
         setError("root", {message: 'Something went wrong. Try again later.'});
       }
       clearResponseState(); // next request is not tied
+      setIsLoggingIn(false);
     }
 
   }, [loading])  
@@ -93,7 +78,7 @@ export function LoginForm({
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
-                <p className="text-balance text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   Login to your Cramble account
                 </p>
               </div>
@@ -139,8 +124,8 @@ export function LoginForm({
                 {errors.password && 
                   <Label className="text-xs text-destructive">{errors.password.message?.replaceAll('\"', "")}</Label>}
               </div>
-              <Button type="submit" disabled={isSubmitting ? true : false} className="w-full">
-                {isSubmitting 
+              <Button type="submit" disabled={isLoggingIn ? true : false} className="w-full">
+                {isLoggingIn 
                 ? <LoaderCircle className="animate-spin"></LoaderCircle>
                 : 'Login'}
               </Button>
@@ -150,15 +135,15 @@ export function LoginForm({
 
               {/* redirect to singup/confirm page */}
               {verifyAccountData && 
-                  <Label className="text-xs text-destructive md:text-sm text-center">
-                    Your account is unverfied.
-                    <Link 
-                      href={`/signup/confirm?username=${encodeURIComponent(verifyAccountData.username)}&email=${encodeURIComponent(verifyAccountData.email)}`}
-                      className="text-primary text-xs md:text-sm border-b-2"
-                      >
-                      Verify?
-                    </Link>
-                  </Label>}
+                <Label className="text-xs text-destructive md:text-sm text-center">
+                  Your account is unverified.
+                  <Link 
+                    href={`/signup/confirm?username=${encodeURIComponent(verifyAccountData.username)}&email=${encodeURIComponent(verifyAccountData.email)}`}
+                    className="text-primary text-xs md:text-sm border-b-2"
+                    >
+                    Verify?
+                  </Link>
+                </Label>}
 
               <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
                 <span className="relative z-10 bg-background px-2 text-muted-foreground">
@@ -181,7 +166,7 @@ export function LoginForm({
                 </Button>
               </div>
               <div className="text-center text-sm">
-                Don't have an account?{" "}
+                Don&#39;t have an account?{" "}
                 <Link href='/signup' className="underline underline-offset-4">
                   Sign up
                 </Link>

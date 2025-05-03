@@ -11,7 +11,8 @@ import {
 import { useDelete } from "@/hooks/use-request"
 import { Trash2, TriangleAlert, X } from "lucide-react"
 import { useEffect, useState } from "react"
-import { toast, Toaster } from "sonner"
+import { toast } from "sonner"
+import { API_BASE_URL } from "@/constants";
 
 export type DeleteDeckDialogProps = {
     deckId: number, 
@@ -20,7 +21,7 @@ export type DeleteDeckDialogProps = {
 }
 
 export default function DeleteDeckDialog( { deckId, onDeckDelete, onPopOverClose }: DeleteDeckDialogProps ){
-    const {status, statusText, error, loading, executeDeleteRequest, clearResponseState} = useDelete(`http://localhost:3001/api/decks/${deckId}`);
+    const {status, error, loading, executeDeleteRequest, clearResponseState} = useDelete(`${API_BASE_URL}/api/decks/${deckId}`);
 
     const [isDialogOpen, setIsDialogOpen]= useState<boolean>(false);
 

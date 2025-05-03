@@ -1,20 +1,5 @@
 'use client'
 
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "../ui/button"
-import { CirclePlus, Plus, Pickaxe } from "lucide-react";
-import { useIsMobile } from "@/hooks/use-mobile"
-import { DeckProps } from "../deck";
-import { SubmitHandler, useFieldArray, useForm } from "react-hook-form"
-import { Textarea } from "../ui/textarea"
-import { FlashcardInputCard } from "../flashcard-input-card"
-import { ChangeEvent, useEffect, useState } from "react"
-import { usePost } from "@/hooks/use-request"
-import { toast } from "sonner"
-import Joi from "joi"
-import { joiResolver } from "@hookform/resolvers/joi"
-
 import {
     Dialog,
     DialogContent,
@@ -28,59 +13,32 @@ import {
     CardContent,
     CardDescription,
 } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "../ui/button"
+import { CirclePlus, Plus, Pickaxe } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile"
+import { DeckProps } from "../deck";
+import { SubmitHandler, useFieldArray, useForm } from "react-hook-form"
+import { Textarea } from "../ui/textarea"
+import { FlashcardInputCard } from "../flashcard-input-card"
+import { ChangeEvent, useEffect, useState } from "react"
+import { usePost } from "@/hooks/use-request"
+import { toast } from "sonner"
+import { joiResolver } from "@hookform/resolvers/joi"
+import { API_BASE_URL } from "@/constants";
+import { DeckFlashcardsSchema } from "@/schema/deck-flashcards-schema"
+import { DeckFlashcardsFormData } from "@/form-types/DeckFlashcardsFormData"
 
 export type AddDeckDialogProps = {
     variant: 'simple-button' | 'deck-button',
     onDeckAdded: (newlyAddedDeck: DeckProps) => void;
 }
 
-// Define schemas
-export const FlashcardsSchema = Joi.object({
-    front: Joi.string().min(1).max(400).required().messages({
-        "string.empty": "question is required",
-        "string.min": "question must be at least 1 character",
-        "string.max": "question cannot exceed 400 characters",
-    }),
-    back: Joi.string().min(1).max(400).required().messages({
-        "string.empty": "answer is required",
-        "string.min": "answer must be at least 1 character",
-        "string.max": "answer cannot exceed 400 characters",
-    }),
-});
-
-export const DeckFlashcardsSchema = Joi.object({
-    title: Joi.string().min(3).max(30).required().messages({
-        "string.empty": "title is required",
-        "string.min": "title must be at least 3 characters",
-        "string.max": "title cannot exceed 30 characters",
-    }),
-    description: Joi.string().min(3).max(250).required().messages({
-        "string.empty": "description is required",
-        "string.min": "description must be at least 3 characters",
-        "string.max": "description cannot exceed 250 characters",
-    }),
-    createdAt: Joi.string().isoDate().required().messages({
-        "string.isoDate": "invalid date format",
-    }),
-    flashcards: Joi.array().items(FlashcardsSchema).min(1).required().messages({
-        "array.min": "at least one flashcard is required",
-    }),
-});
-
-export type DeckFlashcardsFormData = {
-    title: string,
-    description: string,
-    createdAt: string,
-    flashcards: {
-        front: string,
-        back: string
-    }[]
-}
-
 export function AddDeckDialog({variant="deck-button", onDeckAdded} : AddDeckDialogProps){
     const isMobile = useIsMobile();
     const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
-    const {status, data, loading, executePostRequest , clearResponseState } = usePost('http://localhost:3001/api/decks');
+    const {status, data, loading, executePostRequest , clearResponseState } = usePost(`${API_BASE_URL}/api/decks`);
     const {register, unregister, control, getValues, handleSubmit, formState: {errors, isSubmitting}, reset, setError, clearErrors } = useForm<DeckFlashcardsFormData>({
         resolver: joiResolver(DeckFlashcardsSchema),
         defaultValues: {
