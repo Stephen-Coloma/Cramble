@@ -9,11 +9,11 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import { usePost } from "@/hooks/use-request"
-// import { useUserStore } from "@/store/userStore"
 import { Handshake, LogOut, LogOutIcon, X } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
+import { API_BASE_URL } from "@/constants"
 
 export type DeleteDeckDialogProps = {
     deckId: number, 
@@ -23,8 +23,7 @@ export type DeleteDeckDialogProps = {
 
 export default function LogoutDialog(){
     const router = useRouter();
-    // const userStore = useUserStore;
-    const {status, statusText, error, loading, executePostRequest, clearResponseState} = usePost(`http://localhost:3001/auth/logout`);
+    const {status, statusText, error, loading, executePostRequest, clearResponseState} = usePost(`${API_BASE_URL}/auth/logout`);
     
     useEffect(()=>{
         if(status === 200){
@@ -37,7 +36,6 @@ export default function LogoutDialog(){
             })
             clearResponseState();
             setIsDialogOpen(false);
-            // userStore.persist.clearStorage()// clear the local storage
             router.replace('/')
         }
     }, [loading])

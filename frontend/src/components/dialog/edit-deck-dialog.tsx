@@ -10,36 +10,16 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { usePost, usePut } from "@/hooks/use-request"
-import { Pencil, X, Trash2, FolderCheck, FileCheck, Check } from "lucide-react"
+import { usePut } from "@/hooks/use-request"
+import { Pencil, X, Check } from "lucide-react"
 import { useState, useEffect, ChangeEvent } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { toast } from "sonner"
-import Joi from "joi"
 import { joiResolver } from "@hookform/resolvers/joi"
 import { Textarea } from "../ui/textarea"
-
-export const DeckSchema = Joi.object({
-    title: Joi.string().min(3).max(30).required().messages({
-        "string.empty": "title is required",
-        "string.min": "title must be at least 3 characters",
-        "string.max": "title cannot exceed 30 characters",
-    }),
-    description: Joi.string().min(3).max(250).required().messages({
-        "string.empty": "description is required",
-        "string.min": "description must be at least 3 characters",
-        "string.max": "description cannot exceed 250 characters",
-    }),
-    editedAt: Joi.string().isoDate().required().messages({
-        "string.isoDate": "invalid date format",
-    })
-})
-
-export type DeckFormData = {
-    title: string,
-    description: string,
-    editedAt: string
-}
+import { API_BASE_URL } from "@/constants";
+import { DeckSchema } from "@/schema/deck-shema"
+import { DeckFormData } from "@/form-types/DeckFormData"
 
 export type EditDeckDialogProps = {
     deckId: number,
@@ -58,9 +38,9 @@ export default function EditDeckDialog({
 }: EditDeckDialogProps){
     const [isDialogOpen, setIsDialogOpen]= useState<boolean>(false);
 
-    const {status, statusText, error, loading, executePutRequest, clearResponseState} = usePut(`http://localhost:3001/api/decks/${deckId}`);
+    const {status, loading, executePutRequest, clearResponseState} = usePut(`${API_BASE_URL}/api/decks/${deckId}`);
 
-    const {register, unregister, handleSubmit, getValues, formState: {errors, isSubmitting}, setError, clearErrors} = useForm<DeckFormData>({
+    const {register, handleSubmit, getValues, formState: {errors, isSubmitting}, setError, clearErrors} = useForm<DeckFormData>({
         resolver: joiResolver(DeckSchema),
         defaultValues: {
             title: title,
