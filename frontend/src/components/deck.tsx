@@ -1,6 +1,6 @@
 import { DeckWithStatsDTO } from "@/dtos/deck/DeckWithStats.dto";
 import { Bar, BarChart, XAxis, YAxis } from "recharts";
-import { Swords, Info, Wrench } from "lucide-react";
+import { Swords, Info, Wrench, Pencil, HelpCircle, BookOpen, BookOpenCheck, ClipboardList, FileQuestion, ListCheck } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
 import DeleteDeckDialog from "./dialog/delete-deck-dialog";
@@ -107,6 +107,14 @@ export function Deck({
 
   const [isPopOverOpen, setIsPopOverOpen] = useState<boolean>(false);
 
+  const handleStartReview = (deckId: number) => {
+    console.log('clicked: ', deckId);
+  }
+  
+  const handleStartQuiz = (deckId: number) => {
+    console.log('clicked: ', deckId);
+  }
+
   return (
     <Card className="w-100 border-2 hover:border-primary shadow transition-colors duration-200">
       <CardHeader>
@@ -164,8 +172,8 @@ export function Deck({
       </CardContent>
 
       <CardFooter className="flex justify-end">
-        {/* edit and play buttons */}
         <div>
+        {/* edit and delete buttons */}
           <Popover open={isPopOverOpen} onOpenChange={setIsPopOverOpen}>
             <PopoverTrigger className="h-9 px-4 py-2 bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 rounded-r-none inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0">
               <Wrench />
@@ -186,10 +194,34 @@ export function Deck({
               />
             </PopoverContent>
           </Popover>
-          <Button className="rounded-l-none">
-              <Swords/>
-              Play
-          </Button>
+          {/* play and quiz button*/}
+          <Popover>
+            <PopoverTrigger asChild className="">
+              <Button className="rounded-l-none">
+                  <Swords/>
+                  Play
+              </Button>
+            </PopoverTrigger>
+
+            <PopoverContent className="w-fit flex flex-col p-2">
+              <Button 
+                variant={'ghost'} 
+                className="justify-start px-2 text-muted-foreground"
+                onClick={()=> handleStartReview(deckId)}
+              >
+                <BookOpenCheck/>
+                Review flashcards
+              </Button>
+              <Button 
+                variant={'ghost'} 
+                className="justify-start px-2 text-muted-foreground"
+                onClick={()=> handleStartQuiz(deckId)}
+              >
+                <ClipboardList />
+                Start mockup quiz
+              </Button>
+            </PopoverContent>
+          </Popover>
         </div>
       </CardFooter>
     </Card>
