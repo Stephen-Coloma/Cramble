@@ -1,20 +1,11 @@
-import {PageTitle, PageTitleProps} from "@/components/page-title"
+import { PageHeader } from "@/components/page-header"
 import ProfileSettings from "@/components/profile-settings"
-import { UserCog } from 'lucide-react'
 
 
-export default function MyDecks() {
-  const pageDetails: PageTitleProps = {
-    title: 'Profile Settings',
-    desc: 'Update your account settings, change your password, and manage personal preferences here',
-    iconColor: '#303030',
-    iconBg: 'bg-gray-200',
-    Icon: UserCog
-  }
-
+export default function Settings() {
   return (
     <div className=" w-full">
-      <PageTitle {...pageDetails}/>
+      <PageHeader route='/dashboard/settings'/>
       <ProfileSettings></ProfileSettings>
       <></>
     </div>
