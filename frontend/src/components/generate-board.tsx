@@ -28,9 +28,11 @@ import { Progress } from "@/components/ui/progress";
 import { generateFlashcardsSchema } from "@/schema/generate-flashcards-schema";
 import { GenerateFlashcardsFormData } from "@/form-types/GenerateFlashcardsFormData";
 import { API_BASE_URL } from "@/constants"
-export default function GenerateBoard() {
 
-  const [remaining, setRemaining] = useState<number>(1500);
+const minCharCount = 1500;
+
+export default function GenerateBoard() {
+  const [remaining, setRemaining] = useState<number>(minCharCount);
   const [charCount, setCharCount] = useState<number>(0);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
@@ -75,12 +77,12 @@ export default function GenerateBoard() {
   };
 
   // Calculate progress percentage for the character count
-  const progressPercentage = Math.min((charCount / 1500) * 100, 100);
+  const progressPercentage = Math.min((charCount / minCharCount) * 100, 100);
 
   return (
     <>
       <div className="flex flex-col justify-start md:justify-center md:h-1/2 lg:h-3/4 max-w-3xl mx-auto w-full">
-        <Card className="shadow-lg border-t-4 border-t-primary">
+        <Card className="shadow-lg">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-xl md:text-2xl font-bold">
               <Bot className="text-primary" />
@@ -110,7 +112,7 @@ export default function GenerateBoard() {
                       target.style.height = `${target.scrollHeight}px`;
                       const length = e.target.value.length;
                       setCharCount(length);
-                      setRemaining(1500 - length);
+                      setRemaining(minCharCount - length);
                     }}
                   />
                   {isSubmitting && (
@@ -130,18 +132,18 @@ export default function GenerateBoard() {
                     <Label
                       className={`text-xs ${errors.text ? "text-destructive" : "text-muted-foreground"}`}
                     >
-                      {charCount >= 1500
+                      {charCount >= minCharCount
                         ? "Minimum character requirement met"
                         : `${remaining} more characters needed`}
                     </Label>
                     <span className="text-xs text-muted-foreground">
-                      {charCount}/1500
+                      {charCount}/minCharCount
                     </span>
                   </div>
                   <Progress
                     value={progressPercentage}
                     className="h-1"
-                    color={charCount >= 1500 ? "bg-green-500" : "bg-primary"}
+                    color={charCount >= minCharCount ? "bg-green-500" : "bg-primary"}
                   />
                 </div>
               </div>
