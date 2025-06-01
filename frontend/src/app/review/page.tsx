@@ -32,7 +32,7 @@ import {
 import { Flashcard } from "@/dtos/flashcard/Flashcard.dto"
 import { MASTERY_LEVEL } from "@/dtos/flashcard/Flashcard.dto"
 import { ModeToggle } from "@/components/mode-toggle"
-import ReviewCompleteDialog from "@/components/dialog/review-complete-dialog"
+import ReviewCompleteDialog, { getReviewTally } from "@/components/dialog/review-complete-dialog"
 
 
 export default function Review() {
@@ -51,90 +51,6 @@ export default function Review() {
       deckId: 3,
       front: "What team does Kimi Antonelli drive for?",
       back: "Mercedes",
-      mastery: "unrated",
-    },
-    {
-      flashcardId: 23,
-      deckId: 3,
-      front: "Until what year has Formula 1 agreed to race in Miami?",
-      back: "2041",
-      mastery: "unrated",
-    },
-    {
-      flashcardId: 24,
-      deckId: 3,
-      front: "Who offered advice to Max Verstappen on fatherhood?",
-      back: "Christian Horner",
-      mastery: "unrated",
-    },
-    {
-      flashcardId: 25,
-      deckId: 3,
-      front: "What was Lando Norris's position in the Driver Standings after the Miami GP?",
-      back: "2nd",
-      mastery: "unrated",
-    },
-    {
-      flashcardId: 26,
-      deckId: 3,
-      front: "What was the main topic of the 'F1 Explains' podcast mentioned?",
-      back: "The making of the Miami Grand Prix",
-      mastery: "unrated",
-    },
-    {
-      flashcardId: 27,
-      deckId: 3,
-      front: "What feature highlighted the tragic story of a racer with the nickname 'Captain Nice'?",
-      back: "The story of Mark Donohue",
-      mastery: "unrated",
-    },
-    {
-      flashcardId: 28,
-      deckId: 3,
-      front: "What did the Miami Sprint Qualifying highlights video show?",
-      back: "Antonelli's historic maiden pole",
-      mastery: "unrated",
-    },
-    {
-      flashcardId: 29,
-      deckId: 3,
-      front: "What was the topic of the 'Tech Talk' segment?",
-      back: "Miami car updates",
-      mastery: "unrated",
-    },
-    {
-      flashcardId: 30,
-      deckId: 3,
-      front: "What did Oscar Piastri say about his pole position attempt in Miami?",
-      back: "He revealed where it 'went away' from him.",
-      mastery: "unrated",
-    },
-    {
-      flashcardId: 31,
-      deckId: 3,
-      front: "What was the topic of the 'Tech Talk' segment?",
-      back: "Miami car updates",
-      mastery: "unrated",
-    },
-    {
-      flashcardId: 32,
-      deckId: 3,
-      front: "What did Oscar Piastri say about his pole position attempt in Miami?",
-      back: "He revealed where it 'went away' from him.",
-      mastery: "unrated",
-    },
-    {
-      flashcardId: 33,
-      deckId: 3,
-      front: "What was the topic of the 'Tech Talk' segment?",
-      back: "Miami car updates",
-      mastery: "unrated",
-    },
-    {
-      flashcardId: 34,
-      deckId: 3,
-      front: "What did Oscar Piastri say about his pole position attempt in Miami?",
-      back: "He revealed where it 'went away' from him.",
       mastery: "unrated",
     },
   ]
@@ -193,8 +109,8 @@ export default function Review() {
   const progressPercentage = ((currentIndex + 1) / flashcards.length) * 100
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      <div className="relative z-10 min-h-screen flex flex-col">
+    <div className="min-h-screen">
+      <div className="z-10 min-h-screen flex flex-col">
         {/* Header */}
         <div className="p-6 text-center">
           <div className="inline-flex items-center gap-3 mb-4">
