@@ -3,40 +3,24 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import {
-  ChevronLeft,
-  ChevronRight,
   RotateCcw,
   Shuffle,
-  Play,
-  Pause,
-  Home,
   Brain,
   Target,
-  Zap,
   CheckCircle2,
   AlertCircle,
-  Clock,
   Volume2,
   VolumeOff,
 } from "lucide-react"
 import { Flashcard } from "@/dtos/flashcard/Flashcard.dto"
 import { MASTERY_LEVEL } from "@/dtos/flashcard/Flashcard.dto"
 import { ModeToggle } from "@/components/mode-toggle"
-import ReviewCompleteDialog, { getReviewTally } from "@/components/dialog/review-complete-dialog"
+import ReviewCompleteDialog from "@/components/dialog/review-complete-dialog"
 
 
 export default function Review() {
-
   // Sample data
   const originalFlashcards: Flashcard[] = [
     {
@@ -55,7 +39,6 @@ export default function Review() {
     },
   ]
   const deckTitle = "Formula 1 Miami GP 2025 Quiz"
-  const masteryLevels: MASTERY_LEVEL[] = ["unsure", "familiar", "mastered"]
 
   const [flashcards, setFlashcards] = useState<Flashcard[]>(originalFlashcards)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -105,7 +88,6 @@ export default function Review() {
     }
   }
 
-  
   const progressPercentage = ((currentIndex + 1) / flashcards.length) * 100
 
   return (
@@ -113,8 +95,8 @@ export default function Review() {
       <div className="z-10 min-h-screen flex flex-col">
         {/* Header */}
         <div className="p-6 text-center">
-          <div className="inline-flex items-center gap-3 mb-4">
-            <div className="p-2 bg-white/10 backdrop-blur-sm rounded-xl">
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-4">
+            <div className="p-2 bg-gray-200 dark:bg-white/10 backdrop-blur-sm rounded-xl">
               <Brain className="w-6 h-6 text-secondary-foreground" />
             </div>
             <h1 className="text-2xl sm:text-3xl font-bold text-secondary-foreground">{deckTitle}</h1>
@@ -203,7 +185,7 @@ export default function Review() {
             </Card>
 
             {/* Mastery Rating */}
-            <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-muted">
+            <div className="rounded-2xl p-6 border bg-card">
               <div className="text-center mb-4">
                 <h3 className="text-lg font-semibold text-seconbdary-foreground mb-1">Rate Your Knowledge</h3>
                 <p className="text-sm text-muted-foreground">How well do you know this question?</p>
@@ -216,7 +198,7 @@ export default function Review() {
                   className={`h-16 rounded-xl transition-all duration-300 flex flex-col items-center justify-center gap-1 ${
                     selectedMasteryLevel === 'unsure'
                       ? `bg-gradient-to-br from-rose-400 to-red-500 text-secondary-foreground scale-105`
-                      : "bg-muted text-secondary-foreground hover:bg-primary/50 hover:scale-105"
+                      : "bg-muted text-secondary-foreground hover:bg-muted/50 hover:scale-105"
                   }`}
                   variant="outline"
                 >
@@ -230,7 +212,7 @@ export default function Review() {
                   className={`h-16 rounded-xl transition-all duration-300 flex flex-col items-center justify-center gap-1 ${
                     selectedMasteryLevel === 'familiar'
                       ? `bg-gradient-to-br from-amber-400 to-orange-500 text-secondary-foreground scale-105`
-                      : "bg-muted text-secondary-foreground hover:bg-primary/50 hover:scale-105"
+                      : "bg-muted text-secondary-foreground hover:bg-muted/50 hover:scale-105"
                   }`}
                   variant="outline"
                 >
@@ -244,7 +226,7 @@ export default function Review() {
                   className={`h-16 rounded-xl transition-all duration-300 flex flex-col items-center justify-center gap-1 ${
                     selectedMasteryLevel === 'mastered'
                       ? `bg-gradient-to-br from-emerald-400 to-green-500 text-secondary-foreground scale-105`
-                      : "bg-muted text-secondary-foreground hover:bg-primary/50 hover:scale-105"
+                      : "bg-muted text-secondary-foreground hover:bg-muted/50 hover:scale-105"
                   }`}
                   variant="outline"
                 >
