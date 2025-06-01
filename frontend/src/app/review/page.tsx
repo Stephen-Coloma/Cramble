@@ -148,10 +148,10 @@ export default function Review() {
   const [masteryRatings, setMasteryRatings] = useState<Record<number, MASTERY_LEVEL>>({}) // flasdhcardId to mastery level mapping for every session
   const [isShuffled, setIsShuffled] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [selectedMasteryLevel, setSelectedMasteryLevel] = useState<MASTERY_LEVEL>('unrated')
   const [showCompletionModal, setShowCompletionModal] = useState(false)
 
   const currentCard = flashcards[currentIndex]
-  const currentMastery = masteryRatings[currentCard?.flashcardId] || "unrated"
 
   // resets the cards to first card
   const shuffleCards = () => {
@@ -171,84 +171,43 @@ export default function Review() {
     setIsPlaying(!isPlaying)
   }
 
-  const handleMasterySelect = async(userMastertyRate: MASTERY_LEVEL) => {
+  const handleMasterySelect = async(userSelectedMasteryLevel: MASTERY_LEVEL) => {
     setMasteryRatings((prev) => ({
       ...prev,
-      [currentCard.flashcardId]: userMastertyRate,
+      [currentCard.flashcardId]: userSelectedMasteryLevel,
     }))
-    await new Promise((resolve) => setTimeout(resolve, 800)) // Simulate async operation
+    setSelectedMasteryLevel(userSelectedMasteryLevel);
+    await new Promise((resolve) => setTimeout(resolve, 800)) // delay before moving to next card
+
     // Move to next card after rating
     if (currentIndex < flashcards.length - 1) {
       setCurrentIndex(currentIndex + 1)
+      setSelectedMasteryLevel('unrated'); // reset the selected mastery level for another card
       setIsFlipped(false)
     } else {
-      handleDoneReviewing()
+      setShowCompletionModal(true)
     }
   }
 
-  const handleDoneReviewing = () => {
-    setShowCompletionModal(true)
-  }
-
-  const getStatistics = () => {
-    const stats = {
+  const getReviewTally = (reviewSessionRecord: Record<number, MASTERY_LEVEL>) => {
+    const tally = {
       mastered: 0,
       familiar: 0,
       unsure: 0,
       total: flashcards.length,
     }
 
-    Object.values(masteryRatings).forEach((rating) => {
-      if (rating === "mastered") stats.mastered++
-      else if (rating === "familiar") stats.familiar++
-      else if (rating === "unsure") stats.unsure++
+    Object.values(reviewSessionRecord).forEach((rating) => {
+      if (rating === "mastered") tally.mastered++
+      else if (rating === "familiar") tally.familiar++
+      else if (rating === "unsure") tally.unsure++
     })
 
-    return stats
+    return tally
   }
 
-  const stats = getStatistics()
+  const stats = getReviewTally(masteryLevels)
   const progressPercentage = ((currentIndex + 1) / flashcards.length) * 100
-
-  const getMasteryConfig = (level: MASTERY_LEVEL) => {
-    const isSelected = currentMastery === level
-    switch (level) {
-      case "mastered":
-        return {
-          icon: CheckCircle2,
-          label: "Mastered",
-          color: isSelected
-            ? "bg-emerald-500 text-white shadow-lg shadow-emerald-200"
-            : "bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-emerald-200",
-          gradient: "from-emerald-400 to-green-500",
-        }
-      case "familiar":
-        return {
-          icon: Target,
-          label: "Familiar",
-          color: isSelected
-            ? "bg-amber-500 text-white shadow-lg shadow-amber-200"
-            : "bg-amber-50 text-amber-700 hover:bg-amber-100 border-amber-200",
-          gradient: "from-amber-400 to-orange-500",
-        }
-      case "unsure":
-        return {
-          icon: AlertCircle,
-          label: "Unsure",
-          color: isSelected
-            ? "bg-rose-500 text-white shadow-lg shadow-rose-200"
-            : "bg-rose-50 text-rose-700 hover:bg-rose-100 border-rose-200",
-          gradient: "from-rose-400 to-red-500",
-        }
-      default:
-        return {
-          icon: Clock,
-          label: "Unrated",
-          color: "bg-gray-50 text-gray-600 border-gray-200",
-          gradient: "from-gray-400 to-gray-500",
-        }
-    }
-  }
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -352,27 +311,47 @@ export default function Review() {
               </div>
 
               <div className="grid grid-cols-3 gap-4">
-                {(masteryLevels).map((level) => {
-                  const config = getMasteryConfig(level)
-                  const Icon = config.icon
-                  const isSelected = currentMastery === level
+                {/* unsure */}
+                <Button
+                  onClick={() => handleMasterySelect('unsure')}
+                  className={`h-16 rounded-xl transition-all duration-300 flex flex-col items-center justify-center gap-1 ${
+                    selectedMasteryLevel === 'unsure'
+                      ? `bg-gradient-to-br from-rose-400 to-red-500 text-secondary-foreground scale-105`
+                      : "bg-muted text-secondary-foreground hover:bg-primary/50 hover:scale-105"
+                  }`}
+                  variant="outline"
+                >
+                  <AlertCircle className="w-5 h-5" />
+                  <span className="text-xs font-medium capitalize text-secondary-foreground">Unsure</span>
+                </Button>
 
-                  return (
-                    <Button
-                      key={level}
-                      onClick={() => handleMasterySelect(level)}
-                      className={`h-16 rounded-xl transition-all duration-300 flex flex-col items-center justify-center gap-1 ${
-                        isSelected
-                          ? `bg-gradient-to-br ${config.gradient} text-secondary-foreground scale-105`
-                          : "bg-muted text-secondary-foreground hover:bg-primary/50 hover:scale-105"
-                      }`}
-                      variant="outline"
-                    >
-                      <Icon className="w-5 h-5" />
-                      <span className="text-xs font-medium capitalize text-secondary-foreground">{level}</span>
-                    </Button>
-                  )
-                })}
+                {/* familiar */}
+                <Button
+                  onClick={() => handleMasterySelect('familiar')}
+                  className={`h-16 rounded-xl transition-all duration-300 flex flex-col items-center justify-center gap-1 ${
+                    selectedMasteryLevel === 'familiar'
+                      ? `bg-gradient-to-br from-amber-400 to-orange-500 text-secondary-foreground scale-105`
+                      : "bg-muted text-secondary-foreground hover:bg-primary/50 hover:scale-105"
+                  }`}
+                  variant="outline"
+                >
+                  <Target className="w-5 h-5" />
+                  <span className="text-xs font-medium capitalize text-secondary-foreground">Familiar</span>
+                </Button>
+
+                {/* mastered */}
+                <Button
+                  onClick={() => handleMasterySelect('mastered')}
+                  className={`h-16 rounded-xl transition-all duration-300 flex flex-col items-center justify-center gap-1 ${
+                    selectedMasteryLevel === 'mastered'
+                      ? `bg-gradient-to-br from-emerald-400 to-green-500 text-secondary-foreground scale-105`
+                      : "bg-muted text-secondary-foreground hover:bg-primary/50 hover:scale-105"
+                  }`}
+                  variant="outline"
+                >
+                  <CheckCircle2 className="w-5 h-5" />
+                  <span className="text-xs font-medium capitalize text-secondary-foreground">Mastered</span>
+                </Button>
               </div>
             </div>
           </div>
