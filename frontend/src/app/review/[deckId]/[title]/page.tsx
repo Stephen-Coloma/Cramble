@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -18,29 +18,48 @@ import { Flashcard } from "@/dtos/flashcard/Flashcard.dto"
 import { MASTERY_LEVEL } from "@/dtos/flashcard/Flashcard.dto"
 import { ModeToggle } from "@/components/mode-toggle"
 import ReviewCompleteDialog from "@/components/dialog/review-complete-dialog"
+import { useFetch } from "@/hooks/use-request"
+import { API_BASE_URL } from "@/constants"
+import { useParams } from "next/navigation"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
+import { AxiosError } from "axios"
 
+export type ReviewProps = {
+  deckId: number
+  deckTitle: string
+}
 
 export default function Review() {
-  // Sample data
-  const originalFlashcards: Flashcard[] = [
-    {
-      flashcardId: 21,
-      deckId: 3,
-      front: "Who won the 2025 Miami Sprint Qualifying?",
-      back: "Kimi Antonelli",
-      mastery: "mastered",
-    },
-    {
-      flashcardId: 22,
-      deckId: 3,
-      front: "What team does Kimi Antonelli drive for?",
-      back: "Mercedes",
-      mastery: "unrated",
-    },
-  ]
-  const deckTitle = "Formula 1 Miami GP 2025 Quiz"
-
-  const [flashcards, setFlashcards] = useState<Flashcard[]>(originalFlashcards)
+  const params = useParams();
+  const deckId = Number(params.deckId);
+  const deckTitle = decodeURIComponent(params.title as string);
+  const router = useRouter();
+  const {status, statusText, data, error, loading} = useFetch<Flashcard[]>(`${API_BASE_URL}/api/flashcards/${deckId}`);
+  
+  useEffect(() => {
+    if (status === 200 && Array.isArray(data)) {
+      setFlashcards(data)
+    }
+    
+    if(error) {
+      const errorStatus = (error as AxiosError).response?.status;
+      // the cards does not belong to the user
+      if(errorStatus === 401) {
+        toast.error('Unauthorized', {
+          description: `You do not have access to this deck.`
+        })
+      }else if(errorStatus === 500) {
+        toast.error('Cannot Process', {
+          description: `An error occured. Please try again later.`
+        })
+      }
+      router.replace('/dashboard/mydecks');
+    }
+    
+  }, [loading])
+  
+  const [flashcards, setFlashcards] = useState<Flashcard[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
   const [submittedAnswers, setSubmittedAnswers] = useState<Record<number, MASTERY_LEVEL>>({}) // flasdhcardId to mastery level mapping for every session
@@ -58,7 +77,7 @@ export default function Review() {
       setFlashcards(shuffled)
       setIsShuffled(true)
     } else {
-      setFlashcards(originalFlashcards)
+      setFlashcards(data as Flashcard[]) // reset to original order
       setIsShuffled(false)
     }
     setCurrentIndex(0)

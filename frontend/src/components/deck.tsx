@@ -107,12 +107,9 @@ export function Deck({
 
   const [isPopOverOpen, setIsPopOverOpen] = useState<boolean>(false);
 
-  const handleStartReview = (deckId: number) => {
-    console.log('clicked: ', deckId);
-  }
-  
-  const handleStartQuiz = (deckId: number) => {
-    console.log('clicked: ', deckId);
+  const handlePlayClick = () => {
+    // Navigate to the review page with the deckId
+    window.location.href = `/review/${deckId}/${title}`;
   }
 
   return (
@@ -195,33 +192,12 @@ export function Deck({
             </PopoverContent>
           </Popover>
           {/* play and quiz button*/}
-          <Popover>
-            <PopoverTrigger asChild className="">
-              <Button className="rounded-l-none">
-                  <Swords/>
-                  Play
-              </Button>
-            </PopoverTrigger>
-
-            <PopoverContent className="w-fit flex flex-col p-2">
-              <Button 
-                variant={'ghost'} 
-                className="justify-start px-2 text-muted-foreground"
-                onClick={()=> handleStartReview(deckId)}
-              >
-                <BookOpenCheck/>
-                Review flashcards
-              </Button>
-              <Button 
-                variant={'ghost'} 
-                className="justify-start px-2 text-muted-foreground"
-                onClick={()=> handleStartQuiz(deckId)}
-              >
-                <ClipboardList />
-                Start mockup quiz
-              </Button>
-            </PopoverContent>
-          </Popover>
+          <Button className="rounded-l-none"
+            onClick={handlePlayClick}
+          >
+            <Swords/>
+            Play
+          </Button>
         </div>
       </CardFooter>
     </Card>
