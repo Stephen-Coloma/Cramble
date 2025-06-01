@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
 import ReviewSkeleton from "@/components/review-skeleton";
+import FlashcardFlip from "@/components/flashcard-flip";
 
 export type ReviewProps = {
   deckId: number;
@@ -61,16 +62,19 @@ export default function Review() {
     }
   }, [loading]);
 
-  const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
+  const [flashcards, setFlashcards] = useState<Flashcard[]>([{
+    flashcardId: 0,
+    front: "Loading...",
+    back: "Please wait",
+    deckId: deckId,
+    mastery: "unrated",
+  }]); // initially empty, will be populated after fetch
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [submittedAnswers, setSubmittedAnswers] = useState<
-    Record<number, MASTERY_LEVEL>
-  >({}); // flasdhcardId to mastery level mapping for every session
+  const [submittedAnswers, setSubmittedAnswers] = useState<Record<number, MASTERY_LEVEL>>({}); // flasdhcardId to mastery level mapping for every session
   const [isShuffled, setIsShuffled] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [selectedMasteryLevel, setSelectedMasteryLevel] =
-    useState<MASTERY_LEVEL>("unrated");
+  const [selectedMasteryLevel, setSelectedMasteryLevel] = useState<MASTERY_LEVEL>("unrated");
   const [showCompletionModal, setShowCompletionModal] = useState(false);
 
   const currentCard = flashcards[currentIndex];
@@ -116,7 +120,7 @@ export default function Review() {
 
   const progressPercentage = ((currentIndex + 1) / flashcards.length) * 100;
 
-  return !loading && !error ?  (
+  return !loading && !error && data ?  (
     <div className="min-h-screen">
       <div className="z-10 min-h-screen flex flex-col">
         {/* Header */}
@@ -190,34 +194,12 @@ export default function Review() {
             </div>
 
             {/* Flashcard */}
-            <Card
-              className="w-full h-96 sm:h-[28rem] cursor-pointer transition-all duration-500 hover:scale-[1.02] bg-muted border-0"
-              onClick={() => setIsFlipped(!isFlipped)}
-            >
-              <CardContent className="h-full flex items-center justify-center p-8 relative overflow-hidden">
-                {/* Card Glow Effect */}
-                <div className="text-center relative z-10 w-full">
-                  {/* Card Type Indicator */}
-                  <div className="inline-flex items-center gap-2 mb-8 px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full">
-                    <div
-                      className={`w-2 h-2 rounded-full ${isFlipped ? "bg-green-500" : "bg-blue-500"} animate-pulse`}
-                    />
-                    <span className="text-sm font-medium text-muted-foreground dark:text-muted">
-                      {isFlipped ? "Answer" : "Question"}
-                    </span>
-                    <RotateCcw className="w-4 h-4 text-muted-foreground dark:text-muted" />
-                  </div>
-
-                  <p className="text-xl sm:text-2xl font-semibold leading-relaxed text-secondary-foreground max-w-3xl mx-auto">
-                    {isFlipped ? currentCard?.back : currentCard?.front}
-                  </p>
-
-                  <div className="mt-8 text-sm text-muted-foreground">
-                    Tap anywhere to flip
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            <FlashcardFlip
+              isFlipped={isFlipped}
+              onFlip={() => setIsFlipped(!isFlipped)}
+              frontContent={currentCard.front}
+              backContent={currentCard.back}
+            />
 
             {/* Mastery Rating */}
             <div className="rounded-2xl p-6 border bg-card">
@@ -288,7 +270,7 @@ export default function Review() {
           showCompletionModal={showCompletionModal}
           setShowCompletionModal={setShowCompletionModal}
           submittedAnswers={submittedAnswers}
-        ></ReviewCompleteDialog>
+        />
       </div>
     </div>
   ) : (

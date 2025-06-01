@@ -10,6 +10,8 @@ import { CheckCircle2, Target, AlertCircle, Home } from "lucide-react";
 import {useRouter} from "next/navigation";
 import { Button } from "../ui/button";
 import { MASTERY_LEVEL } from "@/dtos/flashcard/Flashcard.dto";
+import confetti from "canvas-confetti";
+import { useEffect } from "react";
 
 export type ReviewCompleteDialogProps = {
   showCompletionModal: boolean;
@@ -25,6 +27,16 @@ export default function ReviewCompleteDialog({
 
   const stats = getReviewTally(submittedAnswers)
   const router = useRouter();
+
+  useEffect(() => {
+    if (showCompletionModal) {
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
+    }
+  }, [showCompletionModal]);
 
   return (
     <Dialog open={showCompletionModal} onOpenChange={setShowCompletionModal}>

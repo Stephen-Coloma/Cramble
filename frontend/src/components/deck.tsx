@@ -192,7 +192,7 @@ export function Deck({
             </PopoverContent>
           </Popover>
           {/* play and quiz button*/}
-          <Button className="rounded-l-none"
+          <Button className="rounded-l-none text-secondary dark:text-secondary-foreground hover:bg-primary/80 hover:text-secondary"
             onClick={handlePlayClick}
           >
             <Swords/>
