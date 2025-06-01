@@ -29,14 +29,13 @@ import {
   Volume2,
   VolumeOff,
 } from "lucide-react"
-import { useRouter } from "next/navigation"
 import { Flashcard } from "@/dtos/flashcard/Flashcard.dto"
 import { MASTERY_LEVEL } from "@/dtos/flashcard/Flashcard.dto"
 import { ModeToggle } from "@/components/mode-toggle"
+import ReviewCompleteDialog from "@/components/dialog/review-complete-dialog"
 
 
 export default function Review() {
-  const router = useRouter()
 
   // Sample data
   const originalFlashcards: Flashcard[] = [
@@ -145,7 +144,7 @@ export default function Review() {
   const [flashcards, setFlashcards] = useState<Flashcard[]>(originalFlashcards)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
-  const [masteryRatings, setMasteryRatings] = useState<Record<number, MASTERY_LEVEL>>({}) // flasdhcardId to mastery level mapping for every session
+  const [submittedAnswers, setSubmittedAnswers] = useState<Record<number, MASTERY_LEVEL>>({}) // flasdhcardId to mastery level mapping for every session
   const [isShuffled, setIsShuffled] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
   const [selectedMasteryLevel, setSelectedMasteryLevel] = useState<MASTERY_LEVEL>('unrated')
@@ -172,11 +171,12 @@ export default function Review() {
   }
 
   const handleMasterySelect = async(userSelectedMasteryLevel: MASTERY_LEVEL) => {
-    setMasteryRatings((prev) => ({
+    setSubmittedAnswers((prev) => ({
       ...prev,
       [currentCard.flashcardId]: userSelectedMasteryLevel,
     }))
     setSelectedMasteryLevel(userSelectedMasteryLevel);
+    
     await new Promise((resolve) => setTimeout(resolve, 800)) // delay before moving to next card
 
     // Move to next card after rating
@@ -189,24 +189,7 @@ export default function Review() {
     }
   }
 
-  const getReviewTally = (reviewSessionRecord: Record<number, MASTERY_LEVEL>) => {
-    const tally = {
-      mastered: 0,
-      familiar: 0,
-      unsure: 0,
-      total: flashcards.length,
-    }
-
-    Object.values(reviewSessionRecord).forEach((rating) => {
-      if (rating === "mastered") tally.mastered++
-      else if (rating === "familiar") tally.familiar++
-      else if (rating === "unsure") tally.unsure++
-    })
-
-    return tally
-  }
-
-  const stats = getReviewTally(masteryLevels)
+  
   const progressPercentage = ((currentIndex + 1) / flashcards.length) * 100
 
   return (
@@ -358,52 +341,7 @@ export default function Review() {
         </div>
 
         {/* Completion Modal */}
-        <Dialog open={showCompletionModal} onOpenChange={setShowCompletionModal}>
-          <DialogContent className="sm:max-w-lg border-0 shadow-2xl bg-white/95 backdrop-blur-xl">
-            <DialogHeader>
-              <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                🎉 Amazing Work!
-              </DialogTitle>
-              <DialogDescription className="text-center text-gray-600">
-                You've completed your study session
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-6 py-6">
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="bg-gradient-to-br from-emerald-50 to-green-100 p-6 rounded-2xl border border-emerald-200">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-emerald-600">{stats.mastered}</div>
-                  <div className="text-sm text-emerald-700 font-medium">Mastered</div>
-                </div>
-                <div className="bg-gradient-to-br from-amber-50 to-yellow-100 p-6 rounded-2xl border border-amber-200">
-                  <Target className="w-8 h-8 text-amber-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-amber-600">{stats.familiar}</div>
-                  <div className="text-sm text-amber-700 font-medium">Familiar</div>
-                </div>
-                <div className="bg-gradient-to-br from-rose-50 to-red-100 p-6 rounded-2xl border border-rose-200">
-                  <AlertCircle className="w-8 h-8 text-rose-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-rose-600">{stats.unsure}</div>
-                  <div className="text-sm text-rose-700 font-medium">Need Review</div>
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="inline-block bg-gray-50 border border-gray-200 rounded-xl px-6 py-3">
-                  <span className="text-sm text-gray-600">Total cards reviewed: </span>
-                  <span className="font-bold text-gray-800">{stats.total}</span>
-                </div>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                onClick={() => router.push("/dashboard")}
-                className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                <Home className="w-5 h-5 mr-2" />
-                Return to Homepage
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <ReviewCompleteDialog showCompletionModal={showCompletionModal} setShowCompletionModal={setShowCompletionModal} submittedAnswers={submittedAnswers}></ReviewCompleteDialog>
       </div>
     </div>
   )
