@@ -18,7 +18,7 @@ import { Flashcard } from "@/dtos/flashcard/Flashcard.dto";
 import { MASTERY_LEVEL } from "@/dtos/flashcard/Flashcard.dto";
 import { ModeToggle } from "@/components/mode-toggle";
 import ReviewCompleteDialog from "@/components/dialog/review-complete-dialog";
-import { useFetch } from "@/hooks/use-request";
+import { useFetch, usePut } from "@/hooks/use-request";
 import { API_BASE_URL } from "@/constants";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -40,6 +40,7 @@ export default function Review() {
   const { status, statusText, data, error, loading } = useFetch<Flashcard[]>(
     `${API_BASE_URL}/api/flashcards/${deckId}`
   );
+  const rateUpdateRequest = usePut(`${API_BASE_URL}/api/flashcards/${deckId}/rate`)
 
   useEffect(() => {
     if (status === 200 && Array.isArray(data)) {
@@ -62,16 +63,10 @@ export default function Review() {
     }
   }, [loading]);
 
-  const [flashcards, setFlashcards] = useState<Flashcard[]>([{
-    flashcardId: 0,
-    front: "Loading...",
-    back: "Please wait",
-    deckId: deckId,
-    mastery: "unrated",
-  }]); // initially empty, will be populated after fetch
+  const [flashcards, setFlashcards] = useState<Flashcard[]>([]); // initially empty, will be populated after fetch
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [submittedAnswers, setSubmittedAnswers] = useState<Record<number, MASTERY_LEVEL>>({}); // flasdhcardId to mastery level mapping for every session
+  const [userAnswers, setUserAnswers] = useState<Record<number, MASTERY_LEVEL>>({}); // flasdhcardId to mastery level mapping for every session
   const [isShuffled, setIsShuffled] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedMasteryLevel, setSelectedMasteryLevel] = useState<MASTERY_LEVEL>("unrated");
@@ -97,16 +92,14 @@ export default function Review() {
     setIsPlaying(!isPlaying);
   };
 
-  const handleMasterySelect = async (
-    userSelectedMasteryLevel: MASTERY_LEVEL
-  ) => {
-    setSubmittedAnswers((prev) => ({
+  const handleMasterySelect = async (userSelectedMasteryLevel: MASTERY_LEVEL) => {
+    setSelectedMasteryLevel(userSelectedMasteryLevel);
+    await new Promise((resolve) => setTimeout(resolve, 500)); // delay before moving to next card    
+
+    setUserAnswers((prev) => ({
       ...prev,
       [currentCard.flashcardId]: userSelectedMasteryLevel,
     }));
-    setSelectedMasteryLevel(userSelectedMasteryLevel);
-
-    await new Promise((resolve) => setTimeout(resolve, 800)); // delay before moving to next card
 
     // Move to next card after rating
     if (currentIndex < flashcards.length - 1) {
@@ -118,9 +111,24 @@ export default function Review() {
     }
   };
 
-  const progressPercentage = ((currentIndex + 1) / flashcards.length) * 100;
+  //useEffect too save the mastery ratings to the database
+  useEffect(() => {
+    if (showCompletionModal) { // the first if is to prevent the execution of this code when the component is first rendered
+      const formattedAnswers = Object.entries(userAnswers)
+      .map(([flashcardId, mastery])=> {
+        return {
+          flashcardId: Number(flashcardId),
+          mastery: mastery as MASTERY_LEVEL,
+        }
+      })
+      rateUpdateRequest.executePutRequest(formattedAnswers);
+    }
+  }, [showCompletionModal])
 
-  return !loading && !error && data ?  (
+  const progressPercentage = ((Object.keys(userAnswers).length) / flashcards.length) * 100;
+
+  // todo: conditional rendering for error state
+  return flashcards.length > 0?  (
     <div className="min-h-screen">
       <div className="z-10 min-h-screen flex flex-col">
         {/* Header */}
@@ -139,7 +147,7 @@ export default function Review() {
             <div className="flex items-center justify-between text-sm text-muted-foreground mb-2">
               <span>Progress</span>
               <span>
-                {currentIndex + 1} of {flashcards.length}
+                {Object.keys(userAnswers).length} of {flashcards.length}
               </span>
             </div>
             <div className="w-full bg-muted rounded-full h-2 overflow-hidden backdrop-blur-sm">
@@ -269,7 +277,7 @@ export default function Review() {
         <ReviewCompleteDialog
           showCompletionModal={showCompletionModal}
           setShowCompletionModal={setShowCompletionModal}
-          submittedAnswers={submittedAnswers}
+          submittedAnswers={userAnswers}
         />
       </div>
     </div>
