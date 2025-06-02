@@ -35,6 +35,8 @@ export default function ReviewCompleteDialog({
         spread: 70,
         origin: { y: 0.6 },
       });
+      console.log(submittedAnswers);
+      
     }
   }, [showCompletionModal]);
 
