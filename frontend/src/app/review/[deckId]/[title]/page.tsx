@@ -129,7 +129,7 @@ export default function Review() {
 
   // todo: conditional rendering for error state
   return flashcards.length > 0?  (
-    <div className="min-h-screen">
+    <div className="bg-[url('/assets/cramble-background-25.svg')] bg-cover bg-center min-h-screen">
       <div className="z-10 min-h-screen flex flex-col">
         {/* Header */}
         <div className="p-6 text-center">
