@@ -17,7 +17,7 @@ const isOwnerOfDeck = async(req: Request, res: Response, next: NextFunction) =>{
         //retrieve userId from request object, retrieve deckId from req.params
         const userId = req.userId;
         
-        (result[0] && userId === result[0].userId) ? next() : res.sendStatus(401); 
+        (result[0] && (userId === result[0].userId)) ? next() : res.sendStatus(401); 
     }catch(error: unknown){
         sendErrorToClient(error, res)
     }

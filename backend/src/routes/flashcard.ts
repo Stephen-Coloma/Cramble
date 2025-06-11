@@ -5,6 +5,7 @@ import addFlashcardToDeckController from "../controller/flashcard/addFlashcardTo
 import isFlashCardDataValid from "../middleware/validation/isFlashCardDataValid";
 import updateFlashcardController from "../controller/flashcard/updateFlashcard";
 import deleteFlashcardController from "../controller/flashcard/deleteFlashcards";
+import updateFlashcardRateController from "../controller/flashcard/updateFlashcardRate";
 
 const flashcardRouter = Router();
 
@@ -150,6 +151,73 @@ flashcardRouter.get('/flashcards/:deckId', isOwnerOfDeck, getFlashcardsControlle
  */
 
 flashcardRouter.post('/flashcards/:deckId', isOwnerOfDeck, isFlashCardDataValid, addFlashcardToDeckController);
+
+/**
+ * @swagger
+ * /api/flashcards/{deckId}/rate:
+ *   put:
+ *     summary: Update the rating of flashcards in a specific deck
+ *     description: This is used when the user rates flashcards after reviewing them. The user must own the deck to perform this action.
+ *     tags:
+ *       - flashcards
+ *     parameters:
+ *       - in: path
+ *         name: deckId
+ *         required: true
+ *         description: ID of the deck containing the flashcards
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: array
+ *             items:
+ *               type: object
+ *               properties:
+ *                 flashcardId:
+ *                   type: integer
+ *                   description: The ID of the flashcard to update
+ *                   example: 21
+ *                 mastery:
+ *                   type: string
+ *                   description: The new mastery level for the flashcard
+ *                   example: mastered
+ *           example:
+ *             - flashcardId: 21
+ *               mastery: mastered
+ *             - flashcardId: 22
+ *               mastery: familiar
+ *             - flashcardId: 23
+ *               mastery: unsure
+ *     responses:
+ *       200:
+ *         description: Flashcards' rates updated successfully
+ *       401:
+ *         description: Unauthorized access or not the owner of the deck
+ *         content:
+ *           application/json:
+ *             examples:
+ *               unauthorized:
+ *                 summary: User is not authenticated
+ *                 value:
+ *                   message: "Access Denied - Invalid or Expired Tokens"
+ *               notOwner:
+ *                 summary: User does not own the deck
+ *                 value:
+ *                   message: "You are not authorized to update this flashcard."
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: "Internal Server Error"
+ *     security:
+ *       - cookieAuth: []
+ */
+
+flashcardRouter.put('/flashcards/:deckId/rate',isOwnerOfDeck, updateFlashcardRateController)
 
 /**
  * @swagger
