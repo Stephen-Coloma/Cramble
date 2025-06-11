@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   RotateCcw,
@@ -22,10 +21,10 @@ import { useFetch, usePut } from "@/hooks/use-request";
 import { API_BASE_URL } from "@/constants";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { AxiosError } from "axios";
 import ReviewSkeleton from "@/components/review-skeleton";
 import FlashcardFlip from "@/components/flashcard-flip";
+import ErrorLoadingCards from "@/components/error-loading-cards";
+import { AxiosError } from "axios";
 
 export type ReviewProps = {
   deckId: number;
@@ -45,21 +44,6 @@ export default function Review() {
   useEffect(() => {
     if (status === 200 && Array.isArray(data)) {
       setFlashcards(data);
-    }
-
-    if (error) {
-      const errorStatus = (error as AxiosError).response?.status;
-      // the cards does not belong to the user
-      if (errorStatus === 401) {
-        toast.error("Unauthorized", {
-          description: `You do not have access to this deck.`,
-        });
-      } else if (errorStatus === 500) {
-        toast.error("Cannot Process", {
-          description: `An error occured. Please try again later.`,
-        });
-      }
-      router.replace("/dashboard/mydecks");
     }
   }, [loading]);
 
@@ -127,7 +111,18 @@ export default function Review() {
 
   const progressPercentage = ((Object.keys(userAnswers).length) / flashcards.length) * 100;
 
-  // todo: conditional rendering for error state
+  if (error) {
+    const errorStatus = (error as AxiosError).response?.status;
+    let message;
+    // the cards does not belong to the user
+    if (errorStatus === 401) {
+      message = "You do not have access to this deck.";
+    } else if (errorStatus === 500) {
+      message = "An error occurred. Please try again later.";
+    }
+    return (<ErrorLoadingCards errorMessage={message} fallbackRoute="/dashboard/mydecks"/>)
+  }
+
   return flashcards.length > 0?  (
     <div className="bg-[url('/assets/cramble-background-25.svg')] bg-cover bg-center min-h-screen">
       <div className="z-10 min-h-screen flex flex-col">
