@@ -27,19 +27,9 @@ const navItems = [
       icon: LibraryBig,
     },
     {
-      name: "Explore Decks (Soon)",
-      url: "/dashboard/explore",
-      icon: Compass,
-    },
-    {
       name: "Generate with AI",
       url: "/dashboard/generate",
       icon: Sparkles,
-    },
-    {
-      name: "FAQs",
-      url: "/dashboard/faqs",
-      icon: CircleHelp,
     },
     {
       name: "Feedback",
